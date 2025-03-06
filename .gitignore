@@ -1,0 +1,10 @@
+# Gradle
+.gradle
+build
+
+# IntelliJ
+.idea
+
+# Misc
+*.sw?
+.DS_Store
