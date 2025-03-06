@@ -35,3 +35,14 @@ tasks.register<Exec>("npmBuild") {
 tasks.register("build") {
     dependsOn("npmBuild")
 }
+
+/*
+ * Task for running the Vite dev server.
+ * The code should ideally work regardless of if it's hosted from
+ * Vite's dev server or Spring Boot.
+ */
+tasks.register<Exec>("viteRun") {
+    dependsOn("npmInstall")
+
+    commandLine("npm", "run", "dev")
+}
