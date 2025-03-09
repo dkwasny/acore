@@ -48,9 +48,7 @@ public record DbcReader(Path dbcFolder) {
         }
 
         var stringMap = getStringMap(fileName, header);
-        var records = getRecords(recordType, fileName, header, stringMap);
-
-        return records;
+        return getRecords(recordType, fileName, header, stringMap);
     }
 
     private InputStream newBufferedStream(Path filename) throws IOException {
@@ -77,7 +75,11 @@ public record DbcReader(Path dbcFolder) {
     }
 
     private DbcHeader getHeader(InputStream inputStream) throws IOException {
-        inputStream.skip(MAGIC_OFFSET);
+        long skipped = inputStream.skip(MAGIC_OFFSET);
+        if (skipped != MAGIC_OFFSET) {
+            throw new RuntimeException("Incorrect amount of bytes skipped: " + skipped);
+        }
+
 
         long recordCount = readUint(inputStream);
         long fieldCount = readUint(inputStream);
@@ -106,7 +108,10 @@ public record DbcReader(Path dbcFolder) {
     }
 
     private <T> List<T> getRecords(Class<T> recordType, InputStream inputStream, DbcHeader header, Map<Long, String> stringMap) throws Exception {
-        inputStream.skip(HEADER_OFFSET);
+        long skipped = inputStream.skip(HEADER_OFFSET);
+        if (skipped != HEADER_OFFSET) {
+            throw new RuntimeException("Incorrect amount of bytes skipped: " + skipped);
+        }
 
         var retVal = new ArrayList<T>();
 
@@ -198,8 +203,7 @@ public record DbcReader(Path dbcFolder) {
             bytes[i] = inputStream.read();
         }
 
-        long value = bytes[0] << 0 | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
-        return value;
+        return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
     }
 
     private int readInt(InputStream inputStream) throws IOException {
@@ -208,8 +212,7 @@ public record DbcReader(Path dbcFolder) {
             bytes[i] = inputStream.read();
         }
 
-        int value = bytes[0] << 0 | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
-        return value;
+        return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
     }
 
     private float readFloat(InputStream inputStream) throws IOException {
@@ -218,9 +221,8 @@ public record DbcReader(Path dbcFolder) {
             bytes[i] = inputStream.read();
         }
 
-        var intBits = bytes[0] << 0 | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
-        var retVal = Float.intBitsToFloat(intBits);
-        return retVal;
+        var intBits = bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
+        return Float.intBitsToFloat(intBits);
     }
 
     private String readString(InputStream inputStream, Map<Long, String> stringMap) throws IOException {
