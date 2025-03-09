@@ -1,8 +1,8 @@
-package net.kwas.acore;
+package net.kwas.acore.dbc.model;
 
 import java.util.EnumMap;
 
-public record DbcStringRef(EnumMap<DbcLocale, String> data, long flags) {
+public record DbcLocaleString(EnumMap<DbcLocale, String> data, long flags) {
 
     public String get(DbcLocale locale) {
         return data.get(locale);

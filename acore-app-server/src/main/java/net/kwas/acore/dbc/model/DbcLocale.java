@@ -1,4 +1,4 @@
-package net.kwas.acore;
+package net.kwas.acore.dbc.model;
 
 public enum DbcLocale {
     EN_US,

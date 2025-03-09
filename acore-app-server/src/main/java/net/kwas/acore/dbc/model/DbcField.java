@@ -1,4 +1,4 @@
-package net.kwas.acore;
+package net.kwas.acore.dbc.model;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

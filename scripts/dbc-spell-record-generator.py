@@ -1,16 +1,8 @@
-# A simple script for converting DBC schemas found on the wowdev wiki into
-# record class bodies for the server project.
-# Schemas can be found at: https://wowdev.wiki/Category:DBC_WotLK
+# The main goal of this script was to generate the SpellDbc model class for me.
+# There are too many fields to be doing that by hand.
 #
-# The output will need manual editing to look nice.
-#
-# Copy the type and name columns for the 3.3.5 table in whatever dbc
-# type you care about.
-# Put the text into a file and pass it into this script.
-#
-# Sample input:
-# unit32<whitespace>field1
-# uint32<whitespacee>field2[3]
+# The source data is found on the wowdev wiki:
+# https://wowdev.wiki/DB/Spell
 
 import sys
 
@@ -42,7 +34,7 @@ for line in lines:
             javaType = 'Float'
         case 'langstringrefⁱ':
             dbcType = 'STRING_REF'
-            javaType = 'DbcStringRef'
+            javaType = 'DbcLocaleString'
         case _:
             dbcType = inType
             javaType = inType

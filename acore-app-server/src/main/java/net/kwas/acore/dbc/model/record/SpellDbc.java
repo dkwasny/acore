@@ -1,10 +1,14 @@
-package net.kwas.acore;
+package net.kwas.acore.dbc.model.record;
+
+import net.kwas.acore.dbc.model.DbcField;
+import net.kwas.acore.dbc.model.DbcLocaleString;
+import net.kwas.acore.dbc.model.DbcType;
 
 import java.util.List;
 
 public record SpellDbc(
     @DbcField(type = DbcType.UINT32)
-    Long iD,
+    Long id,
 
     @DbcField(type = DbcType.UINT32)
     Long spellCategory,
@@ -133,7 +137,7 @@ public record SpellDbc(
     Long manaCost,
 
     @DbcField(type = DbcType.UINT32)
-    Long manaCostPerlevel,
+    Long manaCostPerLevel,
 
     @DbcField(type = DbcType.UINT32)
     Long manaPerSecond,
@@ -235,25 +239,25 @@ public record SpellDbc(
     List<Long> spellVisual,
 
     @DbcField(type = DbcType.UINT32)
-    Long spellIconID,
+    Long spellIconId,
 
     @DbcField(type = DbcType.UINT32)
-    Long activeIconID,
+    Long activeIconId,
 
     @DbcField(type = DbcType.UINT32)
     Long spellPriority,
 
-    @DbcField(type = DbcType.STRING_REF)
-    DbcStringRef spellName,
+    @DbcField(type = DbcType.LOCALE_STRING)
+    DbcLocaleString spellName,
 
-    @DbcField(type = DbcType.STRING_REF)
-    DbcStringRef spellSubtext,
+    @DbcField(type = DbcType.LOCALE_STRING)
+    DbcLocaleString spellSubtext,
 
-    @DbcField(type = DbcType.STRING_REF)
-    DbcStringRef description,
+    @DbcField(type = DbcType.LOCALE_STRING)
+    DbcLocaleString description,
 
-    @DbcField(type = DbcType.STRING_REF)
-    DbcStringRef toolTip,
+    @DbcField(type = DbcType.LOCALE_STRING)
+    DbcLocaleString toolTip,
 
     @DbcField(type = DbcType.UINT32)
     Long manaCostPercentage,
@@ -307,10 +311,10 @@ public record SpellDbc(
     Long schoolMask,
 
     @DbcField(type = DbcType.UINT32)
-    Long runeCostID,
+    Long runeCostId,
 
     @DbcField(type = DbcType.UINT32)
-    Long spellMissileID,
+    Long spellMissileId,
 
     @DbcField(type = DbcType.UINT32)
     Long powerDisplayId,
@@ -319,7 +323,7 @@ public record SpellDbc(
     List<Float> effectBonusMultiplier,
 
     @DbcField(type = DbcType.UINT32)
-    Long spellDescriptionVariableID,
+    Long spellDescriptionVariableId,
 
     @DbcField(type = DbcType.UINT32)
     Long spellDifficultyId
