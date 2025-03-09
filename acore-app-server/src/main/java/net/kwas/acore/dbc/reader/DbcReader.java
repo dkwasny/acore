@@ -9,7 +9,10 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public record DbcReader(Path dbcFolder) {
 
@@ -74,10 +77,7 @@ public record DbcReader(Path dbcFolder) {
     }
 
     private DbcHeader getHeader(InputStream inputStream) throws IOException {
-        long skipped = inputStream.skip(MAGIC_OFFSET);
-        if (skipped != MAGIC_OFFSET) {
-            throw new RuntimeException("Incorrect amount of bytes skipped: " + skipped);
-        }
+        inputStream.skip(MAGIC_OFFSET);
 
         long recordCount = readUint(inputStream);
         long fieldCount = readUint(inputStream);
@@ -106,10 +106,7 @@ public record DbcReader(Path dbcFolder) {
     }
 
     private <T> List<T> getRecords(Class<T> recordType, InputStream inputStream, DbcHeader header, Map<Long, String> stringMap) throws Exception {
-        long skipped = inputStream.skip(HEADER_OFFSET);
-        if (skipped != HEADER_OFFSET) {
-            throw new RuntimeException("Incorrect amount of bytes skipped: " + skipped);
-        }
+        inputStream.skip(HEADER_OFFSET);
 
         var retVal = new ArrayList<T>();
 
@@ -161,7 +158,10 @@ public record DbcReader(Path dbcFolder) {
 
             int nextChar = inputStream.read();
 
-            if (nextChar == 0) {
+            if (nextChar == -1) {
+                throw new RuntimeException("Unexpected EOF when reading string block");
+            }
+            else if (nextChar == 0) {
                 retVal.put(stringStartOffset, builder.toString());
                 builder = new StringBuilder();
                 // Add one to skip the current null byte
