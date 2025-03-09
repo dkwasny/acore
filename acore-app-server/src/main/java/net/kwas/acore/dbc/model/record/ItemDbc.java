@@ -3,29 +3,44 @@ package net.kwas.acore.dbc.model.record;
 import net.kwas.acore.dbc.model.DbcField;
 import net.kwas.acore.dbc.model.DbcType;
 
-public record ItemDbc(
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+public class ItemDbc {
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemClass,
+    @DbcField(DbcType.UINT32)
+    public long id;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemSubClass,
+    @DbcField(DbcType.UINT32)
+    public long classId;
 
-    @DbcField(type = DbcType.INT32)
-    Integer soundOverrideSubclassId,
+    @DbcField(DbcType.UINT32)
+    public long subclassId;
 
-    @DbcField(type = DbcType.UINT32)
-    Long materialId,
+    @DbcField(DbcType.INT32)
+    public int soundOverrideSubclassId;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemDisplayInfo,
+    @DbcField(DbcType.INT32)
+    public int material;
 
-    @DbcField(type = DbcType.INT32)
-    Integer inventorySlotId,
+    @DbcField(DbcType.UINT32)
+    public long displayInfoId;
 
-    @DbcField(type = DbcType.INT32)
-    Integer sheathId
-) {
+    @DbcField(DbcType.UINT32)
+    public long inventoryType;
+
+    @DbcField(DbcType.UINT32)
+    public long sheatheType;
+
+    @Override
+    public String toString() {
+        return "ItemDbc{" +
+            "id=" + id +
+            ", classId=" + classId +
+            ", subclassId=" + subclassId +
+            ", soundOverrideSubclassId=" + soundOverrideSubclassId +
+            ", material=" + material +
+            ", displayInfoId=" + displayInfoId +
+            ", inventoryType=" + inventoryType +
+            ", sheatheType=" + sheatheType +
+            '}';
+    }
+
 }

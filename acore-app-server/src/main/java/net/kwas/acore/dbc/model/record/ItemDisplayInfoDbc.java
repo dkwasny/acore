@@ -4,75 +4,111 @@ import net.kwas.acore.dbc.model.DbcField;
 import net.kwas.acore.dbc.model.DbcType;
 
 public class ItemDisplayInfoDbc {
-    @DbcField(type = DbcType.UINT32)
-    Long id,
 
-    @DbcField(type = DbcType.UINT32)
-    String model,
+    @DbcField(DbcType.UINT32)
+    public long id;
 
-    @DbcField(type = DbcType.UINT32)
-    Long rightModel,
+    @DbcField(DbcType.STRING)
+    public String modelName0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String modelName1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String modelTexture0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String modelTexture1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String inventoryIcon0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String inventoryIcon1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long geosetGroup0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long geosetGroup1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long geosetGroup2;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long flags;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long spellVisualId;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long groupSoundIndex;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long helmetGeosetVisId0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.UINT32)
+    public long helmetGeosetVisId1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture0;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture1;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture2;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture3;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture4;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture5;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId,
+    @DbcField(DbcType.STRING)
+    public String texture6;
 
-    @DbcField(type = DbcType.UINT32)
-    Long itemId
+    @DbcField(DbcType.STRING)
+    public String texture7;
+
+    @DbcField(DbcType.INT32)
+    public int itemVisual;
+
+    @DbcField(DbcType.UINT32)
+    public long particleColorId;
+
+    @Override
+    public String toString() {
+        return "ItemDisplayInfoDbc{" +
+            "id=" + id +
+            ", modelName0='" + modelName0 + '\'' +
+            ", modelName1='" + modelName1 + '\'' +
+            ", modelTexture0='" + modelTexture0 + '\'' +
+            ", modelTexture1='" + modelTexture1 + '\'' +
+            ", inventoryIcon0='" + inventoryIcon0 + '\'' +
+            ", inventoryIcon1='" + inventoryIcon1 + '\'' +
+            ", geosetGroup0=" + geosetGroup0 +
+            ", geosetGroup1=" + geosetGroup1 +
+            ", geosetGroup2=" + geosetGroup2 +
+            ", flags=" + flags +
+            ", spellVisualId=" + spellVisualId +
+            ", groupSoundIndex=" + groupSoundIndex +
+            ", helmetGeosetVisId0=" + helmetGeosetVisId0 +
+            ", helmetGeosetVisId1=" + helmetGeosetVisId1 +
+            ", texture0='" + texture0 + '\'' +
+            ", texture1='" + texture1 + '\'' +
+            ", texture2='" + texture2 + '\'' +
+            ", texture3='" + texture3 + '\'' +
+            ", texture4='" + texture4 + '\'' +
+            ", texture5='" + texture5 + '\'' +
+            ", texture6='" + texture6 + '\'' +
+            ", texture7='" + texture7 + '\'' +
+            ", itemVisual=" + itemVisual +
+            ", particleColorId=" + particleColorId +
+            '}';
+    }
+
 }

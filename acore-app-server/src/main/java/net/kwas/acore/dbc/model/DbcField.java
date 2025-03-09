@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.RECORD_COMPONENT})
+@Target({ElementType.FIELD})
 public @interface DbcField {
-    DbcType type();
-    int count() default 1;
+    DbcType value();
 }
