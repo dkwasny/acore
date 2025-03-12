@@ -1,7 +1,7 @@
 import net.kwas.acore.dbc.model.DbcField;
 import net.kwas.acore.dbc.model.DbcType;
 
-public class TestBrokenRecordDbc {
+public class DbcTestBrokenRecord {
 
     @DbcField(DbcType.UINT32)
     public long field1;

@@ -3,7 +3,7 @@ import net.kwas.acore.dbc.model.DbcType;
 
 import java.util.Objects;
 
-public class TestRecordDbc {
+public class DbcTestRecord {
 
     @DbcField(DbcType.UINT32)
     public long field1;
@@ -17,11 +17,11 @@ public class TestRecordDbc {
     @DbcField(DbcType.STRING)
     public String field4;
 
-    public TestRecordDbc() {
+    public DbcTestRecord() {
 
     }
 
-    public TestRecordDbc(long field1, int field2, float field3, String field4) {
+    public DbcTestRecord(long field1, int field2, float field3, String field4) {
         this.field1 = field1;
         this.field2 = field2;
         this.field3 = field3;
@@ -31,7 +31,7 @@ public class TestRecordDbc {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        TestRecordDbc that = (TestRecordDbc) o;
+        DbcTestRecord that = (DbcTestRecord) o;
         return field1 == that.field1 && field2 == that.field2 && Float.compare(field3, that.field3) == 0 && Objects.equals(field4, that.field4);
     }
 

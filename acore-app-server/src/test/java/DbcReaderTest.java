@@ -50,11 +50,11 @@ public class DbcReaderTest {
 
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
-        var actual = dbcReader.readDbc(TestRecordDbc.class);
+        var actual = dbcReader.readDbc(DbcTestRecord.class);
         var expected = List.of(
-            new TestRecordDbc(1L, 2, 3.0F, "12345"),
-            new TestRecordDbc(10L, 20, 3.14F, "abcde"),
-            new TestRecordDbc(5L, -10, -5.1F, "")
+            new DbcTestRecord(1L, 2, 3.0F, "12345"),
+            new DbcTestRecord(10L, 20, 3.14F, "abcde"),
+            new DbcTestRecord(5L, -10, -5.1F, "")
         );
 
         Assertions.assertEquals(expected, actual);
@@ -79,9 +79,9 @@ public class DbcReaderTest {
 
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
-        var actual = dbcReader.readDbc(TestRecordDbc.class);
+        var actual = dbcReader.readDbc(DbcTestRecord.class);
         var expected = List.of(
-            new TestRecordDbc(1L, 2, 3.0F, "12345")
+            new DbcTestRecord(1L, 2, 3.0F, "12345")
         );
 
         Assertions.assertEquals(expected, actual);
@@ -107,7 +107,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class DbcReaderTest {
         toFile(byteList, "TestBrokenRecord.dbc");
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestBrokenRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestBrokenRecord.class));
     }
 
     @Test
@@ -222,7 +222,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -245,7 +245,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestRecord.class));
     }
 
     @Test
@@ -268,7 +268,7 @@ public class DbcReaderTest {
         toFile(byteList);
         var dbcReader = new DbcReader(dbcDir);
 
-        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(TestBrokenRecordDbc.class));
+        Assertions.assertThrows(RuntimeException.class, () -> dbcReader.readDbc(DbcTestBrokenRecord.class));
     }
 
     private Path toFile(List<Byte> bytes) throws IOException {
