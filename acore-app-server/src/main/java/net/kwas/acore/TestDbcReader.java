@@ -1,9 +1,11 @@
 package net.kwas.acore;
 
-import net.kwas.acore.dbc.model.record.ItemDbc;
-import net.kwas.acore.dbc.model.record.ItemDisplayInfoDbc;
-import net.kwas.acore.dbc.model.record.SpellDbc;
-import net.kwas.acore.dbc.model.record.SpellIconDbc;
+import net.kwas.acore.dbc.model.record.DbcItem;
+import net.kwas.acore.dbc.model.record.DbcItemClass;
+import net.kwas.acore.dbc.model.record.DbcItemDisplayInfo;
+import net.kwas.acore.dbc.model.record.DbcItemSubClass;
+import net.kwas.acore.dbc.model.record.DbcSpell;
+import net.kwas.acore.dbc.model.record.DbcSpellIcon;
 import net.kwas.acore.dbc.reader.DbcReader;
 
 import java.nio.file.Paths;
@@ -18,22 +20,23 @@ public class TestDbcReader {
 
         var reader = new DbcReader(dirPath);
 
-        var spells = reader.readDbc(SpellDbc.class);
+        var spells = reader.readDbc(DbcSpell.class);
         printList(spells);
 
-        var spellIcons = reader.readDbc(SpellIconDbc.class);
+        var spellIcons = reader.readDbc(DbcSpellIcon.class);
         printList(spellIcons);
 
-        var items = reader.readDbc(ItemDbc.class);
+        var items = reader.readDbc(DbcItem.class);
         printList(items);
 
-        var itemDisplayInfos = reader.readDbc(ItemDisplayInfoDbc.class);
+        var itemDisplayInfos = reader.readDbc(DbcItemDisplayInfo.class);
         printList(itemDisplayInfos);
 
-        var blizzard = spells.stream().filter(x -> x.id == 10).findFirst().get();
-        var blizzardIconId = blizzard.spellIconId;
-        var blizzardIcon = spellIcons.stream().filter(x -> x.id == blizzardIconId).findFirst().get();
-        System.out.println(blizzard + "\n" + blizzardIconId + "\n" + blizzardIcon);
+        var itemClasses = reader.readDbc(DbcItemClass.class);
+        printList(itemClasses);
+
+        var itemSubClasses = reader.readDbc(DbcItemSubClass.class);
+        printList(itemSubClasses);
     }
 
     private static void printList(List<?> list) {

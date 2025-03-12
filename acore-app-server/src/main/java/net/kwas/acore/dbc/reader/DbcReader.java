@@ -57,7 +57,7 @@ public record DbcReader(Path dbcFolder) {
 
     private <T> Path getFilename(Class<T> recordType) {
         var className = recordType.getSimpleName();
-        var fileName = className.replaceAll("Dbc$", "");
+        var fileName = className.replaceAll("^Dbc", "");
         return dbcFolder.resolve(fileName + ".dbc");
     }
 

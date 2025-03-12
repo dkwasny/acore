@@ -3,7 +3,7 @@ package net.kwas.acore.dbc.model.record;
 import net.kwas.acore.dbc.model.DbcField;
 import net.kwas.acore.dbc.model.DbcType;
 
-public class SpellIconDbc {
+public class DbcSpellIcon {
 
     @DbcField(DbcType.UINT32)
     public long id;
