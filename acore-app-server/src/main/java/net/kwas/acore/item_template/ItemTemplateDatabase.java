@@ -1,12 +1,8 @@
 package net.kwas.acore.item_template;
 
-import net.kwas.acore.dbc.model.record.DbcItem;
-import net.kwas.acore.dbc.model.record.DbcItemDisplayInfo;
-import net.kwas.acore.dbc.spring.DbcMgr;
 import net.kwas.acore.util.AcoreUtils;
 import net.kwas.acore.util.Icons;
-import net.kwas.acore.util.Stopwatch;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -17,27 +13,22 @@ import java.util.stream.Collectors;
 public class ItemTemplateDatabase {
 
     private final Map<Long, String> iconMap;
-    private final ItemTemplateRepository itr;
+    private final ItemTemplateRepository repo;
 
-    @Autowired
-    public ItemTemplateDatabase(DbcMgr dbcMgr, ItemTemplateRepository itr) {
-        this(generateIconMap(dbcMgr), itr);
-    }
-
-    public ItemTemplateDatabase(Map<Long, String> iconMap, ItemTemplateRepository itr) {
+    public ItemTemplateDatabase(@Qualifier("ItemIconMap") Map<Long, String> iconMap, ItemTemplateRepository repo) {
         this.iconMap = iconMap;
-        this.itr = itr;
+        this.repo = repo;
     }
 
     public Collection<ItemTemplate> getAll() {
-        var sqlData = itr.findAll();
-        return AcoreUtils.iterableToList(sqlData).stream()
+        var sqlData = repo.findAll();
+        return AcoreUtils.iterableToStream(sqlData)
             .map(this::toItemTemplate)
             .collect(Collectors.toList());
     }
 
     public ItemTemplate getById(long id) {
-        var sqlData = itr.findById(id);
+        var sqlData = repo.findById(id);
         if (sqlData.isEmpty()) {
             throw new RuntimeException("Invalid item template ID: " + id);
         }
@@ -56,20 +47,4 @@ public class ItemTemplateDatabase {
         );
     }
 
-    private static Map<Long, String> generateIconMap(DbcMgr dbcMgr) {
-        var stopwatch = Stopwatch.start("ReadItemIcons");
-
-        var reader = dbcMgr.getReader();
-        var items = reader.readDbc(DbcItem.class);
-        var itemDisplayInfos = reader.readDbc(DbcItemDisplayInfo.class);
-
-        var itemDisplayInfoMap = itemDisplayInfos.stream()
-            .collect(Collectors.toMap(x -> x.id, x -> x));
-
-        var retVal = items.stream()
-                .collect(Collectors.toMap(x -> x.id, x -> itemDisplayInfoMap.get(x.displayInfoId).inventoryIcon0));
-
-        stopwatch.stop();
-        return retVal;
-    }
 }

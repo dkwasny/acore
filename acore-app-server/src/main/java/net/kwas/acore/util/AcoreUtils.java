@@ -1,14 +1,12 @@
 package net.kwas.acore.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class AcoreUtils {
 
-    public static <T> List<T> iterableToList(Iterable<T> iterable) {
-        var retVal = new ArrayList<T>();
-        iterable.forEach(retVal::add);
-        return retVal;
+    public static <T> Stream<T> iterableToStream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
 }

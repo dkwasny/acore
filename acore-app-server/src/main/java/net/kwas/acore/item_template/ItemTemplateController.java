@@ -1,11 +1,9 @@
 package net.kwas.acore.item_template;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
@@ -36,6 +34,7 @@ public class ItemTemplateController {
     public String getItemTemplateDescription(@PathVariable long id) {
         return db.getById(id).description();
     }
+
 }
 
 
