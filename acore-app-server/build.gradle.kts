@@ -23,6 +23,9 @@ dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.3"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("com.mysql:mysql-connector-j")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

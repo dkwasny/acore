@@ -17,7 +17,6 @@ public class SpellController {
 
     private final SpellDatabase spellDb;
 
-    @Autowired
     public SpellController(SpellDatabase spellDb) {
         this.spellDb = spellDb;
     }

@@ -13,3 +13,12 @@ Intended to be a fun little dashboard for the MySQL database backing the [Azerot
 3. Open the app in your web browser based on what UI server you're using
     * Spring Boot: `http://localhost:8080`
     * Vite Dev: `http://localhost:5173`
+
+
+TODO
+```
+create user 'acore-app'@'localhost' identified by 'password';
+grant select on acore_auth.* to 'acore-app'@'localhost';
+grant select on acore_characters.* to 'acore-app'@'localhost';
+grant select on acore_world.* to 'acore-app'@'localhost';
+```

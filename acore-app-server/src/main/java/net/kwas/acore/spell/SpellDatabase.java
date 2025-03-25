@@ -4,6 +4,7 @@ import net.kwas.acore.dbc.model.record.DbcSpell;
 import net.kwas.acore.dbc.model.record.DbcSpellIcon;
 import net.kwas.acore.dbc.reader.DbcReader;
 import net.kwas.acore.dbc.spring.DbcMgr;
+import net.kwas.acore.util.Icons;
 import net.kwas.acore.util.Stopwatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -62,7 +63,7 @@ public class SpellDatabase {
         var retVal = Collections.synchronizedMap(new LinkedHashMap<Long, Spell>());
         for (var dbcSpell : dbcSpells) {
             var dbcIcon = dbcSpellIconMap.get(dbcSpell.spellIconId);
-            var iconUrl = getIconUrl(dbcIcon);
+            var iconUrl = Icons.getIconUrl(dbcIcon);
             var spell = new Spell(
                 dbcSpell.id,
                 dbcSpell.name0,
@@ -74,13 +75,6 @@ public class SpellDatabase {
         }
         stopwatch.stop();
         return retVal;
-    }
-
-    private static String getIconUrl(String dbcIcon) {
-        var split = dbcIcon.split("\\\\");
-        var iconName = split[split.length - 1];
-        var lowerCase = iconName.toLowerCase();
-        return "https://wow.zamimg.com/images/wow/icons/small/" + lowerCase + ".jpg";
     }
 
 }
