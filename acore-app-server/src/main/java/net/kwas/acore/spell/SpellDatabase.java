@@ -12,17 +12,28 @@ public class SpellDatabase {
 
     private final Map<Long, Spell> records;
 
-    public SpellDatabase(@Qualifier("SpellMap") Map<Long, Spell> records) {
+    private final CharacterSpellRepository charSpellRepo;
+
+    public SpellDatabase(
+        @Qualifier("SpellMap") Map<Long, Spell> records,
+        CharacterSpellRepository charSpellRepo
+    ) {
         this.records = records;
+        this.charSpellRepo = charSpellRepo;
     }
 
-    public Spell getById(long id) {
+    public Spell getSpell(long id) {
         return records.get(id);
     }
 
-    public Collection<Spell> getAll() {
+    public Collection<Spell> getSpells() {
         return records.values();
     }
+
+//    public Collection<Spell> getSpellsForCharacter(long characterId) {
+//        var charSpells = charSpellRepo.findById(characterId);
+//
+//    }
 
     public Collection<Spell> searchName(String query) {
         return records.values().stream()

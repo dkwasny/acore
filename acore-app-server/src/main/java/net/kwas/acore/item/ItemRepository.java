@@ -26,10 +26,16 @@ public interface ItemRepository extends CrudRepository<SqlItemInstance, Long> {
     String FILTERED_ITEM_QUERY = ITEM_QUERY
         + " WHERE ii.guid = :id";
 
+    String CHARACTER_FILTERED_ITEM_QUERY = ITEM_QUERY
+        + " WHERE ii.owner_guid = :characterId";
+
     @Query(ITEM_QUERY)
-    List<SqlItem> getItemSummaries();
+    List<SqlItem> getItems();
 
     @Query(FILTERED_ITEM_QUERY)
-    SqlItem getItemSummary(long id);
+    SqlItem getItem(long id);
+
+    @Query(CHARACTER_FILTERED_ITEM_QUERY)
+    List<SqlItem> getItemsForCharacter(long characterId);
 
 }

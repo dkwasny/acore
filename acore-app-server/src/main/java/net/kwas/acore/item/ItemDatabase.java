@@ -20,14 +20,20 @@ public class ItemDatabase {
     }
 
     public Collection<Item> getItems() {
-        return repo.getItemSummaries().stream()
+        return repo.getItems().stream()
             .map(this::createItem)
             .collect(Collectors.toList());
     }
 
     public Item getItem(long id) {
-        var sqlItemSummary = repo.getItemSummary(id);
+        var sqlItemSummary = repo.getItem(id);
         return createItem(sqlItemSummary);
+    }
+
+    public Collection<Item> getItemsForCharacter(long characterId) {
+        return repo.getItemsForCharacter(characterId).stream()
+            .map(this::createItem)
+            .collect(Collectors.toList());
     }
 
     private Item createItem(SqlItem sqlItem) {

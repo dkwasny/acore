@@ -22,27 +22,27 @@ public class SpellController {
 
     @GetMapping("/api/spell")
     public Collection<Spell> getSpells() {
-        return spellDb.getAll();
+        return spellDb.getSpells();
     }
 
     @GetMapping("/api/spell/{id}")
     public Spell getSpell(@PathVariable long id) {
-        return spellDb.getById(id);
+        return spellDb.getSpell(id);
     }
 
     @GetMapping("/api/spell/{id}/name")
     public String getSpellName(@PathVariable long id) {
-        return spellDb.getById(id).name();
+        return spellDb.getSpell(id).name();
     }
 
     @GetMapping("/api/spell/{id}/description")
     public String getSpellDescription(@PathVariable long id) {
-        return spellDb.getById(id).description();
+        return spellDb.getSpell(id).description();
     }
 
     @GetMapping("/api/spell/search")
     public List<Spell> searchSpells(@RequestParam String searchField, @RequestParam String query) {
-        var spells = spellDb.getAll();
+        var spells = spellDb.getSpells();
 
         var stringRetriever = getStringRetriever(searchField);
 
