@@ -16,23 +16,13 @@ public class ItemController {
     }
 
     @GetMapping("/api/item")
-    public Collection<SqlItem> getItems() {
+    public Collection<Item> getItems() {
         return db.getItems();
     }
 
     @GetMapping("/api/item/{id}")
-    public SqlItem getItem(@PathVariable long id) {
+    public Item getItem(@PathVariable long id) {
         return db.getItem(id);
-    }
-
-    @GetMapping("/api/item/summary")
-    public Collection<ItemSummary> getItemSummaries() {
-        return db.getItemSummaries();
-    }
-
-    @GetMapping("/api/item/{id}/summary")
-    public ItemSummary getItemSummary(@PathVariable long id) {
-        return db.getItemSummary(id);
     }
 
 }

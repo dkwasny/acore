@@ -1,6 +1,5 @@
 package net.kwas.acore.item;
 
-import net.kwas.acore.util.AcoreUtils;
 import net.kwas.acore.util.Icons;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -20,38 +19,29 @@ public class ItemDatabase {
         this.iconMap = iconMap;
     }
 
-    public Collection<SqlItem> getItems() {
-        return AcoreUtils.iterableToStream(repo.findAll())
-            .collect(Collectors.toList());
-    }
-
-    public SqlItem getItem(long id) {
-        return repo.findById(id).get();
-    }
-
-    public Collection<ItemSummary> getItemSummaries() {
+    public Collection<Item> getItems() {
         return repo.getItemSummaries().stream()
-            .map(this::createItemSummary)
+            .map(this::createItem)
             .collect(Collectors.toList());
     }
 
-    public ItemSummary getItemSummary(long id) {
+    public Item getItem(long id) {
         var sqlItemSummary = repo.getItemSummary(id);
-        return createItemSummary(sqlItemSummary);
+        return createItem(sqlItemSummary);
     }
 
-    private ItemSummary createItemSummary(SqlItemSummary sqlItemSummary) {
-        var iconRef = iconMap.get(sqlItemSummary.itemTemplateId());
+    private Item createItem(SqlItem sqlItem) {
+        var iconRef = iconMap.get(sqlItem.itemTemplateId());
         var iconUrl = Icons.getIconUrl(iconRef);
-        return new ItemSummary(
-            sqlItemSummary.id(),
-            sqlItemSummary.itemTemplateId(),
-            sqlItemSummary.name(),
-            sqlItemSummary.description(),
+        return new Item(
+            sqlItem.id(),
+            sqlItem.itemTemplateId(),
+            sqlItem.name(),
+            sqlItem.description(),
             iconUrl,
-            sqlItemSummary.ownerId(),
-            sqlItemSummary.ownerName(),
-            sqlItemSummary.count()
+            sqlItem.ownerId(),
+            sqlItem.ownerName(),
+            sqlItem.count()
         );
     }
 
