@@ -11,27 +11,27 @@ import java.util.stream.Collectors;
 @Component
 public class ItemDatabase {
 
-    private final ItemRepository repo;
+    private final ItemQueries queries;
     private final Map<Long, String> iconMap;
 
-    public ItemDatabase(ItemRepository repo, @Qualifier("ItemIconMap") Map<Long, String> iconMap) {
-        this.repo = repo;
+    public ItemDatabase(ItemQueries queries, @Qualifier("ItemIconMap") Map<Long, String> iconMap) {
+        this.queries = queries;
         this.iconMap = iconMap;
     }
 
     public Collection<Item> getItems() {
-        return repo.getItems().stream()
+        return queries.getItems().stream()
             .map(this::createItem)
             .collect(Collectors.toList());
     }
 
     public Item getItem(long id) {
-        var sqlItemSummary = repo.getItem(id);
+        var sqlItemSummary = queries.getItem(id);
         return createItem(sqlItemSummary);
     }
 
     public Collection<Item> getItemsForCharacter(long characterId) {
-        return repo.getItemsForCharacter(characterId).stream()
+        return queries.getItemsForCharacter(characterId).stream()
             .map(this::createItem)
             .collect(Collectors.toList());
     }

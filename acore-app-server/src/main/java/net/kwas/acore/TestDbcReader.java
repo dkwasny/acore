@@ -9,6 +9,8 @@ import net.kwas.acore.dbc.model.record.DbcItemClass;
 import net.kwas.acore.dbc.model.record.DbcItemDisplayInfo;
 import net.kwas.acore.dbc.model.record.DbcItemSubClass;
 import net.kwas.acore.dbc.model.record.DbcSpell;
+import net.kwas.acore.dbc.model.record.DbcSpellDescriptionVariables;
+import net.kwas.acore.dbc.model.record.DbcSpellDuration;
 import net.kwas.acore.dbc.model.record.DbcSpellIcon;
 import net.kwas.acore.dbc.reader.DbcReader;
 
@@ -24,7 +26,8 @@ public class TestDbcReader {
 
         var reader = new DbcReader(dirPath);
 
-//        var spells = reader.readDbc(DbcSpell.class);
+        var spells = reader.readDbc(DbcSpell.class);
+        printList(spells.stream().filter(x -> x.id == 25771L).collect(Collectors.toUnmodifiableList()));
 //        printList(spells);
 //
 //        var spellIcons = reader.readDbc(DbcSpellIcon.class);
@@ -51,8 +54,14 @@ public class TestDbcReader {
 //        var chrClasses = reader.readDbc(DbcChrClasses.class);
 //        printList(chrClasses);
 
-        var areaTables = reader.readDbc(DbcAreaTable.class);
-        printList(areaTables);
+//        var areaTables = reader.readDbc(DbcAreaTable.class);
+//        printList(areaTables);
+
+//        var spellDescriptionVariables = reader.readDbc(DbcSpellDescriptionVariables.class);
+//        printList(spellDescriptionVariables);
+
+        var spellDurations = reader.readDbc(DbcSpellDuration.class);
+        printList(spellDurations.stream().filter(x -> x.id == 4).collect(Collectors.toUnmodifiableList()));
     }
 
     private static void printList(List<?> list) {

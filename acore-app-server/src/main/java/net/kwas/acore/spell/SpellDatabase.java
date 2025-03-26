@@ -10,16 +10,15 @@ import java.util.stream.Collectors;
 @Component
 public class SpellDatabase {
 
+    private final SpellQueries queries;
     private final Map<Long, Spell> records;
 
-    private final CharacterSpellRepository charSpellRepo;
-
     public SpellDatabase(
-        @Qualifier("SpellMap") Map<Long, Spell> records,
-        CharacterSpellRepository charSpellRepo
+        SpellQueries queries,
+        @Qualifier("SpellMap") Map<Long, Spell> records
     ) {
+        this.queries = queries;
         this.records = records;
-        this.charSpellRepo = charSpellRepo;
     }
 
     public Spell getSpell(long id) {
@@ -30,10 +29,11 @@ public class SpellDatabase {
         return records.values();
     }
 
-//    public Collection<Spell> getSpellsForCharacter(long characterId) {
-//        var charSpells = charSpellRepo.findById(characterId);
-//
-//    }
+    public Collection<Spell> getSpellsForCharacter(long characterId) {
+        return queries.getSpellIdsForCharacter(characterId).stream()
+            .map(records::get)
+            .collect(Collectors.toList());
+    }
 
     public Collection<Spell> searchName(String query) {
         return records.values().stream()
