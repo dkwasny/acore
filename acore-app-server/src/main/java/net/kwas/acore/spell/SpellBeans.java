@@ -41,8 +41,9 @@ public class SpellBeans {
             );
             retVal.put(spell.id(), spell);
         }
+
         stopwatch.stop();
-        return retVal;
+        return Collections.unmodifiableMap(retVal);
     }
 
 }
