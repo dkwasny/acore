@@ -1,3 +1,5 @@
+package net.kwas.acore.dbc.reader;
+
 import net.kwas.acore.dbc.model.DbcField;
 import net.kwas.acore.dbc.model.DbcType;
 

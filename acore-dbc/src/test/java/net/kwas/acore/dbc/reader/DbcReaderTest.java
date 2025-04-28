@@ -1,4 +1,5 @@
-import net.kwas.acore.dbc.reader.DbcReader;
+package net.kwas.acore.dbc.reader;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

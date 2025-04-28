@@ -5,10 +5,19 @@ import net.kwas.acore.dbc.model.record.DbcSpellDuration;
 import net.kwas.acore.dbc.reader.DbcReader;
 
 import java.nio.file.Paths;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TestDbcReader {
+
+    private static final String TAG_REGEX = "\\$[^+*/\\-{} .]*";
+    private static final Pattern TAG_PATTERN = Pattern.compile(TAG_REGEX);
 
     public static void main(String[] args) throws Exception {
         var dirName = "/Users/dkwasny/Desktop/dbc";
@@ -16,8 +25,8 @@ public class TestDbcReader {
 
         var reader = new DbcReader(dirPath);
 
-        var spells = reader.readDbc(DbcSpell.class);
-        printList(spells.stream().filter(x -> x.id == 25771L).collect(Collectors.toUnmodifiableList()));
+//        var spells = reader.readDbc(DbcSpell.class);
+//        printList(spells.stream().filter(x -> x.id == 25771L).collect(Collectors.toUnmodifiableList()));
 //        printList(spells);
 //
 //        var spellIcons = reader.readDbc(DbcSpellIcon.class);
@@ -50,12 +59,42 @@ public class TestDbcReader {
 //        var spellDescriptionVariables = reader.readDbc(DbcSpellDescriptionVariables.class);
 //        printList(spellDescriptionVariables);
 
-        var spellDurations = reader.readDbc(DbcSpellDuration.class);
-        printList(spellDurations.stream().filter(x -> x.id == 4).collect(Collectors.toUnmodifiableList()));
+//        var spellDurations = reader.readDbc(DbcSpellDuration.class);
+//        printList(spellDurations.stream().filter(x -> x.id == 4).collect(Collectors.toUnmodifiableList()));
+
+        var spellIds = Set.of(53L, 587L, 597L, 120L, 27650L);
+        var spells = reader.readDbc(DbcSpell.class);
+
+        printList(spells.stream().filter(x -> spellIds.contains(x.id)).map(x -> new AbstractMap.SimpleImmutableEntry<>(x.id, x.description0)).collect(Collectors.toList()));
+
+        var allTags = spells.stream()
+            .flatMap(x -> getTags(x.description0).stream())
+            .collect(Collectors.toSet())
+            .stream()
+            .sorted()
+            .collect(Collectors.toList());
+        printAll(allTags);
+
+        var tagsPerSpell = spells.stream()
+            .map(x -> new AbstractMap.SimpleImmutableEntry<>(x.id, getTags(x.description0)))
+            .filter(x -> !x.getValue().isEmpty())
+            .collect(Collectors.toUnmodifiableList());
+        printAll(tagsPerSpell);
     }
 
-    private static void printList(List<?> list) {
+    private static List<String> getTags(String string) {
+        var matcher = TAG_PATTERN.matcher(string);
+        return matcher.results()
+            .map(x -> x.group())
+            .collect(Collectors.toList());
+    }
+
+    private static void printList(Collection<?> list) {
         System.out.println(list.stream().limit(20).map(Object::toString).collect(Collectors.joining("\n")));
+    }
+
+    private static void printAll(Collection<?> list) {
+        System.out.println(list.stream().map(Object::toString).collect(Collectors.joining("\n")));
     }
 
 }

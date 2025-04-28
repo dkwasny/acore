@@ -46,3 +46,7 @@ tasks.register<Exec>("viteRun") {
 
     commandLine("npm", "run", "dev")
 }
+
+tasks.register<Delete>("clean") {
+    delete("dist")
+}
