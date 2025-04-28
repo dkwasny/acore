@@ -7,5 +7,6 @@
 
 rootProject.name = "acore-app"
 
+include("acore-dbc")
 include("acore-app-server")
 include("acore-app-ui")

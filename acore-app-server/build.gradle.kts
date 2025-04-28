@@ -25,6 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.mysql:mysql-connector-j")
+    implementation("net.kwas.acore:acore-dbc:0.0.1-SNAPSHOT")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
