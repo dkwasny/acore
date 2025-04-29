@@ -20,7 +20,7 @@ public class TestDbcReader {
     private static final Pattern TAG_PATTERN = Pattern.compile(TAG_REGEX);
 
     public static void main(String[] args) throws Exception {
-        var dirName = "/Users/dkwasny/Desktop/dbc";
+        var dirName = "/Users/dkwasny/Files/dbc";
         var dirPath = Paths.get(dirName);
 
         var reader = new DbcReader(dirPath);
@@ -62,7 +62,7 @@ public class TestDbcReader {
 //        var spellDurations = reader.readDbc(DbcSpellDuration.class);
 //        printList(spellDurations.stream().filter(x -> x.id == 4).collect(Collectors.toUnmodifiableList()));
 
-        var spellIds = Set.of(53L, 587L, 597L, 120L, 27650L);
+        var spellIds = Set.of(53L, 587L, 597L, 120L, 27650L, 47772L);
         var spells = reader.readDbc(DbcSpell.class);
 
         printList(spells.stream().filter(x -> spellIds.contains(x.id)).map(x -> new AbstractMap.SimpleImmutableEntry<>(x.id, x.description0)).collect(Collectors.toList()));
