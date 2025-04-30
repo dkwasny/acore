@@ -32,19 +32,19 @@ public class SpellDatabase {
     public Collection<Spell> getSpellsForCharacter(long characterId) {
         return queries.getSpellIdsForCharacter(characterId).stream()
             .map(records::get)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Collection<Spell> searchName(String query) {
         return records.values().stream()
             .filter(x -> x.name().contains(query))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Collection<Spell> searchDescription(String query) {
         return records.values().stream()
             .filter(x -> x.description().contains(query))
-            .collect(Collectors.toList());
+            .toList();
     }
 
 }

@@ -48,7 +48,7 @@ public class SpellController {
 
         return spells.stream()
             .filter(x -> stringRetriever.apply(x).contains(query))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private Function<Spell, String> getStringRetriever(String searchField) {

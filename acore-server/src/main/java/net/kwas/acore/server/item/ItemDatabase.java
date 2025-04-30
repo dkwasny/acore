@@ -22,7 +22,7 @@ public class ItemDatabase {
     public Collection<Item> getItems() {
         return queries.getItems().stream()
             .map(this::createItem)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Item getItem(long id) {
@@ -33,7 +33,7 @@ public class ItemDatabase {
     public Collection<Item> getItemsForCharacter(long characterId) {
         return queries.getItemsForCharacter(characterId).stream()
             .map(this::createItem)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private Item createItem(SqlItem sqlItem) {

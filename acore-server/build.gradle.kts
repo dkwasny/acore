@@ -20,6 +20,7 @@ dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.3"))
 
     implementation(project(":acore-dbc"))
+    implementation(project(":acore-antlr"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")

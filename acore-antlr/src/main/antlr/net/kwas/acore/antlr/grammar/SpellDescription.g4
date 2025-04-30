@@ -1,35 +1,98 @@
 grammar SpellDescription;
 
-desc: (expr)+ EOF ;
+root: (spellDescriptionVariables | spellDescription) EOF ;
 
-expr: text
-    | funcout
-    | ref
+spellDescription: (expression)+ EOF ;
+
+spellDescriptionVariables: WS* spellDescriptionVariable ((COMMA | WS) spellDescriptionVariable)* ;
+spellDescriptionVariable: '$' name=word EQUAL (spellConditional | formula) ;
+
+expression: formula
+    | reference
+    | spellConditional
+    | number
+    | word
+    | text+=(WS
+        | PERIOD
+        | NON_WORD
+        | COMMA
+        | COLON
+        | EQUAL)+
     ;
 
-funcout: '${' funcin '}' ;
+word: (LOWER_A_CHAR | LOWER_M_CHAR | LOWER_S_CHAR | OTHER_CHARS | DIGITS)+ ;
+number: '-'? DIGITS (PERIOD DIGITS)? ;
 
-funcin: funcref ('*'|'/') funcref
-    | funcref ('+'|'-') funcref
+formula: '${' WS* formulaFragment WS* '}' ;
+
+formulaFragment: OPEN_PAREN WS* formulaFragment WS* CLOSE_PAREN
+    | formulaFragment WS* (MULTIPLICATION | DIVISION) WS* formulaFragment
+    | formulaFragment WS* (ADDITION | SUBTRACTION) WS* formulaFragment
+    | formulaReference
+    | formulaFunction
+    | number
     ;
 
-funcref: ref
-    | NUM
+formulaFunction: max
     ;
 
-ref: M
-    | S
-    | L
+max: '$max(' WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+
+// References that can show up in formulas
+formulaReference: multiplier
+    | spellEffect
+    | duration
+    | variableReference
     ;
 
-text: TEXT ;
+spellConditional: spellConditionalIf WS* spellConditionalElseIf* WS* spellConditionalElse ;
+spellConditionalIf: '$?' spellConditionalFragment '[' expression+ ']';
+spellConditionalElseIf: '?' spellConditionalFragment '[' expression+ ']' ;
+spellConditionalElse: '[' expression+ ']' ;
+spellConditionalFragment: OPEN_PAREN WS* spellConditionalFragment WS* CLOSE_PAREN
+    | EXCLAMATION_POINT spellConditionalFragment
+    | spellConditionalFragment PIPE spellConditionalFragment
+    | spellConditionalSpellRef
+    | spellConditionalAuraRef
+    ;
+spellConditionalSpellRef: LOWER_S_CHAR number ;
+spellConditionalAuraRef: LOWER_A_CHAR number ;
 
-M: '$m' NUM ;
-S: '$s' NUM ;
-L: '$l' LOCAL ';';
+multiplier: '$' spellId=number? LOWER_M_CHAR index=number ;
+spellEffect: '$' spellId=number? LOWER_S_CHAR index=number ;
+duration: '$d' ;
+variableReference: '$<' word '>' ;
 
-TEXT: [a-zA-Z,.% \r\t\n]+ ;
 
-LOCAL: [a-zA-Z:]+ ;
+// All reference types
+reference: formulaReference
+    | localizedString
+    | genderString
+    ;
 
-NUM: [0-9.]+ ;
+localizedString: '$l' word (COLON word)* ';';
+genderString: '$g' word COLON word ';' ;
+
+MULTIPLICATION: '*' ;
+DIVISION: '/' ;
+ADDITION: '+' ;
+SUBTRACTION: '-' ;
+EXCLAMATION_POINT: '!' ;
+PIPE: '|' ;
+
+OPEN_PAREN: '(' ;
+CLOSE_PAREN: ')' ;
+
+LOWER_A_CHAR: 'a' ;
+LOWER_M_CHAR: 'm' ;
+LOWER_S_CHAR: 's' ;
+//LOWER_G_CHAR: 'g' ;
+OTHER_CHARS: [bcdefghijklnopqrtuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]+ ;
+WS: [ \r\t\n]+ ;
+NON_WORD: [%']+ ;
+PERIOD: '.' ;
+COMMA: ',' ;
+COLON: ':' ;
+EQUAL: '=' ;
+
+DIGITS: [0-9]+ ;

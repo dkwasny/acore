@@ -24,7 +24,7 @@ public class ItemTemplateDatabase {
         var sqlData = repo.findAll();
         return AcoreUtils.iterableToStream(sqlData)
             .map(this::toItemTemplate)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public ItemTemplate getById(long id) {

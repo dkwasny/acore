@@ -35,7 +35,7 @@ public class CharacterDatabase {
     public Collection<Character> getCharacters() {
         return AcoreUtils.iterableToStream(repo.findAll())
             .map(this::createCharacter)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Character getCharacter(long id) {

@@ -24,7 +24,8 @@ dependencies {
 
 tasks.generateGrammarSource {
     arguments = arguments + listOf(
-        "-package", "net.kwas.acore.antlr.grammar"
+        "-package", "net.kwas.acore.antlr.grammar",
+        "-visitor"
     )
 }
 
