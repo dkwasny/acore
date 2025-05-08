@@ -5,8 +5,8 @@ import net.kwas.acore.antlr.resolver.NumberResolver;
 public record DivisionResolver(NumberResolver left, NumberResolver right) implements NumberResolver {
 
     @Override
-    public double resoveNumber() {
-        return left.resoveNumber() / right.resoveNumber();
+    public double resolveNumber() {
+        return left.resolveNumber() / right.resolveNumber();
     }
 
 }

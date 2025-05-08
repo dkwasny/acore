@@ -1,42 +1,63 @@
 grammar SpellDescription;
 
-root: (spellDescriptionVariables | spellDescription) EOF ;
+spellDescriptionVariables: WS* spellDescriptionVariable (WS+ spellDescriptionVariable)* WS* ;
+spellDescriptionVariable: DOLLAR_SIGN identifier EQUAL variableDefinition ;
 
-spellDescription: (expression)+ EOF ;
+spellDescription: text ;
 
-spellDescriptionVariables: WS* spellDescriptionVariable ((COMMA | WS) spellDescriptionVariable)* ;
-spellDescriptionVariable: '$' name=word EQUAL (spellConditional | formula) ;
-
-expression: formula
+text: string+ ;
+string: formula
     | reference
-    | spellConditional
+    | stringConditional
     | number
-    | word
-    | text+=(WS
-        | PERIOD
-        | NON_WORD
-        | COMMA
-        | COLON
-        | EQUAL)+
+    | identifier
+    | miscChars
     ;
 
-word: (LOWER_A_CHAR | LOWER_M_CHAR | LOWER_S_CHAR | OTHER_CHARS | DIGITS)+ ;
-number: '-'? DIGITS (PERIOD DIGITS)? ;
+variableDefinition: (numericConditional | formula | formulaFragment) ;
 
-formula: '${' WS* formulaFragment WS* '}' ;
+identifier: (LOWER_A_CHAR
+    | LOWER_D_CHAR
+    | LOWER_G_CHAR
+    | LOWER_L_CHAR
+    | LOWER_M_CHAR
+    | LOWER_S_CHAR
+    | LOWER_T_CHAR
+    | LOWER_X_CHAR
+    | OTHER_CHARS
+    | DIGITS)+ ;
+
+miscChars: (WS
+    | PERIOD
+    | NON_WORD
+    | COMMA
+    | COLON
+    | EQUAL)+ ;
+
+positiveInteger: DIGITS ;
+decimal: HYPHEN? DIGITS (PERIOD DIGITS)? ;
+
+number: (positiveInteger | decimal) ;
+
+formula: DOLLAR_SIGN '{' WS* formulaFragment WS* '}' ;
 
 formulaFragment: OPEN_PAREN WS* formulaFragment WS* CLOSE_PAREN
-    | formulaFragment WS* (MULTIPLICATION | DIVISION) WS* formulaFragment
-    | formulaFragment WS* (ADDITION | SUBTRACTION) WS* formulaFragment
+    | formulaFragment WS* (STAR | FORWARD_SLASH) WS* formulaFragment
+    | formulaFragment WS* (PLUS | HYPHEN) WS* formulaFragment
     | formulaReference
     | formulaFunction
     | number
     ;
 
 formulaFunction: max
+    | greaterThan
     ;
 
-max: '$max(' WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+max: maxHeader OPEN_PAREN WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+maxHeader: DOLLAR_SIGN LOWER_M_CHAR LOWER_A_CHAR LOWER_X_CHAR ;
+
+greaterThan: greaterThanHeader OPEN_PAREN WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+greaterThanHeader: DOLLAR_SIGN LOWER_G_CHAR LOWER_T_CHAR ;
 
 // References that can show up in formulas
 formulaReference: multiplier
@@ -45,23 +66,28 @@ formulaReference: multiplier
     | variableReference
     ;
 
-spellConditional: spellConditionalIf WS* spellConditionalElseIf* WS* spellConditionalElse ;
-spellConditionalIf: '$?' spellConditionalFragment '[' expression+ ']';
-spellConditionalElseIf: '?' spellConditionalFragment '[' expression+ ']' ;
-spellConditionalElse: '[' expression+ ']' ;
-spellConditionalFragment: OPEN_PAREN WS* spellConditionalFragment WS* CLOSE_PAREN
-    | EXCLAMATION_POINT spellConditionalFragment
-    | spellConditionalFragment PIPE spellConditionalFragment
-    | spellConditionalSpellRef
-    | spellConditionalAuraRef
-    ;
-spellConditionalSpellRef: LOWER_S_CHAR number ;
-spellConditionalAuraRef: LOWER_A_CHAR number ;
+numericConditional: numericConditionalIf WS* numericConditionalElseIf* WS* numericConditionalElse ;
+numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
+numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE ;
+numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
 
-multiplier: '$' spellId=number? LOWER_M_CHAR index=number ;
-spellEffect: '$' spellId=number? LOWER_S_CHAR index=number ;
-duration: '$d' ;
-variableReference: '$<' word '>' ;
+stringConditional: stringConditionalIf WS* stringConditionalElseIf* WS* stringConditionalElse ;
+stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text CLOSE_SQUARE;
+stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text CLOSE_SQUARE ;
+stringConditionalElse: OPEN_SQUARE text CLOSE_SQUARE ;
+
+conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
+    | EXCLAMATION_POINT WS* conditionalFragment
+    | conditionalFragment WS* AMPERSAND WS* conditionalFragment
+    | conditionalFragment WS* PIPE WS* conditionalFragment
+    | conditionalSpellRef
+    ;
+conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
+
+multiplier: DOLLAR_SIGN spellId=positiveInteger? LOWER_M_CHAR index=positiveInteger ;
+spellEffect: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+duration: DOLLAR_SIGN LOWER_D_CHAR ;
+variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
 
 // All reference types
@@ -70,29 +96,39 @@ reference: formulaReference
     | genderString
     ;
 
-localizedString: '$l' word (COLON word)* ';';
-genderString: '$g' word COLON word ';' ;
+localizedString: DOLLAR_SIGN LOWER_L_CHAR identifier (COLON identifier)* ';';
+genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
 
-MULTIPLICATION: '*' ;
-DIVISION: '/' ;
-ADDITION: '+' ;
-SUBTRACTION: '-' ;
+STAR: '*' ;
+FORWARD_SLASH: '/' ;
+PLUS: '+' ;
+HYPHEN: '-' ;
 EXCLAMATION_POINT: '!' ;
 PIPE: '|' ;
+AMPERSAND: '&' ;
 
 OPEN_PAREN: '(' ;
 CLOSE_PAREN: ')' ;
 
+OPEN_SQUARE: '[' ;
+CLOSE_SQUARE: ']' ;
+
 LOWER_A_CHAR: 'a' ;
+LOWER_D_CHAR: 'd' ;
+LOWER_G_CHAR: 'g' ;
+LOWER_L_CHAR: 'l' ;
 LOWER_M_CHAR: 'm' ;
 LOWER_S_CHAR: 's' ;
-//LOWER_G_CHAR: 'g' ;
-OTHER_CHARS: [bcdefghijklnopqrtuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]+ ;
+LOWER_T_CHAR: 't' ;
+LOWER_X_CHAR: 'x' ;
+OTHER_CHARS: [bcefhijknopqruvwyzA-Z]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;
 COMMA: ',' ;
 COLON: ':' ;
 EQUAL: '=' ;
+DOLLAR_SIGN: '$' ;
+QUESTION_MARK: '?' ;
 
 DIGITS: [0-9]+ ;

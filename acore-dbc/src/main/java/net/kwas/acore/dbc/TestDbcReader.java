@@ -67,27 +67,30 @@ public class TestDbcReader {
         var spells = reader.readDbc(DbcSpell.class);
 
 
-        var ternarySpellId = 69427L;
-        var ternarySpell = spells.stream().filter(x -> x.id == ternarySpellId).toList();
-        System.out.println(ternarySpell.get(0).description0);
+//        var ternarySpellId = 69427L;
+//        var ternarySpell = spells.stream().filter(x -> x.id == ternarySpellId).toList();
+//        System.out.println(ternarySpell.get(0).description0);
 
 //
 //
-        var spellId = 116L;
-        var spell = spells.stream().filter(x -> x.id == spellId).toList();
-        System.out.println(spell);
-
-        var spellDescriptionVariablesId = 167L;
+//        var spellId = 116L;
+//        var spell = spells.stream().filter(x -> x.id == spellId).toList();
+//        System.out.println(spell);
+//
+//        var spellDescriptionVariablesId = 181L;
         var spellDescriptionVariables = reader.readDbc(DbcSpellDescriptionVariables.class);
-        var spellDescriptionVariable = spellDescriptionVariables.stream().filter(x -> x.id == spellDescriptionVariablesId).toList();
-        System.out.println(spellDescriptionVariable);
+//        var spellDescriptionVariable = spellDescriptionVariables.stream().filter(x -> x.id == spellDescriptionVariablesId).toList();
+//        System.out.println(spellDescriptionVariable);
+//
+//        var descSpell = spells.stream().filter(x -> x.descriptionVariablesId == spellDescriptionVariablesId).toList();
+//        System.out.println(descSpell.get(0).description0);
 
         var allSpellDescriptionVars = spellDescriptionVariables.stream()
-            .map(x -> x.variable)
+            .map(x -> x.id + " -> " + x.variable)
             .collect(Collectors.toSet())
             .stream()
             .sorted()
-            .toList();
+            .collect(Collectors.joining("\n----\n"));
         System.out.println(allSpellDescriptionVars);
 
 //        var allFormulas = spells.stream()

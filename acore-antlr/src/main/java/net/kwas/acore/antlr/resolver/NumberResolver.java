@@ -2,11 +2,11 @@ package net.kwas.acore.antlr.resolver;
 
 public interface NumberResolver extends StringResolver {
 
-    double resoveNumber();
+    double resolveNumber();
 
     @Override
     default String resolveString() {
-        return Double.toString(resoveNumber());
+        return Double.toString(resolveNumber());
     }
 
 }
