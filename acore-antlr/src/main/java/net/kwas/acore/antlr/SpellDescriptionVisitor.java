@@ -21,8 +21,10 @@ import net.kwas.acore.antlr.resolver.StaticStringResolver;
 import net.kwas.acore.antlr.resolver.StringConcatenationResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
+import net.kwas.acore.antlr.resolver.reference.DurationResolver;
 import net.kwas.acore.antlr.resolver.reference.GenderStringResolver;
 import net.kwas.acore.antlr.resolver.reference.LocalizedStringResolver;
+import net.kwas.acore.antlr.resolver.reference.MultiplierResolver;
 import net.kwas.acore.antlr.resolver.reference.VariableResolver;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -31,16 +33,9 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<StringResolver>> {
-
-    private final SpellContext spellCtx;
-
-    public SpellDescriptionVisitor(SpellContext spellCtx) {
-        this.spellCtx = spellCtx;
-    }
 
     public StringResolver parseSpellDescription(SpellDescriptionParser.SpellDescriptionContext ctx) {
         var results = visitSpellDescription(ctx);
@@ -127,27 +122,22 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitMultiplier(SpellDescriptionParser.MultiplierContext ctx) {
-        // TODO NEEDS TO BE <baseValue> + <1 for die count 1> at least
-        // Need to incorporate spell power and coefficient or something.....
-        // Who knows what to do if die count is > 1...
-//        var spellId = Integer.parseInt(ctx.spellId.getText());
-//        var index = Integer.parseInt(ctx.index.getText());
-//        var value = spellCtx.multipliers().get(spellId).get(index);
-        var value = Long.parseLong(ctx.index.getText());
-        return List.of(new StaticNumberResolver(10.0));
+        var index = Integer.parseInt(ctx.index.getText());
+        var spellId = ctx.spellId != null ? Long.getLong(ctx.spellId.getText()) : null;
+        return List.of(new MultiplierResolver(index, spellId));
     }
 
     @Override
     public List<StringResolver> visitSpellEffect(SpellDescriptionParser.SpellEffectContext ctx) {
-        // TODO Need to use lookups
-        var index = Long.parseLong(ctx.index.getText());
-        return List.of(new StaticNumberResolver(20.0));
+        // TODO Figure out how $s and $m actually differ and create a new resolver.
+        var index = Integer.parseInt(ctx.index.getText());
+        var spellId = ctx.spellId != null ? Long.getLong(ctx.spellId.getText()) : null;
+        return List.of(new MultiplierResolver(index, spellId));
     }
 
     @Override
     public List<StringResolver> visitDuration(SpellDescriptionParser.DurationContext ctx) {
-        // TODO actually implement
-        return List.of(new StaticNumberResolver(120.0));
+        return List.of(new DurationResolver());
     }
 
     @Override
@@ -343,22 +333,4 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         return retVal;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        SpellDescriptionVisitor that = (SpellDescriptionVisitor) o;
-        return Objects.equals(spellCtx, that.spellCtx);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(spellCtx);
-    }
-
-    @Override
-    public String toString() {
-        return "SpellDescriptionVisitor{" +
-            "spellCtx=" + spellCtx +
-            '}';
-    }
 }

@@ -2,12 +2,14 @@ package net.kwas.acore.antlr;
 
 import net.kwas.acore.antlr.grammar.SpellDescriptionLexer;
 import net.kwas.acore.antlr.grammar.SpellDescriptionParser;
+import net.kwas.acore.antlr.resolver.context.CharacterInfo;
+import net.kwas.acore.antlr.resolver.context.SpellContext;
+import net.kwas.acore.antlr.resolver.context.SpellInfo;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AntlrPlayground {
 
@@ -35,11 +37,22 @@ public class AntlrPlayground {
 
     public static void main(String[] args) {
 
-        var spellContext = new SpellContext(
-            100L,
-            Map.of()
+        var ctx = new SpellContext(
+            10L,
+            Map.of(
+                10L, new SpellInfo(
+                    List.of(1, 2, 3),
+                    List.of(1, 2, 3),
+                    List.of(1f, 2f, 3f),
+                    20
+                )
+            ),
+            new CharacterInfo(
+                30,
+                "Male"
+            )
         );
-        var visitor = new SpellDescriptionVisitor(spellContext);
+        var visitor = new SpellDescriptionVisitor();
 
         {
             var lexer = new SpellDescriptionLexer(CharStreams.fromString(INPUT));
@@ -47,26 +60,30 @@ public class AntlrPlayground {
             var parser = new SpellDescriptionParser(tokens);
             var tree = parser.spellDescription();
             var variables = visitor.parseSpellDescription(tree);
-            System.out.println("DESCRIPTION 1: " + variables.resolveString());
+            System.out.println("DESCRIPTION 1: " + variables.resolveString(ctx));
         }
 
-        {
-            var lexer = new SpellDescriptionLexer(CharStreams.fromString(CONDITIONAL_INPUT));
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new SpellDescriptionParser(tokens);
-            var tree = parser.spellDescription();
-            var variables = visitor.parseSpellDescription(tree);
-            System.out.println("DESCRIPTION 2: " + variables.resolveString());
-        }
-
-        {
-            var lexer = new SpellDescriptionLexer(CharStreams.fromString(VARIABLES_INPUT));
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new SpellDescriptionParser(tokens);
-            var tree = parser.spellDescriptionVariables();
-            var variables = visitor.parseSpellDescriptionVariables(tree);
-            System.out.println("VARIABLES 2: " + variables);
-        }
+//        {
+//            var lexer = new SpellDescriptionLexer(CharStreams.fromString(CONDITIONAL_INPUT));
+//            var tokens = new CommonTokenStream(lexer);
+//            var parser = new SpellDescriptionParser(tokens);
+//            var tree = parser.spellDescription();
+//            var variables = visitor.parseSpellDescription(tree);
+//            System.out.println("DESCRIPTION 2: " + variables.resolveString(ctx));
+//        }
+//
+//        {
+//            var lexer = new SpellDescriptionLexer(CharStreams.fromString(VARIABLES_INPUT));
+//            var tokens = new CommonTokenStream(lexer);
+//            var parser = new SpellDescriptionParser(tokens);
+//            var tree = parser.spellDescriptionVariables();
+//            var variables = visitor.parseSpellDescriptionVariables(tree);
+//            var resolved = variables.entrySet().stream()
+//                .map(x -> x.getKey() + " -> " + x.getValue().resolveString(ctx))
+//                .sorted()
+//                .toList();
+//            System.out.println("VARIABLES 2: " + resolved);
+//        }
 
     }
 

@@ -60,11 +60,37 @@ public class TestDbcReader {
 //        var areaTables = reader.readDbc(DbcAreaTable.class);
 //        printList(areaTables);
 
-//        var spellDurations = reader.readDbc(DbcSpellDuration.class);
-//        printList(spellDurations.stream().filter(x -> x.id == 4).toList());
+        var spells = reader.readDbc(DbcSpell.class);
+
+        var spellDurations = reader.readDbc(DbcSpellDuration.class);
+        printAll(spellDurations);
+        System.out.println();
+
+        var perLevelDurations = spellDurations.stream()
+            .filter(x -> x.durationPerLevel != 0)
+            .toList();
+        printAll(perLevelDurations);
+
+        var perLevelDurationIds = perLevelDurations.stream()
+            .map(x -> x.id)
+            .collect(Collectors.toSet());
+
+        var durationSpells = spells.stream()
+            .filter(x -> perLevelDurationIds.contains(x.durationIndex))
+            .toList();
+        printAll(durationSpells);
+
+
+        var durationSpellStrings = durationSpells.stream()
+            .map(x -> x.id + " -> " + x.durationIndex)
+            .collect(Collectors.toSet())
+            .stream()
+            .sorted()
+            .toList();
+        printAll(durationSpellStrings);
 
 //        var spellIds = Set.of(53L, 587L, 597L, 120L, 27650L, 47772L, 65422L);
-        var spells = reader.readDbc(DbcSpell.class);
+
 
 
 //        var ternarySpellId = 69427L;
@@ -85,13 +111,13 @@ public class TestDbcReader {
 //        var descSpell = spells.stream().filter(x -> x.descriptionVariablesId == spellDescriptionVariablesId).toList();
 //        System.out.println(descSpell.get(0).description0);
 
-        var allSpellDescriptionVars = spellDescriptionVariables.stream()
-            .map(x -> x.id + " -> " + x.variable)
-            .collect(Collectors.toSet())
-            .stream()
-            .sorted()
-            .collect(Collectors.joining("\n----\n"));
-        System.out.println(allSpellDescriptionVars);
+//        var allSpellDescriptionVars = spellDescriptionVariables.stream()
+//            .map(x -> x.id + " -> " + x.variable)
+//            .collect(Collectors.toSet())
+//            .stream()
+//            .sorted()
+//            .collect(Collectors.joining("\n----\n"));
+//        System.out.println(allSpellDescriptionVars);
 
 //        var allFormulas = spells.stream()
 //            .flatMap(x -> getFormulas(x.description0).stream())
@@ -116,6 +142,8 @@ public class TestDbcReader {
 //            .filter(x -> !x.getValue().isEmpty())
 //            .toList();
 //        printAll(tagsPerSpell);
+
+
     }
 
     private static List<String> getTags(String string) {
