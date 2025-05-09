@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<StringResolver>> {
@@ -44,7 +42,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         this.spellCtx = spellCtx;
     }
 
-    // TODO: Figure out how to add top level methods to easily get descriptions and variables (already in map form).
     public StringResolver parseSpellDescription(SpellDescriptionParser.SpellDescriptionContext ctx) {
         var results = visitSpellDescription(ctx);
         return getStringResolver(results);
@@ -296,21 +293,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         return new ConditionBranch<>(condition, value);
     }
 
-
-    @Override
-    protected List<StringResolver> defaultResult() {
-        return List.of();
-    }
-
-    @Override
-    protected List<StringResolver> aggregateResult(List<StringResolver> aggregate, List<StringResolver> nextResult) {
-        var retVal = new ArrayList<StringResolver>();
-        retVal.addAll(aggregate);
-        retVal.addAll(nextResult);
-
-        return retVal;
-    }
-
     private BooleanResolver getBooleanResolver(List<StringResolver> resolvers) {
         return getResolver(resolvers, BooleanResolver.class);
     }
@@ -335,6 +317,30 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         }
 
         return clazz.cast(stringResolver);
+    }
+
+    @Override
+    protected List<StringResolver> defaultResult() {
+        return List.of();
+    }
+
+    @Override
+    protected List<StringResolver> aggregateResult(List<StringResolver> aggregate, List<StringResolver> nextResult) {
+        List<StringResolver> retVal;
+
+        if (aggregate.isEmpty()) {
+            retVal = nextResult;
+        }
+        else if (nextResult.isEmpty()) {
+            retVal = aggregate;
+        }
+        else {
+            retVal = new ArrayList<>();
+            retVal.addAll(aggregate);
+            retVal.addAll(nextResult);
+        }
+
+        return retVal;
     }
 
     @Override
