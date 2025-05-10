@@ -10,10 +10,18 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AntlrPlayground {
 
-    private static final String INPUT = "Backstab the target 5, causing $m2% weapon damage plus ${$m1*1.5} to the target.  Must be behind the target.  Requires a dagger in the main hand.  Awards $s3 combo $lpoint:points;.  Math is ${(-1 + 2) / (3 + 4 / 5)} and ${ 1+2 } and ${$<mult> + $max( 10.20 ,$max($max(50 , 1),2 ))}.  Flat number is 2.5.";
+    private static final String INPUT = "Backstab the target 5, causing $m2% weapon damage plus ${$m1*1.5} to the target.  Must be behind the target.  Requires a dagger in the main hand.  Awards $s3 combo $lpoint:points;.  Math is ${(-1 + 2) / (3 + 4 / 5)} and ${ 1+2 } and ${$<mult> + $max( 10.20 ,$max($max(50 , 1),2 ))}.  Actual is $<actual>.  Var1 is $<var1>.";
+
+    private static final String VARIABLE_INPUT = """
+        $var1=30-10
+        $var2=${$<var1> + 3}
+        $actual=$?s50[${$<var2>*10}][${1}]
+        $mult=3
+        """;
 
     private static final String CONDITIONAL_INPUT = """
         Absorbs $s1 healing. This is a conditional: $?(s25306|!((!a48165)|a66109))[something returned true, $ghe:she; didn't do anything with $48165s3]?!a66109[something false else something true] [something false else something false, did $s2 mod damage to $ghim:her;] and lasts $d.
@@ -37,53 +45,40 @@ public class AntlrPlayground {
 
     public static void main(String[] args) {
 
+        var visitor = new SpellDescriptionVisitor();
+
+        var varLexer = new SpellDescriptionLexer(CharStreams.fromString(VARIABLE_INPUT));
+        var varTokens = new CommonTokenStream(varLexer);
+        var varParser = new SpellDescriptionParser(varTokens);
+        var varTree = varParser.spellDescriptionVariables();
+        var variables = visitor.parseSpellDescriptionVariables(varTree);
+        System.out.println("VARIABLES: " + variables);
+
         var ctx = new SpellContext(
             10L,
             Map.of(
                 10L, new SpellInfo(
-                    List.of(1, 2, 3),
-                    List.of(1, 2, 3),
+                    List.of(1, 2, 1),
+                    List.of(1, 2, 0),
                     List.of(1f, 2f, 3f),
                     20
                 )
             ),
             new CharacterInfo(
                 30,
-                "Male"
-            )
+                "Male",
+                Set.of(50L)
+            ),
+            variables
         );
-        var visitor = new SpellDescriptionVisitor();
 
-        {
-            var lexer = new SpellDescriptionLexer(CharStreams.fromString(INPUT));
-            var tokens = new CommonTokenStream(lexer);
-            var parser = new SpellDescriptionParser(tokens);
-            var tree = parser.spellDescription();
-            var variables = visitor.parseSpellDescription(tree);
-            System.out.println("DESCRIPTION 1: " + variables.resolveString(ctx));
-        }
+        var descLexer = new SpellDescriptionLexer(CharStreams.fromString(INPUT));
+        var descTokens = new CommonTokenStream(descLexer);
+        var descParser = new SpellDescriptionParser(descTokens);
+        var descTree = descParser.spellDescription();
+        var description = visitor.parseSpellDescription(descTree);
 
-//        {
-//            var lexer = new SpellDescriptionLexer(CharStreams.fromString(CONDITIONAL_INPUT));
-//            var tokens = new CommonTokenStream(lexer);
-//            var parser = new SpellDescriptionParser(tokens);
-//            var tree = parser.spellDescription();
-//            var variables = visitor.parseSpellDescription(tree);
-//            System.out.println("DESCRIPTION 2: " + variables.resolveString(ctx));
-//        }
-//
-//        {
-//            var lexer = new SpellDescriptionLexer(CharStreams.fromString(VARIABLES_INPUT));
-//            var tokens = new CommonTokenStream(lexer);
-//            var parser = new SpellDescriptionParser(tokens);
-//            var tree = parser.spellDescriptionVariables();
-//            var variables = visitor.parseSpellDescriptionVariables(tree);
-//            var resolved = variables.entrySet().stream()
-//                .map(x -> x.getKey() + " -> " + x.getValue().resolveString(ctx))
-//                .sorted()
-//                .toList();
-//            System.out.println("VARIABLES 2: " + resolved);
-//        }
+        System.out.println("DESCRIPTION: " + description.resolveString(ctx));
 
     }
 

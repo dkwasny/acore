@@ -7,8 +7,11 @@ public record VariableResolver(String variable) implements NumberResolver {
 
     @Override
     public double resolveNumber(SpellContext ctx) {
-        // TODO Get value from context
-        return 400.0;
+        var resolver = ctx.getVariables().get(variable);
+        if (resolver == null) {
+            throw new RuntimeException("Variable not found: " + variable);
+        }
+        return resolver.resolveNumber(ctx);
     }
 
 }

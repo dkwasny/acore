@@ -9,9 +9,24 @@ public record LocalizedStringResolver(List<String> resolvers) implements StringR
 
     @Override
     public String resolveString(SpellContext ctx) {
-        var lastRenderedNumber = ctx.getLastRenderedNumber();
+        // Cast to int so we can use it as an index
+        var lastRenderedNumber = (int)ctx.getLastRenderedNumber();
 
-        var index = (int)Math.max(Math.min(lastRenderedNumber, resolvers.size() - 1), 0);
+        if (lastRenderedNumber < 0) {
+            throw new RuntimeException("Unexpected negative value: " + lastRenderedNumber);
+        }
+
+        int index;
+        if (lastRenderedNumber == 0) {
+            // The number zero needs a plural word in english.
+            // Just use the last word in the list and pray.
+            index = resolvers.size() - 1;
+        }
+        else {
+            // I've seen cases where there are more than two options.
+            // I think this applies to non-english languages, but I'll keep the logic regardless.
+            index = Math.min(lastRenderedNumber - 1, resolvers.size() - 1);
+        }
 
         return resolvers.get(index);
     }
