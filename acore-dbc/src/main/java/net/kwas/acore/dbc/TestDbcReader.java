@@ -62,32 +62,38 @@ public class TestDbcReader {
 
         var spells = reader.readDbc(DbcSpell.class);
 
-        var spellDurations = reader.readDbc(DbcSpellDuration.class);
-        printAll(spellDurations);
-        System.out.println();
-
-        var perLevelDurations = spellDurations.stream()
-            .filter(x -> x.durationPerLevel != 0)
+        var relevantSpells = spells.stream()
+            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
             .toList();
-        printAll(perLevelDurations);
 
-        var perLevelDurationIds = perLevelDurations.stream()
-            .map(x -> x.id)
-            .collect(Collectors.toSet());
+        System.out.println("");
 
-        var durationSpells = spells.stream()
-            .filter(x -> perLevelDurationIds.contains(x.durationIndex))
-            .toList();
-        printAll(durationSpells);
-
-
-        var durationSpellStrings = durationSpells.stream()
-            .map(x -> x.id + " -> " + x.durationIndex)
-            .collect(Collectors.toSet())
-            .stream()
-            .sorted()
-            .toList();
-        printAll(durationSpellStrings);
+//        var spellDurations = reader.readDbc(DbcSpellDuration.class);
+//        printAll(spellDurations);
+//        System.out.println();
+//
+//        var perLevelDurations = spellDurations.stream()
+//            .filter(x -> x.durationPerLevel != 0)
+//            .toList();
+//        printAll(perLevelDurations);
+//
+//        var perLevelDurationIds = perLevelDurations.stream()
+//            .map(x -> x.id)
+//            .collect(Collectors.toSet());
+//
+//        var durationSpells = spells.stream()
+//            .filter(x -> perLevelDurationIds.contains(x.durationIndex))
+//            .toList();
+//        printAll(durationSpells);
+//
+//
+//        var durationSpellStrings = durationSpells.stream()
+//            .map(x -> x.id + " -> " + x.durationIndex)
+//            .collect(Collectors.toSet())
+//            .stream()
+//            .sorted()
+//            .toList();
+//        printAll(durationSpellStrings);
 
 //        var spellIds = Set.of(53L, 587L, 597L, 120L, 27650L, 47772L, 65422L);
 

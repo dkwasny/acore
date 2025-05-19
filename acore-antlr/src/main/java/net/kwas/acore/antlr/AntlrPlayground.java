@@ -61,6 +61,8 @@ public class AntlrPlayground {
                     List.of(1, 2, 1),
                     List.of(1, 2, 0),
                     List.of(1f, 2f, 3f),
+                    List.of(0f, 0f, 0f),
+                    List.of(0L, 0L, 0L),
                     20
                 )
             ),

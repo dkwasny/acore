@@ -21,9 +21,11 @@ identifier: (LOWER_A_CHAR
     | LOWER_G_CHAR
     | LOWER_L_CHAR
     | LOWER_M_CHAR
+    | LOWER_O_CHAR
     | LOWER_S_CHAR
     | LOWER_T_CHAR
     | LOWER_X_CHAR
+    | UPPER_M_CHAR
     | OTHER_CHARS
     | DIGITS)+ ;
 
@@ -33,11 +35,6 @@ miscChars: (WS
     | COMMA
     | COLON
     | EQUAL)+ ;
-
-positiveInteger: DIGITS ;
-decimal: HYPHEN? DIGITS (PERIOD DIGITS)? ;
-
-number: (positiveInteger | decimal) ;
 
 formula: DOLLAR_SIGN '{' WS* formulaFragment WS* '}' ;
 
@@ -60,9 +57,9 @@ greaterThan: greaterThanHeader OPEN_PAREN WS* left=formulaFragment WS* COMMA WS*
 greaterThanHeader: DOLLAR_SIGN LOWER_G_CHAR LOWER_T_CHAR ;
 
 // References that can show up in formulas
-formulaReference: multiplier
-    | spellEffect
+formulaReference: damageBound
     | duration
+    | auraPeriod
     | variableReference
     ;
 
@@ -83,21 +80,30 @@ conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
     | conditionalSpellRef
     ;
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
-
-multiplier: DOLLAR_SIGN spellId=positiveInteger? LOWER_M_CHAR index=positiveInteger ;
-spellEffect: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
-duration: DOLLAR_SIGN LOWER_D_CHAR ;
+damageBound: DOLLAR_SIGN spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
+duration: DOLLAR_SIGN spellId=positiveInteger? LOWER_D_CHAR ;
+auraPeriod: DOLLAR_SIGN spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
 variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
+positiveInteger: DIGITS ;
+decimal: HYPHEN? DIGITS (PERIOD DIGITS)? ;
+
+number: (positiveInteger | decimal) ;
 
 // All reference types
 reference: formulaReference
     | localizedString
     | genderString
+    | auraDamageString
+    | dividedDamageString
+    | damageString
     ;
 
 localizedString: DOLLAR_SIGN LOWER_L_CHAR identifier (COLON identifier)* ';';
 genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
+auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
+dividedDamageString: DOLLAR_SIGN FORWARD_SLASH divisor=positiveInteger SEMI_COLON LOWER_S_CHAR index=positiveInteger ;
+damageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
 
 STAR: '*' ;
 FORWARD_SLASH: '/' ;
@@ -118,10 +124,12 @@ LOWER_D_CHAR: 'd' ;
 LOWER_G_CHAR: 'g' ;
 LOWER_L_CHAR: 'l' ;
 LOWER_M_CHAR: 'm' ;
+LOWER_O_CHAR: 'o' ;
 LOWER_S_CHAR: 's' ;
 LOWER_T_CHAR: 't' ;
 LOWER_X_CHAR: 'x' ;
-OTHER_CHARS: [bcefhijknopqruvwyzA-Z]+ ;
+UPPER_M_CHAR: 'M' ;
+OTHER_CHARS: [bcefhijknpqruvwyzABCDEFGHIJKLNOPQRSTUVWXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;
@@ -130,5 +138,6 @@ COLON: ':' ;
 EQUAL: '=' ;
 DOLLAR_SIGN: '$' ;
 QUESTION_MARK: '?' ;
+SEMI_COLON: ';' ;
 
 DIGITS: [0-9]+ ;

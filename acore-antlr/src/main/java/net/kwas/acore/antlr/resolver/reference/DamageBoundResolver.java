@@ -3,7 +3,7 @@ package net.kwas.acore.antlr.resolver.reference;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.NumberResolver;
 
-public record MultiplierResolver(int index, Long spellId) implements NumberResolver {
+public record DamageBoundResolver(int index, Long spellId, boolean isUpperBound) implements NumberResolver {
 
     @Override
     public double resolveNumber(SpellContext ctx) {
@@ -12,12 +12,17 @@ public record MultiplierResolver(int index, Long spellId) implements NumberResol
         var actualIndex = index - 1;
         var spellInfo = ctx.getSpellInfos().get(mySpellId);
         var baseValue = spellInfo.baseValues().get(actualIndex);
+
+        var effectPerLevel = spellInfo.baseValuePerLevels().get(actualIndex);
+        var characterLevel = ctx.getCharacterInfo().characterLevel();
+        var perLevelBonus = effectPerLevel * characterLevel;
+
         var dieSides = spellInfo.dieSides().get(actualIndex);
 
-        // TODO NEEDS TO BE <baseValue> + <1 for die count 1> at least
-        // I feel like we need to incorporate spell power and coefficient or something.....
-        // Who knows what to do if die count is > 1...
-        return baseValue + dieSides;
+        var roll = isUpperBound ? dieSides : 1;
+
+        // TODO: I feel like we need to incorporate spell power and coefficient or something.....
+        return baseValue + perLevelBonus + roll;
     }
 
 }

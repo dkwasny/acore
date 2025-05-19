@@ -7,8 +7,7 @@ public record ConditionalSpellRefResolver(long spellId) implements BooleanResolv
 
     @Override
     public boolean resolveBoolean(SpellContext ctx) {
-        // TODO: See if context has spellId
-        return true;
+        return ctx.getCharacterInfo().learnedSpellIds().contains(spellId);
     }
 
 }

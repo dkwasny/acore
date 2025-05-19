@@ -21,10 +21,14 @@ import net.kwas.acore.antlr.resolver.StaticStringResolver;
 import net.kwas.acore.antlr.resolver.StringConcatenationResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
+import net.kwas.acore.antlr.resolver.reference.AuraDamageStringResolver;
+import net.kwas.acore.antlr.resolver.reference.AuraPeriodResolver;
+import net.kwas.acore.antlr.resolver.reference.DamageStringResolver;
+import net.kwas.acore.antlr.resolver.reference.DividedDamageStringResolver;
 import net.kwas.acore.antlr.resolver.reference.DurationResolver;
 import net.kwas.acore.antlr.resolver.reference.GenderStringResolver;
 import net.kwas.acore.antlr.resolver.reference.LocalizedStringResolver;
-import net.kwas.acore.antlr.resolver.reference.MultiplierResolver;
+import net.kwas.acore.antlr.resolver.reference.DamageBoundResolver;
 import net.kwas.acore.antlr.resolver.reference.VariableResolver;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -121,23 +125,31 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitMultiplier(SpellDescriptionParser.MultiplierContext ctx) {
+    public List<StringResolver> visitDamageBound(SpellDescriptionParser.DamageBoundContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
-        var spellId = ctx.spellId != null ? Long.getLong(ctx.spellId.getText()) : null;
-        return List.of(new MultiplierResolver(index, spellId));
+        var spellId = getOptionalInteger(ctx.spellId);
+        var isUpper = ctx.UPPER_M_CHAR() != null;
+        return List.of(new DamageBoundResolver(index, spellId, isUpper));
     }
 
     @Override
-    public List<StringResolver> visitSpellEffect(SpellDescriptionParser.SpellEffectContext ctx) {
-        // TODO Figure out how $s and $m actually differ and create a new resolver.
+    public List<StringResolver> visitDamageString(SpellDescriptionParser.DamageStringContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
-        var spellId = ctx.spellId != null ? Long.getLong(ctx.spellId.getText()) : null;
-        return List.of(new MultiplierResolver(index, spellId));
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new DamageStringResolver(index, spellId));
     }
 
     @Override
     public List<StringResolver> visitDuration(SpellDescriptionParser.DurationContext ctx) {
-        return List.of(new DurationResolver());
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new DurationResolver(spellId));
+    }
+
+    @Override
+    public List<StringResolver> visitAuraPeriod(SpellDescriptionParser.AuraPeriodContext ctx) {
+        var spellId = getOptionalInteger(ctx.spellId);
+        var index = Integer.parseInt(ctx.index.getText());
+        return List.of(new AuraPeriodResolver(spellId, index));
     }
 
     @Override
@@ -151,6 +163,20 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var maleString = ctx.male.getText();
         var femaleString = ctx.female.getText();
         return List.of(new GenderStringResolver(maleString, femaleString));
+    }
+
+    @Override
+    public List<StringResolver> visitAuraDamageString(SpellDescriptionParser.AuraDamageStringContext ctx) {
+        var spellId = getOptionalInteger(ctx.spellId);
+        var index = Integer.parseInt(ctx.index.getText());
+        return List.of(new AuraDamageStringResolver(index, spellId));
+    }
+
+    @Override
+    public List<StringResolver> visitDividedDamageString(SpellDescriptionParser.DividedDamageStringContext ctx) {
+        var divisor = Double.parseDouble(ctx.divisor.getText());
+        var spellIdx = Integer.parseInt(ctx.index.getText());
+        return List.of(new DividedDamageStringResolver(spellIdx, null, divisor));
     }
 
     @Override
@@ -307,6 +333,10 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         }
 
         return clazz.cast(stringResolver);
+    }
+
+    private Long getOptionalInteger(SpellDescriptionParser.PositiveIntegerContext ctx) {
+        return ctx != null ? Long.getLong(ctx.getText()) : null;
     }
 
     @Override
