@@ -153,6 +153,36 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitProcCharges(SpellDescriptionParser.ProcChargesContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitProcCharges(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitProcChance(SpellDescriptionParser.ProcChanceContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitProcChance(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitChainTargets(SpellDescriptionParser.ChainTargetsContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitChainTargets(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitRadius(SpellDescriptionParser.RadiusContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitRadius(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitHearthstoneLocation(SpellDescriptionParser.HearthstoneLocationContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitHearthstoneLocation(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitLocalizedString(SpellDescriptionParser.LocalizedStringContext ctx) {
         var values = ctx.identifier().stream().map(RuleContext::getText).toList();
         return List.of(new LocalizedStringResolver(values));
@@ -198,7 +228,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var right = getNumberResolver(ctx.right.accept(this));
         return List.of(new GreaterThanResolver(left, right));
     }
-
 
     @Override
     public List<StringResolver> visitConditionalSpellRef(SpellDescriptionParser.ConditionalSpellRefContext ctx) {

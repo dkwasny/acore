@@ -3,6 +3,7 @@ package net.kwas.acore.dbc;
 import net.kwas.acore.dbc.model.record.DbcSpell;
 import net.kwas.acore.dbc.model.record.DbcSpellDescriptionVariables;
 import net.kwas.acore.dbc.model.record.DbcSpellDuration;
+import net.kwas.acore.dbc.model.record.DbcSpellRadius;
 import net.kwas.acore.dbc.reader.DbcReader;
 
 import java.nio.file.Paths;
@@ -63,8 +64,15 @@ public class TestDbcReader {
         var spells = reader.readDbc(DbcSpell.class);
 
         var relevantSpells = spells.stream()
-            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
+//            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
+//            .filter(x -> x.id == 324L)
+            .filter(x -> x.description0.contains("$a"))
+//            .filter(x -> x.procChance < 100)
             .toList();
+
+
+
+        var spellRadii = reader.readDbc(DbcSpellRadius.class);
 
         System.out.println("");
 

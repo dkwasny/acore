@@ -19,12 +19,15 @@ variableDefinition: (numericConditional | formula | formulaFragment) ;
 identifier: (LOWER_A_CHAR
     | LOWER_D_CHAR
     | LOWER_G_CHAR
+    | LOWER_H_CHAR
     | LOWER_L_CHAR
     | LOWER_M_CHAR
+    | LOWER_N_CHAR
     | LOWER_O_CHAR
     | LOWER_S_CHAR
     | LOWER_T_CHAR
     | LOWER_X_CHAR
+    | LOWER_Z_CHAR
     | UPPER_M_CHAR
     | OTHER_CHARS
     | DIGITS)+ ;
@@ -60,6 +63,10 @@ greaterThanHeader: DOLLAR_SIGN LOWER_G_CHAR LOWER_T_CHAR ;
 formulaReference: damageBound
     | duration
     | auraPeriod
+    | procCharges
+    | procChance
+    | chainTargets
+    | radius
     | variableReference
     ;
 
@@ -83,6 +90,10 @@ conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
 damageBound: DOLLAR_SIGN spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
 duration: DOLLAR_SIGN spellId=positiveInteger? LOWER_D_CHAR ;
 auraPeriod: DOLLAR_SIGN spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
+procCharges: DOLLAR_SIGN spellId=positiveInteger? LOWER_N_CHAR ;
+procChance: DOLLAR_SIGN spellId=positiveInteger? LOWER_H_CHAR ;
+chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
+radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
 variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
 positiveInteger: DIGITS ;
@@ -97,6 +108,7 @@ reference: formulaReference
     | auraDamageString
     | dividedDamageString
     | damageString
+    | hearthstoneLocation
     ;
 
 localizedString: DOLLAR_SIGN LOWER_L_CHAR identifier (COLON identifier)* ';';
@@ -104,6 +116,7 @@ genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier '
 auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
 dividedDamageString: DOLLAR_SIGN FORWARD_SLASH divisor=positiveInteger SEMI_COLON LOWER_S_CHAR index=positiveInteger ;
 damageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
 
 STAR: '*' ;
 FORWARD_SLASH: '/' ;
@@ -122,14 +135,17 @@ CLOSE_SQUARE: ']' ;
 LOWER_A_CHAR: 'a' ;
 LOWER_D_CHAR: 'd' ;
 LOWER_G_CHAR: 'g' ;
+LOWER_H_CHAR: 'h' ;
 LOWER_L_CHAR: 'l' ;
 LOWER_M_CHAR: 'm' ;
+LOWER_N_CHAR: 'n' ;
 LOWER_O_CHAR: 'o' ;
 LOWER_S_CHAR: 's' ;
 LOWER_T_CHAR: 't' ;
 LOWER_X_CHAR: 'x' ;
+LOWER_Z_CHAR: 'z' ;
 UPPER_M_CHAR: 'M' ;
-OTHER_CHARS: [bcefhijknpqruvwyzABCDEFGHIJKLNOPQRSTUVWXYZ]+ ;
+OTHER_CHARS: [bcefijkpqruvwyABCDEFGHIJKLNOPQRSTUVWXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;

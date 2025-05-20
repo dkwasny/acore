@@ -11,4 +11,15 @@ public record DurationResolver(Long spellId) implements NumberResolver {
         return ctx.getSpellInfos().get(mySpellId).duration();
     }
 
+    @Override
+    public String resolveString(SpellContext ctx) {
+
+        // TODO: Dynamically choose text based on time.
+        // e.g. 10 sec vs 10 min
+        return NumberResolver.super.resolveString(ctx);
+    }
+
+
+
+
 }
