@@ -10,8 +10,9 @@ public interface NumberResolver extends StringResolver {
     default String resolveString(SpellContext ctx) {
         var value = resolveNumber(ctx);
         var rounded = Math.round(value);
-        ctx.setLastRenderedNumber(rounded);
-        return Long.toString(rounded);
+        var absoluteValue = Math.abs(rounded);
+        ctx.setLastRenderedNumber(absoluteValue);
+        return Long.toString(absoluteValue);
     }
 
 }

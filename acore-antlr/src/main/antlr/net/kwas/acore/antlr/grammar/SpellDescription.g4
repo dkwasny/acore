@@ -17,6 +17,7 @@ string: formula
 variableDefinition: (numericConditional | formula | formulaFragment) ;
 
 identifier: (LOWER_A_CHAR
+    | LOWER_B_CHAR
     | LOWER_D_CHAR
     | LOWER_G_CHAR
     | LOWER_H_CHAR
@@ -24,11 +25,20 @@ identifier: (LOWER_A_CHAR
     | LOWER_M_CHAR
     | LOWER_N_CHAR
     | LOWER_O_CHAR
+    | LOWER_Q_CHAR
     | LOWER_S_CHAR
     | LOWER_T_CHAR
+    | LOWER_W_CHAR
     | LOWER_X_CHAR
     | LOWER_Z_CHAR
+    | UPPER_A_CHAR
+    | UPPER_B_CHAR
+    | UPPER_H_CHAR
+    | UPPER_I_CHAR
     | UPPER_M_CHAR
+    | UPPER_P_CHAR
+    | UPPER_S_CHAR
+    | UPPER_W_CHAR
     | OTHER_CHARS
     | DIGITS)+ ;
 
@@ -37,7 +47,8 @@ miscChars: (WS
     | NON_WORD
     | COMMA
     | COLON
-    | EQUAL)+ ;
+    | EQUAL
+    | HYPHEN)+ ;
 
 formula: DOLLAR_SIGN '{' WS* formulaFragment WS* '}' ;
 
@@ -67,8 +78,34 @@ formulaReference: damageBound
     | procChance
     | chainTargets
     | radius
+    | miscValue
+    | pointsPerCombo
     | variableReference
+    | attackPower
+    | mainWeaponDamage
+    | mainWeaponSpeed
+    | spellPower
+    | spirit
     ;
+
+damageBound: DOLLAR_SIGN spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
+duration: DOLLAR_SIGN spellId=positiveInteger? LOWER_D_CHAR ;
+auraPeriod: DOLLAR_SIGN spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
+procCharges: DOLLAR_SIGN spellId=positiveInteger? LOWER_N_CHAR ;
+procChance: DOLLAR_SIGN spellId=positiveInteger? LOWER_H_CHAR ;
+chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
+radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
+miscValue: DOLLAR_SIGN spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
+pointsPerCombo: DOLLAR_SIGN spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
+variableReference: DOLLAR_SIGN '<' identifier '>' ;
+
+attackPower: DOLLAR_SIGN UPPER_A_CHAR UPPER_P_CHAR ;
+mainWeaponDamage: DOLLAR_SIGN ((LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR) | (UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR)) ;
+mainWeaponSpeed: DOLLAR_SIGN UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR ;
+// TODO: Split into different spell power types if we can get said values.
+// I don't think the acore database has them.  Just the base value.
+spellPower: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
+spirit: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
 
 numericConditional: numericConditionalIf WS* numericConditionalElseIf* WS* numericConditionalElse ;
 numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
@@ -87,17 +124,10 @@ conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
     | conditionalSpellRef
     ;
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
-damageBound: DOLLAR_SIGN spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
-duration: DOLLAR_SIGN spellId=positiveInteger? LOWER_D_CHAR ;
-auraPeriod: DOLLAR_SIGN spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
-procCharges: DOLLAR_SIGN spellId=positiveInteger? LOWER_N_CHAR ;
-procChance: DOLLAR_SIGN spellId=positiveInteger? LOWER_H_CHAR ;
-chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
-radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
-variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
 positiveInteger: DIGITS ;
-decimal: HYPHEN? DIGITS (PERIOD DIGITS)? ;
+
+decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
 
 number: (positiveInteger | decimal) ;
 
@@ -106,7 +136,7 @@ reference: formulaReference
     | localizedString
     | genderString
     | auraDamageString
-    | dividedDamageString
+    | multipliedDamageString
     | damageString
     | hearthstoneLocation
     ;
@@ -114,7 +144,7 @@ reference: formulaReference
 localizedString: DOLLAR_SIGN LOWER_L_CHAR identifier (COLON identifier)* ';';
 genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
 auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
-dividedDamageString: DOLLAR_SIGN FORWARD_SLASH divisor=positiveInteger SEMI_COLON LOWER_S_CHAR index=positiveInteger ;
+multipliedDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) multiplier=positiveInteger SEMI_COLON LOWER_S_CHAR index=positiveInteger ;
 damageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
 hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
 
@@ -133,6 +163,7 @@ OPEN_SQUARE: '[' ;
 CLOSE_SQUARE: ']' ;
 
 LOWER_A_CHAR: 'a' ;
+LOWER_B_CHAR: 'b' ;
 LOWER_D_CHAR: 'd' ;
 LOWER_G_CHAR: 'g' ;
 LOWER_H_CHAR: 'h' ;
@@ -140,12 +171,21 @@ LOWER_L_CHAR: 'l' ;
 LOWER_M_CHAR: 'm' ;
 LOWER_N_CHAR: 'n' ;
 LOWER_O_CHAR: 'o' ;
+LOWER_Q_CHAR: 'q' ;
 LOWER_S_CHAR: 's' ;
 LOWER_T_CHAR: 't' ;
+LOWER_W_CHAR: 'w' ;
 LOWER_X_CHAR: 'x' ;
 LOWER_Z_CHAR: 'z' ;
+UPPER_A_CHAR: 'A' ;
+UPPER_B_CHAR: 'B' ;
+UPPER_H_CHAR: 'H' ;
+UPPER_I_CHAR: 'I' ;
 UPPER_M_CHAR: 'M' ;
-OTHER_CHARS: [bcefijkpqruvwyABCDEFGHIJKLNOPQRSTUVWXYZ]+ ;
+UPPER_P_CHAR: 'P' ;
+UPPER_S_CHAR: 'S' ;
+UPPER_W_CHAR: 'W' ;
+OTHER_CHARS: [bcefijkpruvyCDEFGJKLNOQRTUVXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;

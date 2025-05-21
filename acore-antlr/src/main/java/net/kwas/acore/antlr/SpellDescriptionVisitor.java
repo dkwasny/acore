@@ -24,7 +24,7 @@ import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
 import net.kwas.acore.antlr.resolver.reference.AuraDamageStringResolver;
 import net.kwas.acore.antlr.resolver.reference.AuraPeriodResolver;
 import net.kwas.acore.antlr.resolver.reference.DamageStringResolver;
-import net.kwas.acore.antlr.resolver.reference.DividedDamageStringResolver;
+import net.kwas.acore.antlr.resolver.reference.MultipliedDamageStringResolver;
 import net.kwas.acore.antlr.resolver.reference.DurationResolver;
 import net.kwas.acore.antlr.resolver.reference.GenderStringResolver;
 import net.kwas.acore.antlr.resolver.reference.LocalizedStringResolver;
@@ -183,6 +183,48 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitMiscValue(SpellDescriptionParser.MiscValueContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMiscValue(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitPointsPerCombo(SpellDescriptionParser.PointsPerComboContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitPointsPerCombo(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitAttackPower(SpellDescriptionParser.AttackPowerContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitAttackPower(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponDamage(SpellDescriptionParser.MainWeaponDamageContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMainWeaponDamage(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponSpeed(SpellDescriptionParser.MainWeaponSpeedContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMainWeaponSpeed(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitSpellPower(SpellDescriptionParser.SpellPowerContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitSpellPower(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitSpirit(SpellDescriptionParser.SpiritContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitSpirit(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitLocalizedString(SpellDescriptionParser.LocalizedStringContext ctx) {
         var values = ctx.identifier().stream().map(RuleContext::getText).toList();
         return List.of(new LocalizedStringResolver(values));
@@ -203,10 +245,15 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitDividedDamageString(SpellDescriptionParser.DividedDamageStringContext ctx) {
-        var divisor = Double.parseDouble(ctx.divisor.getText());
+    public List<StringResolver> visitMultipliedDamageString(SpellDescriptionParser.MultipliedDamageStringContext ctx) {
+        var multiplier = Double.parseDouble(ctx.multiplier.getText());
+
+        if (ctx.FORWARD_SLASH() != null) {
+            multiplier = 1 / multiplier;
+        }
+
         var spellIdx = Integer.parseInt(ctx.index.getText());
-        return List.of(new DividedDamageStringResolver(spellIdx, null, divisor));
+        return List.of(new MultipliedDamageStringResolver(spellIdx, null, multiplier));
     }
 
     @Override
