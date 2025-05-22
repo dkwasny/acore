@@ -19,8 +19,10 @@ variableDefinition: (numericConditional | formula | formulaFragment) ;
 identifier: (LOWER_A_CHAR
     | LOWER_B_CHAR
     | LOWER_D_CHAR
+    | LOWER_E_CHAR
     | LOWER_G_CHAR
     | LOWER_H_CHAR
+    | LOWER_I_CHAR
     | LOWER_L_CHAR
     | LOWER_M_CHAR
     | LOWER_N_CHAR
@@ -35,8 +37,10 @@ identifier: (LOWER_A_CHAR
     | UPPER_B_CHAR
     | UPPER_H_CHAR
     | UPPER_I_CHAR
+    | UPPER_L_CHAR
     | UPPER_M_CHAR
     | UPPER_P_CHAR
+    | UPPER_R_CHAR
     | UPPER_S_CHAR
     | UPPER_W_CHAR
     | OTHER_CHARS
@@ -80,8 +84,11 @@ formulaReference: damageBound
     | radius
     | miscValue
     | pointsPerCombo
+    | amplitude
+    | maxTargets
     | variableReference
     | attackPower
+    | rangedAttackPower
     | mainWeaponDamage
     | mainWeaponSpeed
     | spellPower
@@ -97,9 +104,13 @@ chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
 radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
 miscValue: DOLLAR_SIGN spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
 pointsPerCombo: DOLLAR_SIGN spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
+// A missing index sems to imply the first index (1)
+amplitude: DOLLAR_SIGN spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
+maxTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_I_CHAR ;
 variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
 attackPower: DOLLAR_SIGN UPPER_A_CHAR UPPER_P_CHAR ;
+rangedAttackPower: DOLLAR_SIGN UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
 mainWeaponDamage: DOLLAR_SIGN ((LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR) | (UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR)) ;
 mainWeaponSpeed: DOLLAR_SIGN UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR ;
 // TODO: Split into different spell power types if we can get said values.
@@ -113,9 +124,9 @@ numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula 
 numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
 
 stringConditional: stringConditionalIf WS* stringConditionalElseIf* WS* stringConditionalElse ;
-stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text CLOSE_SQUARE;
-stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text CLOSE_SQUARE ;
-stringConditionalElse: OPEN_SQUARE text CLOSE_SQUARE ;
+stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE;
+stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE ;
+stringConditionalElse: OPEN_SQUARE text? CLOSE_SQUARE ;
 
 conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
     | EXCLAMATION_POINT WS* conditionalFragment
@@ -135,17 +146,17 @@ number: (positiveInteger | decimal) ;
 reference: formulaReference
     | localizedString
     | genderString
+    | damageString
     | auraDamageString
     | multipliedDamageString
-    | damageString
     | hearthstoneLocation
     ;
 
-localizedString: DOLLAR_SIGN LOWER_L_CHAR identifier (COLON identifier)* ';';
+localizedString: DOLLAR_SIGN (UPPER_L_CHAR | LOWER_L_CHAR) identifier (COLON identifier)* ';';
 genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
-auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
-multipliedDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) multiplier=positiveInteger SEMI_COLON LOWER_S_CHAR index=positiveInteger ;
 damageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
+multipliedDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) multiplier=positiveInteger SEMI_COLON spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
 hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
 
 STAR: '*' ;
@@ -165,8 +176,10 @@ CLOSE_SQUARE: ']' ;
 LOWER_A_CHAR: 'a' ;
 LOWER_B_CHAR: 'b' ;
 LOWER_D_CHAR: 'd' ;
+LOWER_E_CHAR: 'e' ;
 LOWER_G_CHAR: 'g' ;
 LOWER_H_CHAR: 'h' ;
+LOWER_I_CHAR: 'i' ;
 LOWER_L_CHAR: 'l' ;
 LOWER_M_CHAR: 'm' ;
 LOWER_N_CHAR: 'n' ;
@@ -181,11 +194,13 @@ UPPER_A_CHAR: 'A' ;
 UPPER_B_CHAR: 'B' ;
 UPPER_H_CHAR: 'H' ;
 UPPER_I_CHAR: 'I' ;
+UPPER_L_CHAR: 'L' ;
 UPPER_M_CHAR: 'M' ;
 UPPER_P_CHAR: 'P' ;
+UPPER_R_CHAR: 'R' ;
 UPPER_S_CHAR: 'S' ;
 UPPER_W_CHAR: 'W' ;
-OTHER_CHARS: [bcefijkpruvyCDEFGJKLNOQRTUVXYZ]+ ;
+OTHER_CHARS: [bcfijkpruvyCDEFGJKNOQTUVXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;

@@ -195,9 +195,29 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitAmplitude(SpellDescriptionParser.AmplitudeContext ctx) {
+        // TODO IMPLEMENT
+        // Index can be missing on this one.  Use `1` in this case.
+        return super.visitAmplitude(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMaxTargets(SpellDescriptionParser.MaxTargetsContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMaxTargets(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitAttackPower(SpellDescriptionParser.AttackPowerContext ctx) {
         // TODO IMPLEMENT
         return super.visitAttackPower(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitRangedAttackPower(SpellDescriptionParser.RangedAttackPowerContext ctx) {
+        // TODO IMPLEMENT
+        // Not sure if we can get specifically ranged attack power...might need to settle for normal attack power.
+        return super.visitRangedAttackPower(ctx);
     }
 
     @Override
@@ -252,8 +272,9 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
             multiplier = 1 / multiplier;
         }
 
+        var spellId = getOptionalInteger(ctx.spellId);
         var spellIdx = Integer.parseInt(ctx.index.getText());
-        return List.of(new MultipliedDamageStringResolver(spellIdx, null, multiplier));
+        return List.of(new MultipliedDamageStringResolver(spellIdx, spellId, multiplier));
     }
 
     @Override
