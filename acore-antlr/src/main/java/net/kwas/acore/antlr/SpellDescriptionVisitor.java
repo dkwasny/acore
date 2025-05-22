@@ -21,10 +21,9 @@ import net.kwas.acore.antlr.resolver.StaticStringResolver;
 import net.kwas.acore.antlr.resolver.StringConcatenationResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
-import net.kwas.acore.antlr.resolver.reference.AuraDamageStringResolver;
+import net.kwas.acore.antlr.resolver.reference.AuraDamageBoundResolver;
 import net.kwas.acore.antlr.resolver.reference.AuraPeriodResolver;
 import net.kwas.acore.antlr.resolver.reference.DamageStringResolver;
-import net.kwas.acore.antlr.resolver.reference.MultipliedDamageStringResolver;
 import net.kwas.acore.antlr.resolver.reference.DurationResolver;
 import net.kwas.acore.antlr.resolver.reference.GenderStringResolver;
 import net.kwas.acore.antlr.resolver.reference.LocalizedStringResolver;
@@ -130,13 +129,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var spellId = getOptionalInteger(ctx.spellId);
         var isUpper = ctx.UPPER_M_CHAR() != null;
         return List.of(new DamageBoundResolver(index, spellId, isUpper));
-    }
-
-    @Override
-    public List<StringResolver> visitDamageString(SpellDescriptionParser.DamageStringContext ctx) {
-        var index = Integer.parseInt(ctx.index.getText());
-        var spellId = getOptionalInteger(ctx.spellId);
-        return List.of(new DamageStringResolver(index, spellId));
     }
 
     @Override
@@ -258,23 +250,62 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitAuraDamageString(SpellDescriptionParser.AuraDamageStringContext ctx) {
-        var spellId = getOptionalInteger(ctx.spellId);
+    public List<StringResolver> visitDamageStringFragment(SpellDescriptionParser.DamageStringFragmentContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
-        return List.of(new AuraDamageStringResolver(index, spellId));
+        var spellId = getOptionalInteger(ctx.spellId);
+
+        var lowerBoundResolver = new DamageBoundResolver(index, spellId, false);
+        var upperBoundResolver = new DamageBoundResolver(index, spellId, true);
+
+        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
     }
 
     @Override
-    public List<StringResolver> visitMultipliedDamageString(SpellDescriptionParser.MultipliedDamageStringContext ctx) {
-        var multiplier = Double.parseDouble(ctx.multiplier.getText());
+    public List<StringResolver> visitAuraDamageStringFragment(SpellDescriptionParser.AuraDamageStringFragmentContext ctx) {
+        var index = Integer.parseInt(ctx.index.getText());
+        var spellId = getOptionalInteger(ctx.spellId);
 
-        if (ctx.FORWARD_SLASH() != null) {
-            multiplier = 1 / multiplier;
+        var lowerBoundResolver = new AuraDamageBoundResolver(index, spellId, false);
+        var upperBoundResolver = new AuraDamageBoundResolver(index, spellId, true);
+
+        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
+    }
+
+    @Override
+    public List<StringResolver> visitArithmeticDamageString(SpellDescriptionParser.ArithmeticDamageStringContext ctx) {
+        var right = Double.parseDouble(ctx.right.getText());
+
+        List<StringResolver> childResolver;
+        if (ctx.damageStringFragment() != null) {
+            childResolver = ctx.damageStringFragment().accept(this);
+        }
+        else if (ctx.auraDamageStringFragment() != null) {
+            childResolver = ctx.auraDamageStringFragment().accept(this);
+        }
+        else {
+            throw new RuntimeException("No damage resolver for arithmetic resolver");
         }
 
-        var spellId = getOptionalInteger(ctx.spellId);
-        var spellIdx = Integer.parseInt(ctx.index.getText());
-        return List.of(new MultipliedDamageStringResolver(spellIdx, spellId, multiplier));
+        // Leverage DamageStringResolver as a "pair" of number resolvers.
+        // Throw away the damage resolver itself after retrieving the two bound resolvers.
+        var damageResolver = getResolver(childResolver, DamageStringResolver.class);
+        var rightResolver = new StaticNumberResolver(right);
+
+        NumberResolver lowerBoundResolver;
+        NumberResolver upperBoundResolver;
+        if (ctx.STAR() != null) {
+            lowerBoundResolver = new MultiplicationResolver(damageResolver.lowerBoundResolver(), rightResolver);
+            upperBoundResolver = new MultiplicationResolver(damageResolver.upperBoundResolver(), rightResolver);
+        }
+        else if (ctx.FORWARD_SLASH() != null) {
+            lowerBoundResolver = new DivisionResolver(damageResolver.lowerBoundResolver(), rightResolver);
+            upperBoundResolver = new DivisionResolver(damageResolver.upperBoundResolver(), rightResolver);
+        }
+        else {
+            throw new RuntimeException("Unexpected operation for arithmetic string resolver");
+        }
+
+        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
     }
 
     @Override

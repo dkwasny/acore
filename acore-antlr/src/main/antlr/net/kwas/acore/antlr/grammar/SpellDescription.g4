@@ -147,16 +147,18 @@ reference: formulaReference
     | localizedString
     | genderString
     | damageString
-    | auraDamageString
-    | multipliedDamageString
+    | arithmeticDamageString
     | hearthstoneLocation
     ;
 
 localizedString: DOLLAR_SIGN (UPPER_L_CHAR | LOWER_L_CHAR) identifier (COLON identifier)* ';';
 genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
-damageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
-auraDamageString: DOLLAR_SIGN spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
-multipliedDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) multiplier=positiveInteger SEMI_COLON spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+
+damageString: DOLLAR_SIGN (damageStringFragment | auraDamageStringFragment) ;
+damageStringFragment: spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+auraDamageStringFragment: spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
+arithmeticDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageStringFragment | auraDamageStringFragment) ;
+
 hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
 
 STAR: '*' ;
