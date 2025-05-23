@@ -1,6 +1,6 @@
 grammar SpellDescription;
 
-spellDescriptionVariables: WS* spellDescriptionVariable (WS+ spellDescriptionVariable)* WS* ;
+spellDescriptionVariables: spellDescriptionVariable (WS+ spellDescriptionVariable)* ;
 spellDescriptionVariable: DOLLAR_SIGN identifier EQUAL variableDefinition ;
 
 spellDescription: text ;
@@ -56,11 +56,11 @@ miscChars: (WS
     | EQUAL
     | HYPHEN)+ ;
 
-formula: DOLLAR_SIGN '{' WS* formulaFragment WS* '}' ;
+formula: DOLLAR_SIGN '{' formulaFragment '}' ;
 
-formulaFragment: OPEN_PAREN WS* formulaFragment WS* CLOSE_PAREN
-    | formulaFragment WS* (STAR | FORWARD_SLASH) WS* formulaFragment
-    | formulaFragment WS* (PLUS | HYPHEN) WS* formulaFragment
+formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
+    | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
+    | formulaFragment (PLUS | HYPHEN) formulaFragment
     | formulaReference
     | formulaFunction
     | number
@@ -70,10 +70,10 @@ formulaFunction: max
     | greaterThan
     ;
 
-max: maxHeader OPEN_PAREN WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+max: maxHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
 maxHeader: DOLLAR_SIGN LOWER_M_CHAR LOWER_A_CHAR LOWER_X_CHAR ;
 
-greaterThan: greaterThanHeader OPEN_PAREN WS* left=formulaFragment WS* COMMA WS* right=formulaFragment WS* CLOSE_PAREN ;
+greaterThan: greaterThanHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
 greaterThanHeader: DOLLAR_SIGN LOWER_G_CHAR LOWER_T_CHAR ;
 
 // References that can show up in formulas
@@ -126,20 +126,20 @@ mainWeaponSpeed: DOLLAR_SIGN UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR ;
 spellPower: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
 spirit: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
 
-numericConditional: numericConditionalIf WS* numericConditionalElseIf* WS* numericConditionalElse ;
+numericConditional: numericConditionalIf numericConditionalElseIf* numericConditionalElse ;
 numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
 numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE ;
 numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
 
-stringConditional: stringConditionalIf WS* stringConditionalElseIf* WS* stringConditionalElse ;
+stringConditional: stringConditionalIf stringConditionalElseIf* stringConditionalElse ;
 stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE;
 stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE ;
 stringConditionalElse: OPEN_SQUARE text? CLOSE_SQUARE ;
 
-conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
-    | EXCLAMATION_POINT WS* conditionalFragment
-    | conditionalFragment WS* AMPERSAND WS* conditionalFragment
-    | conditionalFragment WS* PIPE WS* conditionalFragment
+conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
+    | EXCLAMATION_POINT conditionalFragment
+    | conditionalFragment AMPERSAND conditionalFragment
+    | conditionalFragment PIPE conditionalFragment
     | conditionalSpellRef
     ;
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
