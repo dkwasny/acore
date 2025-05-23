@@ -7,8 +7,8 @@ spellDescription: text ;
 
 text: string+ ;
 string: formula
-    | reference
     | stringConditional
+    | reference
     | number
     | identifier
     | miscChars
@@ -28,6 +28,7 @@ identifier: (LOWER_A_CHAR
     | LOWER_N_CHAR
     | LOWER_O_CHAR
     | LOWER_Q_CHAR
+    | LOWER_R_CHAR
     | LOWER_S_CHAR
     | LOWER_T_CHAR
     | LOWER_W_CHAR
@@ -35,6 +36,7 @@ identifier: (LOWER_A_CHAR
     | LOWER_Z_CHAR
     | UPPER_A_CHAR
     | UPPER_B_CHAR
+    | UPPER_G_CHAR
     | UPPER_H_CHAR
     | UPPER_I_CHAR
     | UPPER_L_CHAR
@@ -86,6 +88,7 @@ formulaReference: damageBound
     | pointsPerCombo
     | amplitude
     | maxTargets
+    | maxRange
     | variableReference
     | attackPower
     | rangedAttackPower
@@ -104,9 +107,14 @@ chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
 radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
 miscValue: DOLLAR_SIGN spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
 pointsPerCombo: DOLLAR_SIGN spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
-// A missing index sems to imply the first index (1)
+// A missing index seems to imply the first index (1)
 amplitude: DOLLAR_SIGN spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
 maxTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_I_CHAR ;
+// A missing index seems to imply the first index (1)
+// I don't think we care about minimum range.  There was only one spell (52601)
+// that has a non-zero minumum range while also using $r in the description.
+// Said minimum range is just hardcoded into the description.
+maxRange: DOLLAR_SIGN spellId=positiveInteger? LOWER_R_CHAR index=positiveInteger? ;
 variableReference: DOLLAR_SIGN '<' identifier '>' ;
 
 attackPower: DOLLAR_SIGN UPPER_A_CHAR UPPER_P_CHAR ;
@@ -136,28 +144,32 @@ conditionalFragment: OPEN_PAREN WS* conditionalFragment WS* CLOSE_PAREN
     ;
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
 
-positiveInteger: DIGITS ;
-
-decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
-
 number: (positiveInteger | decimal) ;
+
+positiveInteger: DIGITS ;
+decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
 
 // All reference types
 reference: formulaReference
     | localizedString
     | genderString
-    | damageString
     | arithmeticDamageString
     | hearthstoneLocation
+    | damageString
+    | shorthandDamageString
     ;
 
-localizedString: DOLLAR_SIGN (UPPER_L_CHAR | LOWER_L_CHAR) identifier (COLON identifier)* ';';
-genderString: DOLLAR_SIGN LOWER_G_CHAR male=identifier COLON female=identifier ';' ;
+localizedString: DOLLAR_SIGN (UPPER_L_CHAR | LOWER_L_CHAR) text (COLON text)* ';';
+genderString: DOLLAR_SIGN (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identifier ';' ;
 
 damageString: DOLLAR_SIGN (damageStringFragment | auraDamageStringFragment) ;
 damageStringFragment: spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
 auraDamageStringFragment: spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
 arithmeticDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageStringFragment | auraDamageStringFragment) ;
+
+// Some spells omit the `d` constant when referring to damage values from other spells.
+// This leaves it just as a simple integer.  Scary stuff in the grand scheme of things.
+shorthandDamageString: DOLLAR_SIGN spellId=positiveInteger ;
 
 hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
 
@@ -187,6 +199,7 @@ LOWER_M_CHAR: 'm' ;
 LOWER_N_CHAR: 'n' ;
 LOWER_O_CHAR: 'o' ;
 LOWER_Q_CHAR: 'q' ;
+LOWER_R_CHAR: 'r' ;
 LOWER_S_CHAR: 's' ;
 LOWER_T_CHAR: 't' ;
 LOWER_W_CHAR: 'w' ;
@@ -194,6 +207,7 @@ LOWER_X_CHAR: 'x' ;
 LOWER_Z_CHAR: 'z' ;
 UPPER_A_CHAR: 'A' ;
 UPPER_B_CHAR: 'B' ;
+UPPER_G_CHAR: 'G' ;
 UPPER_H_CHAR: 'H' ;
 UPPER_I_CHAR: 'I' ;
 UPPER_L_CHAR: 'L' ;
@@ -202,7 +216,7 @@ UPPER_P_CHAR: 'P' ;
 UPPER_R_CHAR: 'R' ;
 UPPER_S_CHAR: 'S' ;
 UPPER_W_CHAR: 'W' ;
-OTHER_CHARS: [bcfijkpruvyCDEFGJKNOQTUVXYZ]+ ;
+OTHER_CHARS: [bcfijkpuvyCDEFJKNOQTUVXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;

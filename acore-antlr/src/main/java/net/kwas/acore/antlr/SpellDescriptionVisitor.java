@@ -165,6 +165,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     @Override
     public List<StringResolver> visitRadius(SpellDescriptionParser.RadiusContext ctx) {
         // TODO IMPLEMENT
+        // Need to reference SpellRadius DBC
         return super.visitRadius(ctx);
     }
 
@@ -197,6 +198,14 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     public List<StringResolver> visitMaxTargets(SpellDescriptionParser.MaxTargetsContext ctx) {
         // TODO IMPLEMENT
         return super.visitMaxTargets(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMaxRange(SpellDescriptionParser.MaxRangeContext ctx) {
+        // TODO IMPLEMENT
+        // Index can be missing.  Use `1`.
+        // Need to reference SpellRange DBC.
+        return super.visitMaxRange(ctx);
     }
 
     @Override
@@ -238,7 +247,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitLocalizedString(SpellDescriptionParser.LocalizedStringContext ctx) {
-        var values = ctx.identifier().stream().map(RuleContext::getText).toList();
+        var values = ctx.text().stream().map(RuleContext::getText).toList();
         return List.of(new LocalizedStringResolver(values));
     }
 
@@ -253,7 +262,17 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     public List<StringResolver> visitDamageStringFragment(SpellDescriptionParser.DamageStringFragmentContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
         var spellId = getOptionalInteger(ctx.spellId);
+        return createDamageStringResolver(index, spellId);
+    }
 
+    @Override
+    public List<StringResolver> visitShorthandDamageString(SpellDescriptionParser.ShorthandDamageStringContext ctx) {
+        var spellId = Long.parseLong(ctx.spellId.getText());
+        // Shorthand damage strings always reference index 1.
+        return createDamageStringResolver(1, spellId);
+    }
+
+    private List<StringResolver> createDamageStringResolver(int index, Long spellId) {
         var lowerBoundResolver = new DamageBoundResolver(index, spellId, false);
         var upperBoundResolver = new DamageBoundResolver(index, spellId, true);
 

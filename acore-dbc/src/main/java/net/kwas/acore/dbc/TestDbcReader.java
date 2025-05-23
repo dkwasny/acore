@@ -4,6 +4,7 @@ import net.kwas.acore.dbc.model.record.DbcSpell;
 import net.kwas.acore.dbc.model.record.DbcSpellDescriptionVariables;
 import net.kwas.acore.dbc.model.record.DbcSpellDuration;
 import net.kwas.acore.dbc.model.record.DbcSpellRadius;
+import net.kwas.acore.dbc.model.record.DbcSpellRange;
 import net.kwas.acore.dbc.reader.DbcReader;
 
 import java.nio.file.Paths;
@@ -65,14 +66,28 @@ public class TestDbcReader {
 
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-//            .filter(x -> x.id == 1463L)
-            .filter(x -> x.description0.contains("$i"))
+//            .filter(x -> x.id == 5308L)
+            .filter(x -> x.description0.contains("$F"))
+//            .filter(x -> x.description0.matches(".*\\$[0-9]*r .*"))
 //            .filter(x -> x.procChance < 100)
             .toList();
 
 
 
         var spellRadii = reader.readDbc(DbcSpellRadius.class);
+
+        var spellRanges = reader.readDbc(DbcSpellRange.class);
+        var donutRanges = spellRanges.stream()
+            .filter(x -> (x.rangeMin0 > 0.0 || x.rangeMin1 > 0.0))
+            .toList();
+
+        var donutIndicies = donutRanges.stream()
+            .map(x -> x.id)
+            .collect(Collectors.toSet());
+        var donutSpells = spells.stream()
+            .filter(x -> donutIndicies.contains(x.rangeIndex))
+            .filter(x -> x.description0.matches(".*\\$[0-9]*r.*"))
+            .toList();
 
         System.out.println("");
 
