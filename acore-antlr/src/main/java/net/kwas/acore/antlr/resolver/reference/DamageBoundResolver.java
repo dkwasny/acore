@@ -3,6 +3,8 @@ package net.kwas.acore.antlr.resolver.reference;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.NumberResolver;
 
+// TODO: Maybe rename to "isMax"?
+// Maybe the word "bound" could change??
 public record DamageBoundResolver(int index, Long spellId, boolean isUpperBound) implements NumberResolver {
 
     @Override

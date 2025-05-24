@@ -5,7 +5,7 @@ import net.kwas.acore.antlr.resolver.StringResolver;
 
 import java.util.List;
 
-public record LocalizedStringResolver(List<String> resolvers) implements StringResolver {
+public record LocalizedStringResolver(List<String> values) implements StringResolver {
 
     @Override
     public String resolveString(SpellContext ctx) {
@@ -20,15 +20,15 @@ public record LocalizedStringResolver(List<String> resolvers) implements StringR
         if (lastRenderedNumber == 0) {
             // The number zero needs a plural word in english.
             // Just use the last word in the list and pray.
-            index = resolvers.size() - 1;
+            index = values.size() - 1;
         }
         else {
             // I've seen cases where there are more than two options.
             // I think this applies to non-english languages, but I'll keep the logic regardless.
-            index = Math.min(lastRenderedNumber - 1, resolvers.size() - 1);
+            index = Math.min(lastRenderedNumber - 1, values.size() - 1);
         }
 
-        return resolvers.get(index);
+        return values.get(index);
     }
 
 }

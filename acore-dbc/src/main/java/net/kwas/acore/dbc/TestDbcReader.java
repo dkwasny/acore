@@ -66,13 +66,11 @@ public class TestDbcReader {
 
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-//            .filter(x -> x.id == 5308L)
-            .filter(x -> x.description0.contains("$f"))
+            .filter(x -> x.id == 58644L)
+//            .filter(x -> x.description0.contains("`"))
 //            .filter(x -> x.description0.matches(".*\\$[0-9]*r .*"))
 //            .filter(x -> x.procChance < 100)
             .toList();
-
-
 
         var spellRadii = reader.readDbc(DbcSpellRadius.class);
 
@@ -93,7 +91,7 @@ public class TestDbcReader {
 
 //        System.out.println(Double.parseDouble("-.5"));
 
-//        var spellDurations = reader.readDbc(DbcSpellDuration.class);
+        var spellDurations = reader.readDbc(DbcSpellDuration.class);
 //        printAll(spellDurations);
 //        System.out.println();
 //

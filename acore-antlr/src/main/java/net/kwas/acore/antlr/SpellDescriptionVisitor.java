@@ -89,6 +89,9 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         if (ctx.numericReference() != null) {
             return children;
         }
+        else if (ctx.numericDefinition() != null) {
+            return children;
+        }
         else if (ctx.number() != null) {
             return children;
         }
@@ -124,11 +127,24 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitDamageBound(SpellDescriptionParser.DamageBoundContext ctx) {
-        var index = Integer.parseInt(ctx.index.getText());
+    public List<StringResolver> visitMinDamage(SpellDescriptionParser.MinDamageContext ctx) {
+        var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
-        var isUpper = ctx.UPPER_M_CHAR() != null;
-        return List.of(new DamageBoundResolver(index, spellId, isUpper));
+        return List.of(new DamageBoundResolver(index, spellId, false));
+    }
+
+    @Override
+    public List<StringResolver> visitMaxDamage(SpellDescriptionParser.MaxDamageContext ctx) {
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new DamageBoundResolver(index, spellId, true));
+    }
+
+    @Override
+    public List<StringResolver> visitFloor(SpellDescriptionParser.FloorContext ctx) {
+        // TODO IMPLEMENT
+        // Must return number resolver
+        return super.visitFloor(ctx);
     }
 
     @Override
@@ -178,6 +194,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     @Override
     public List<StringResolver> visitMiscValue(SpellDescriptionParser.MiscValueContext ctx) {
         // TODO IMPLEMENT
+        // A missing index implies index 1
         return super.visitMiscValue(ctx);
     }
 
@@ -207,11 +224,30 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitMinRange(SpellDescriptionParser.MinRangeContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMinRange(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitMaxRange(SpellDescriptionParser.MaxRangeContext ctx) {
         // TODO IMPLEMENT
         // Index can be missing.  Use `1`.
         // Need to reference SpellRange DBC.
         return super.visitMaxRange(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMaxStacks(SpellDescriptionParser.MaxStacksContext ctx) {
+        // TODO IMPLEMENT
+        // Use the cumulativeAura property on the spell
+        return super.visitMaxStacks(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMaxTargetLevel(SpellDescriptionParser.MaxTargetLevelContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMaxTargetLevel(ctx);
     }
 
     @Override
@@ -228,9 +264,30 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitMainWeaponDamage(SpellDescriptionParser.MainWeaponDamageContext ctx) {
+    public List<StringResolver> visitMainWeaponMinDamage(SpellDescriptionParser.MainWeaponMinDamageContext ctx) {
         // TODO IMPLEMENT
-        return super.visitMainWeaponDamage(ctx);
+        // What separates a weapon's base damage from it's normal damage?
+        // Maybe attack power or something...
+        // Look at https://www.wowhead.com/tbc/spell=27155/seal-of-righteousness for a spell that uses this.
+        return super.visitMainWeaponMinDamage(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponMaxDamage(SpellDescriptionParser.MainWeaponMaxDamageContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMainWeaponMaxDamage(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponMinBaseDamage(SpellDescriptionParser.MainWeaponMinBaseDamageContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMainWeaponMinBaseDamage(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponMaxBaseDamage(SpellDescriptionParser.MainWeaponMaxBaseDamageContext ctx) {
+        // TODO IMPLEMENT
+        return super.visitMainWeaponMaxBaseDamage(ctx);
     }
 
     @Override
@@ -252,6 +309,20 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitPlayerLevel(SpellDescriptionParser.PlayerLevelContext ctx) {
+        // TODO IMPLEMENT
+        // TODO Is there any difference between upper and lowercase???  Don't think too hard on it.
+        return super.visitPlayerLevel(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitPlayerHandedness(SpellDescriptionParser.PlayerHandednessContext ctx) {
+        // TODO IMPLEMENT
+        // Somehow get 1h vs 2h from player's equipped weapon
+        return super.visitPlayerHandedness(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitLocalizedString(SpellDescriptionParser.LocalizedStringContext ctx) {
         var values = ctx.text().stream().map(RuleContext::getText).toList();
         return List.of(new LocalizedStringResolver(values));
@@ -259,14 +330,18 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitGenderString(SpellDescriptionParser.GenderStringContext ctx) {
-        var maleString = ctx.male.getText();
-        var femaleString = ctx.female.getText();
-        return List.of(new GenderStringResolver(maleString, femaleString));
+//        var maleString = ctx.male.getText();
+//        var femaleString = ctx.female.getText();
+        var values = ctx.text().stream().map(RuleContext::getText).toList();
+        if (values.size() > 2) {
+            throw new RuntimeException("HERE: "+ values);
+        }
+        return List.of(new GenderStringResolver(values));
     }
 
     @Override
     public List<StringResolver> visitDamageString(SpellDescriptionParser.DamageStringContext ctx) {
-        var index = Integer.parseInt(ctx.index.getText());
+        var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
         return createDamageStringResolver(index, spellId);
     }
@@ -287,7 +362,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitAuraDamageString(SpellDescriptionParser.AuraDamageStringContext ctx) {
-        var index = Integer.parseInt(ctx.index.getText());
+        var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
 
         var lowerBoundResolver = new AuraDamageBoundResolver(index, spellId, false);
@@ -340,6 +415,13 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitMin(SpellDescriptionParser.MinContext ctx) {
+        // TODO IMPLEMENT
+        // Must return number resolver
+        return super.visitMin(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitMax(SpellDescriptionParser.MaxContext ctx) {
         var left = getNumberResolver(ctx.left.accept(this));
         var right = getNumberResolver(ctx.right.accept(this));
@@ -347,10 +429,31 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitFunctionConditional(SpellDescriptionParser.FunctionConditionalContext ctx) {
+        // TODO IMPLEMENT
+        // Get condition as booleanresolver and the cases as number resolvers.  Return a number resolver.
+        return super.visitFunctionConditional(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitGreaterThan(SpellDescriptionParser.GreaterThanContext ctx) {
         var left = getNumberResolver(ctx.left.accept(this));
         var right = getNumberResolver(ctx.right.accept(this));
         return List.of(new GreaterThanResolver(left, right));
+    }
+
+    @Override
+    public List<StringResolver> visitGreaterThanOrEqual(SpellDescriptionParser.GreaterThanOrEqualContext ctx) {
+        // TODO IMPLEMENT
+        // Must return boolean resolver
+        return super.visitGreaterThanOrEqual(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitEqual(SpellDescriptionParser.EqualContext ctx) {
+        // TODO IMPLEMENT
+        // Needs to return a boolean resolver
+        return super.visitEqual(ctx);
     }
 
     @Override
@@ -368,6 +471,9 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
             return children;
         }
         else if (ctx.conditionalSpellRef() != null) {
+            return children;
+        }
+        else if (ctx.booleanFunction() != null) {
             return children;
         }
 
@@ -490,6 +596,11 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     private Long getOptionalInteger(SpellDescriptionParser.PositiveIntegerContext ctx) {
         return ctx != null ? Long.getLong(ctx.getText()) : null;
+    }
+
+    private int getIndex(SpellDescriptionParser.PositiveIntegerContext ctx) {
+        // A missing index implies index 1
+        return ctx != null ? Integer.parseInt(ctx.getText()) : 1;
     }
 
     @Override
