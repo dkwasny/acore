@@ -86,7 +86,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var children = super.visitFormulaFragment(ctx);
 
         // Passthrough cases
-        if (ctx.formulaReference() != null) {
+        if (ctx.numericReference() != null) {
             return children;
         }
         else if (ctx.number() != null) {
@@ -259,7 +259,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitDamageStringFragment(SpellDescriptionParser.DamageStringFragmentContext ctx) {
+    public List<StringResolver> visitDamageString(SpellDescriptionParser.DamageStringContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
         var spellId = getOptionalInteger(ctx.spellId);
         return createDamageStringResolver(index, spellId);
@@ -280,7 +280,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitAuraDamageStringFragment(SpellDescriptionParser.AuraDamageStringFragmentContext ctx) {
+    public List<StringResolver> visitAuraDamageString(SpellDescriptionParser.AuraDamageStringContext ctx) {
         var index = Integer.parseInt(ctx.index.getText());
         var spellId = getOptionalInteger(ctx.spellId);
 
@@ -295,11 +295,11 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var right = Double.parseDouble(ctx.right.getText());
 
         List<StringResolver> childResolver;
-        if (ctx.damageStringFragment() != null) {
-            childResolver = ctx.damageStringFragment().accept(this);
+        if (ctx.damageString() != null) {
+            childResolver = ctx.damageString().accept(this);
         }
-        else if (ctx.auraDamageStringFragment() != null) {
-            childResolver = ctx.auraDamageStringFragment().accept(this);
+        else if (ctx.auraDamageString() != null) {
+            childResolver = ctx.auraDamageString().accept(this);
         }
         else {
             throw new RuntimeException("No damage resolver for arithmetic resolver");

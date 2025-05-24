@@ -1,21 +1,181 @@
 grammar SpellDescription;
 
+/*
+ * Grammar entry point for spell descriptions
+ */
+spellDescription: text ;
+
+/*
+ * Grammar entry point for spell description variables
+ */
 spellDescriptionVariables: spellDescriptionVariable (WS+ spellDescriptionVariable)* ;
 spellDescriptionVariable: DOLLAR_SIGN identifier EQUAL variableDefinition ;
 
-spellDescription: text ;
+variableDefinition: numericConditional | formula | formulaFragment ;
 
+/*
+ * Plain text
+ * Can contain pretty much anything.
+ */
 text: string+ ;
 string: formula
     | stringConditional
-    | reference
+    | numericReference
+    | stringReference
     | number
     | identifier
     | miscChars
     ;
 
-variableDefinition: (numericConditional | formula | formulaFragment) ;
+/*
+ * Formula
+ * Contains recursive fragments to create a full formula.
+ */
+formula: DOLLAR_SIGN '{' formulaFragment '}' ;
 
+formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
+    | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
+    | formulaFragment (PLUS | HYPHEN) formulaFragment
+    | formulaFunction
+    | numericReference
+    | number
+    ;
+
+/*
+ * Formula Function
+ * Functions that operate on formula fragments.
+ */
+formulaFunction: DOLLAR_SIGN (
+    max
+    | greaterThan
+    )
+    ;
+
+max: LOWER_M_CHAR LOWER_A_CHAR LOWER_X_CHAR OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
+greaterThan: LOWER_G_CHAR LOWER_T_CHAR OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
+
+/*
+ * Numeric Reference
+ * These references return numbers, and can be use in formulas or as text.
+ */
+numericReference: DOLLAR_SIGN (
+    damageBound
+    | duration
+    | auraPeriod
+    | procCharges
+    | procChance
+    | chainTargets
+    | radius
+    | miscValue
+    | pointsPerCombo
+    | amplitude
+    | maxTargets
+    | maxRange
+    | variableReference
+    | attackPower
+    | rangedAttackPower
+    | mainWeaponDamage
+    | mainWeaponSpeed
+    | spellPower
+    | spirit
+    )
+    ;
+
+damageBound: spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
+duration: spellId=positiveInteger? LOWER_D_CHAR ;
+auraPeriod: spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
+procCharges: spellId=positiveInteger? LOWER_N_CHAR ;
+procChance: spellId=positiveInteger? LOWER_H_CHAR ;
+chainTargets: spellId=positiveInteger? LOWER_X_CHAR ;
+radius: spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
+miscValue: spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
+pointsPerCombo: spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
+// A missing index seems to imply the first index (1)
+amplitude: spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
+maxTargets: spellId=positiveInteger? LOWER_I_CHAR ;
+// A missing index seems to imply the first index (1)
+// I don't think we care about minimum range.  There was only one spell (52601)
+// that has a non-zero minumum range while also using $r in the description.
+// Said minimum range is just hardcoded into the description.
+maxRange: spellId=positiveInteger? LOWER_R_CHAR index=positiveInteger? ;
+variableReference: '<' identifier '>' ;
+
+attackPower: UPPER_A_CHAR UPPER_P_CHAR ;
+rangedAttackPower: UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
+mainWeaponDamage: ((LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR) | (UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR)) ;
+mainWeaponSpeed: UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR ;
+// TODO: Split into different spell power types if we can get said values.
+// I don't think the acore database has them.  Just the base value.
+spellPower: UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
+spirit: UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
+
+/*
+ * Conditionals
+ * These had to be separated into numeric and string variants.
+ * The numeric variant is used in variable definitions.
+ * The string variant is used to render text in descriptions.
+ */
+numericConditional: numericConditionalIf numericConditionalElseIf* numericConditionalElse ;
+numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
+numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE ;
+numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
+
+stringConditional: stringConditionalIf stringConditionalElseIf* stringConditionalElse ;
+stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE;
+stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE ;
+stringConditionalElse: OPEN_SQUARE text? CLOSE_SQUARE ;
+
+conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
+    | EXCLAMATION_POINT conditionalFragment
+    | conditionalFragment AMPERSAND conditionalFragment
+    | conditionalFragment PIPE conditionalFragment
+    | conditionalSpellRef
+    ;
+conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
+
+/*
+ * String References
+ * These references only return strings, and can't be used in formulas or
+ * variable definitions.
+ */
+stringReference: DOLLAR_SIGN (
+    localizedString
+    | genderString
+    | damageString
+    | auraDamageString
+    | arithmeticDamageString
+    | shorthandDamageString
+    | hearthstoneLocation
+    )
+    ;
+
+localizedString: (UPPER_L_CHAR | LOWER_L_CHAR) text (COLON text)* ';';
+genderString: (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identifier ';' ;
+
+// These might appear to return numbers, but can actually return two numbers
+// if the spell has variance (i.e. dice rolls).
+// Ex: `123` vs `123 to 234`
+damageString: spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
+auraDamageString: spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
+arithmeticDamageString: (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageString | auraDamageString | numericReference) ;
+
+// Some spells omit the `d` constant when referring to damage values from other spells.
+// This leaves it just as a simple integer.  Scary stuff in the grand scheme of things.
+shorthandDamageString: spellId=positiveInteger ;
+
+hearthstoneLocation: LOWER_Z_CHAR ;
+
+/*
+ * Building Blocks
+ */
+number: (positiveInteger | decimal) ;
+positiveInteger: DIGITS ;
+decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
+
+// Intended to be any alphanumeric string.
+// The letters have to be split out due to supporting logic intermixed with
+// plain text (both of which are part of the grammar).
+// TODO: Is there a better way to handle this?
 identifier: (LOWER_A_CHAR
     | LOWER_B_CHAR
     | LOWER_D_CHAR
@@ -56,123 +216,10 @@ miscChars: (WS
     | EQUAL
     | HYPHEN)+ ;
 
-formula: DOLLAR_SIGN '{' formulaFragment '}' ;
-
-formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
-    | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
-    | formulaFragment (PLUS | HYPHEN) formulaFragment
-    | formulaReference
-    | formulaFunction
-    | number
-    ;
-
-formulaFunction: max
-    | greaterThan
-    ;
-
-max: maxHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
-maxHeader: DOLLAR_SIGN LOWER_M_CHAR LOWER_A_CHAR LOWER_X_CHAR ;
-
-greaterThan: greaterThanHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
-greaterThanHeader: DOLLAR_SIGN LOWER_G_CHAR LOWER_T_CHAR ;
-
-// References that can show up in formulas
-formulaReference: damageBound
-    | duration
-    | auraPeriod
-    | procCharges
-    | procChance
-    | chainTargets
-    | radius
-    | miscValue
-    | pointsPerCombo
-    | amplitude
-    | maxTargets
-    | maxRange
-    | variableReference
-    | attackPower
-    | rangedAttackPower
-    | mainWeaponDamage
-    | mainWeaponSpeed
-    | spellPower
-    | spirit
-    ;
-
-damageBound: DOLLAR_SIGN spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
-duration: DOLLAR_SIGN spellId=positiveInteger? LOWER_D_CHAR ;
-auraPeriod: DOLLAR_SIGN spellId=positiveInteger? LOWER_T_CHAR index=positiveInteger ;
-procCharges: DOLLAR_SIGN spellId=positiveInteger? LOWER_N_CHAR ;
-procChance: DOLLAR_SIGN spellId=positiveInteger? LOWER_H_CHAR ;
-chainTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_X_CHAR ;
-radius: DOLLAR_SIGN spellId=positiveInteger? LOWER_A_CHAR index=positiveInteger ;
-miscValue: DOLLAR_SIGN spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
-pointsPerCombo: DOLLAR_SIGN spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
-// A missing index seems to imply the first index (1)
-amplitude: DOLLAR_SIGN spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
-maxTargets: DOLLAR_SIGN spellId=positiveInteger? LOWER_I_CHAR ;
-// A missing index seems to imply the first index (1)
-// I don't think we care about minimum range.  There was only one spell (52601)
-// that has a non-zero minumum range while also using $r in the description.
-// Said minimum range is just hardcoded into the description.
-maxRange: DOLLAR_SIGN spellId=positiveInteger? LOWER_R_CHAR index=positiveInteger? ;
-variableReference: DOLLAR_SIGN '<' identifier '>' ;
-
-attackPower: DOLLAR_SIGN UPPER_A_CHAR UPPER_P_CHAR ;
-rangedAttackPower: DOLLAR_SIGN UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
-mainWeaponDamage: DOLLAR_SIGN ((LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR) | (UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR)) ;
-mainWeaponSpeed: DOLLAR_SIGN UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR ;
-// TODO: Split into different spell power types if we can get said values.
-// I don't think the acore database has them.  Just the base value.
-spellPower: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
-spirit: DOLLAR_SIGN UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
-
-numericConditional: numericConditionalIf numericConditionalElseIf* numericConditionalElse ;
-numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
-numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE ;
-numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
-
-stringConditional: stringConditionalIf stringConditionalElseIf* stringConditionalElse ;
-stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE;
-stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE ;
-stringConditionalElse: OPEN_SQUARE text? CLOSE_SQUARE ;
-
-conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
-    | EXCLAMATION_POINT conditionalFragment
-    | conditionalFragment AMPERSAND conditionalFragment
-    | conditionalFragment PIPE conditionalFragment
-    | conditionalSpellRef
-    ;
-conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
-
-number: (positiveInteger | decimal) ;
-
-positiveInteger: DIGITS ;
-decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
-
-// All reference types
-reference: formulaReference
-    | localizedString
-    | genderString
-    | arithmeticDamageString
-    | hearthstoneLocation
-    | damageString
-    | shorthandDamageString
-    ;
-
-localizedString: DOLLAR_SIGN (UPPER_L_CHAR | LOWER_L_CHAR) text (COLON text)* ';';
-genderString: DOLLAR_SIGN (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identifier ';' ;
-
-damageString: DOLLAR_SIGN (damageStringFragment | auraDamageStringFragment) ;
-damageStringFragment: spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
-auraDamageStringFragment: spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
-arithmeticDamageString: DOLLAR_SIGN (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageStringFragment | auraDamageStringFragment) ;
-
-// Some spells omit the `d` constant when referring to damage values from other spells.
-// This leaves it just as a simple integer.  Scary stuff in the grand scheme of things.
-shorthandDamageString: DOLLAR_SIGN spellId=positiveInteger ;
-
-hearthstoneLocation: DOLLAR_SIGN LOWER_Z_CHAR ;
-
+/*
+ * Lexer Rules
+ * There should be little to no overlap on these rules to keep things simple.
+ */
 STAR: '*' ;
 FORWARD_SLASH: '/' ;
 PLUS: '+' ;
