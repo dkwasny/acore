@@ -220,14 +220,6 @@ miscChars: (WS
  * Lexer Rules
  * There should be little to no overlap on these rules to keep things simple.
  */
-STAR: '*' ;
-FORWARD_SLASH: '/' ;
-PLUS: '+' ;
-HYPHEN: '-' ;
-EXCLAMATION_POINT: '!' ;
-PIPE: '|' ;
-AMPERSAND: '&' ;
-
 OPEN_PAREN: '(' ;
 CLOSE_PAREN: ')' ;
 
@@ -240,6 +232,7 @@ CLOSE_CURLY: '}' ;
 LT_SIGN: '<' ;
 GT_SIGN: '>' ;
 
+// See `identifier` for more on why the letters are split out like this.
 LOWER_A_CHAR: 'a' ;
 LOWER_B_CHAR: 'b' ;
 LOWER_D_CHAR: 'd' ;
@@ -279,5 +272,11 @@ EQUAL: '=' ;
 DOLLAR_SIGN: '$' ;
 QUESTION_MARK: '?' ;
 SEMI_COLON: ';' ;
-
+STAR: '*' ;
+FORWARD_SLASH: '/' ;
+PLUS: '+' ;
+HYPHEN: '-' ;
+EXCLAMATION_POINT: '!' ;
+PIPE: '|' ;
+AMPERSAND: '&' ;
 DIGITS: [0-9]+ ;
