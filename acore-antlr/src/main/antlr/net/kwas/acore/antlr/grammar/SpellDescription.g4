@@ -58,8 +58,8 @@ greaterThan: LOWER_G_CHAR LOWER_T_CHAR OPEN_PAREN left=formulaFragment COMMA rig
  * Numeric Reference
  * These references return numbers, and can be use in formulas or as text.
  */
-numericReference: DOLLAR_SIGN (
-    damageBound
+numericReference: DOLLAR_SIGN numericDefinition ;
+numericDefinition: damageBound
     | duration
     | auraPeriod
     | procCharges
@@ -69,6 +69,7 @@ numericReference: DOLLAR_SIGN (
     | miscValue
     | pointsPerCombo
     | amplitude
+    | chainAmplitude
     | maxTargets
     | maxRange
     | variableReference
@@ -78,7 +79,6 @@ numericReference: DOLLAR_SIGN (
     | mainWeaponSpeed
     | spellPower
     | spirit
-    )
     ;
 
 damageBound: spellId=positiveInteger? (LOWER_M_CHAR | UPPER_M_CHAR) index=positiveInteger ;
@@ -92,6 +92,7 @@ miscValue: spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger ;
 pointsPerCombo: spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger ;
 // A missing index seems to imply the first index (1)
 amplitude: spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
+chainAmplitude: spellId=positiveInteger? (LOWER_F_CHAR | UPPER_F_CHAR) index=positiveInteger? ;
 maxTargets: spellId=positiveInteger? LOWER_I_CHAR ;
 // A missing index seems to imply the first index (1)
 // I don't think we care about minimum range.  There was only one spell (52601)
@@ -157,7 +158,7 @@ genderString: (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identif
 // Ex: `123` vs `123 to 234`
 damageString: spellId=positiveInteger? LOWER_S_CHAR index=positiveInteger ;
 auraDamageString: spellId=positiveInteger? LOWER_O_CHAR index=positiveInteger ;
-arithmeticDamageString: (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageString | auraDamageString | numericReference) ;
+arithmeticDamageString: (STAR | FORWARD_SLASH) right=positiveInteger SEMI_COLON (damageString | auraDamageString | numericDefinition) ;
 
 // Some spells omit the `d` constant when referring to damage values from other spells.
 // This leaves it just as a simple integer.  Scary stuff in the grand scheme of things.
@@ -180,6 +181,7 @@ identifier: (LOWER_A_CHAR
     | LOWER_B_CHAR
     | LOWER_D_CHAR
     | LOWER_E_CHAR
+    | LOWER_F_CHAR
     | LOWER_G_CHAR
     | LOWER_H_CHAR
     | LOWER_I_CHAR
@@ -196,6 +198,7 @@ identifier: (LOWER_A_CHAR
     | LOWER_Z_CHAR
     | UPPER_A_CHAR
     | UPPER_B_CHAR
+    | UPPER_F_CHAR
     | UPPER_G_CHAR
     | UPPER_H_CHAR
     | UPPER_I_CHAR
@@ -214,7 +217,8 @@ miscChars: (WS
     | COMMA
     | COLON
     | EQUAL
-    | HYPHEN)+ ;
+    | HYPHEN
+    | PLUS)+ ;
 
 /*
  * Lexer Rules
@@ -237,6 +241,7 @@ LOWER_A_CHAR: 'a' ;
 LOWER_B_CHAR: 'b' ;
 LOWER_D_CHAR: 'd' ;
 LOWER_E_CHAR: 'e' ;
+LOWER_F_CHAR: 'f' ;
 LOWER_G_CHAR: 'g' ;
 LOWER_H_CHAR: 'h' ;
 LOWER_I_CHAR: 'i' ;
@@ -253,6 +258,7 @@ LOWER_X_CHAR: 'x' ;
 LOWER_Z_CHAR: 'z' ;
 UPPER_A_CHAR: 'A' ;
 UPPER_B_CHAR: 'B' ;
+UPPER_F_CHAR: 'F' ;
 UPPER_G_CHAR: 'G' ;
 UPPER_H_CHAR: 'H' ;
 UPPER_I_CHAR: 'I' ;
@@ -262,7 +268,7 @@ UPPER_P_CHAR: 'P' ;
 UPPER_R_CHAR: 'R' ;
 UPPER_S_CHAR: 'S' ;
 UPPER_W_CHAR: 'W' ;
-OTHER_CHARS: [bcfijkpuvyCDEFJKNOQTUVXYZ]+ ;
+OTHER_CHARS: [bcijkpuvyCDEJKNOQTUVXYZ]+ ;
 WS: [ \r\t\n]+ ;
 NON_WORD: [%']+ ;
 PERIOD: '.' ;

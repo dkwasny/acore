@@ -195,6 +195,12 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitChainAmplitude(SpellDescriptionParser.ChainAmplitudeContext ctx) {
+        // TODO Implement
+        return super.visitChainAmplitude(ctx);
+    }
+
+    @Override
     public List<StringResolver> visitMaxTargets(SpellDescriptionParser.MaxTargetsContext ctx) {
         // TODO IMPLEMENT
         return super.visitMaxTargets(ctx);
