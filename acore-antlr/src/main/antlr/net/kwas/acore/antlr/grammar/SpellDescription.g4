@@ -31,7 +31,7 @@ string: formula
  * Formula
  * Contains recursive fragments to create a full formula.
  */
-formula: DOLLAR_SIGN '{' formulaFragment '}' ;
+formula: DOLLAR_SIGN OPEN_CURLY formulaFragment CLOSE_CURLY ;
 
 formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
     | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
@@ -98,7 +98,7 @@ maxTargets: spellId=positiveInteger? LOWER_I_CHAR ;
 // that has a non-zero minumum range while also using $r in the description.
 // Said minimum range is just hardcoded into the description.
 maxRange: spellId=positiveInteger? LOWER_R_CHAR index=positiveInteger? ;
-variableReference: '<' identifier '>' ;
+variableReference: LT_SIGN identifier GT_SIGN ;
 
 attackPower: UPPER_A_CHAR UPPER_P_CHAR ;
 rangedAttackPower: UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
@@ -149,8 +149,8 @@ stringReference: DOLLAR_SIGN (
     )
     ;
 
-localizedString: (UPPER_L_CHAR | LOWER_L_CHAR) text (COLON text)* ';';
-genderString: (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identifier ';' ;
+localizedString: (UPPER_L_CHAR | LOWER_L_CHAR) text (COLON text)* SEMI_COLON ;
+genderString: (UPPER_G_CHAR | LOWER_G_CHAR) male=identifier COLON female=identifier SEMI_COLON ;
 
 // These might appear to return numbers, but can actually return two numbers
 // if the spell has variance (i.e. dice rolls).
@@ -233,6 +233,12 @@ CLOSE_PAREN: ')' ;
 
 OPEN_SQUARE: '[' ;
 CLOSE_SQUARE: ']' ;
+
+OPEN_CURLY: '{' ;
+CLOSE_CURLY: '}' ;
+
+LT_SIGN: '<' ;
+GT_SIGN: '>' ;
 
 LOWER_A_CHAR: 'a' ;
 LOWER_B_CHAR: 'b' ;
