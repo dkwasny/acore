@@ -35,8 +35,9 @@ public class SpellParserTester {
 
     private static String parseDescription(DbcSpell dbcSpell) {
         var rawText = dbcSpell.description0;
+
         // Spell 57861 contains a stray dollar sign, which is mucking things up ATM.
-        if (rawText == null || rawText.isEmpty() || dbcSpell.id == 57861L) {
+        if (rawText == null || rawText.isEmpty()) {
             return "";
         }
 
@@ -50,7 +51,8 @@ public class SpellParserTester {
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
                 System.out.println("ERROR " + dbcSpell.name0 + " (" + dbcSpell.id + "): " + msg);
                 System.out.println("TEXT: " + rawText);
-                throw new RuntimeException();
+                System.out.println("-----------------------");
+//                throw new RuntimeException();
             }
         });
 

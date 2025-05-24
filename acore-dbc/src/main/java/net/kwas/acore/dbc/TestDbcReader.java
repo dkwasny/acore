@@ -66,9 +66,9 @@ public class TestDbcReader {
 
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-            .filter(x -> x.id == 58644L)
-//            .filter(x -> x.description0.contains("`"))
-//            .filter(x -> x.description0.matches(".*\\$[0-9]*r .*"))
+//            .filter(x -> x.id == 57861L)
+            .filter(x -> x.description0.contains("["))
+//            .filter(x -> x.description0.matches(".*\\$[0-9]+[^a-zA-Z0-9]+.*"))
 //            .filter(x -> x.procChance < 100)
             .toList();
 

@@ -65,8 +65,8 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitMiscChars(SpellDescriptionParser.MiscCharsContext ctx) {
-        var value = ctx.getText();
-        return List.of(new StaticStringResolver(value));
+        var text = ctx.getText();
+        return List.of(new StaticStringResolver(text));
     }
 
     @Override
@@ -330,9 +330,8 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitGenderString(SpellDescriptionParser.GenderStringContext ctx) {
-//        var maleString = ctx.male.getText();
-//        var femaleString = ctx.female.getText();
         var values = ctx.text().stream().map(RuleContext::getText).toList();
+        // TODO: Remove after some testing with real life values
         if (values.size() > 2) {
             throw new RuntimeException("HERE: "+ values);
         }
@@ -347,10 +346,21 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitShorthandDamageString(SpellDescriptionParser.ShorthandDamageStringContext ctx) {
-        var spellId = Long.parseLong(ctx.spellId.getText());
-        // Shorthand damage strings always reference index 1.
-        return createDamageStringResolver(1, spellId);
+    public List<StringResolver> visitPercentDamageStringRule(SpellDescriptionParser.PercentDamageStringRuleContext ctx) {
+        var integer = Integer.parseInt(ctx.positiveInteger().getText());
+
+        // This is special logic I made up based on a few spells that use this rule.
+        // See the grammar file for more information.
+        int index = 1;
+        Long spellId = null;
+        if (integer <= 3) {
+            index = integer;
+        }
+        else {
+            spellId = Long.valueOf(index);
+        }
+
+        return createDamageStringResolver(index, spellId);
     }
 
     private List<StringResolver> createDamageStringResolver(int index, Long spellId) {
@@ -375,6 +385,9 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     public List<StringResolver> visitArithmeticDamageString(SpellDescriptionParser.ArithmeticDamageStringContext ctx) {
         var right = Double.parseDouble(ctx.right.getText());
 
+        // TODO: This needs updating to handle numericDefinition children
+        // These are number resolvers which are different than the damage string resolvers.
+        // There will be some nasty code here, but nothing crazy.
         List<StringResolver> childResolver;
         if (ctx.damageString() != null) {
             childResolver = ctx.damageString().accept(this);
@@ -429,10 +442,10 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitFunctionConditional(SpellDescriptionParser.FunctionConditionalContext ctx) {
+    public List<StringResolver> visitFormulaConditional(SpellDescriptionParser.FormulaConditionalContext ctx) {
         // TODO IMPLEMENT
         // Get condition as booleanresolver and the cases as number resolvers.  Return a number resolver.
-        return super.visitFunctionConditional(ctx);
+        return super.visitFormulaConditional(ctx);
     }
 
     @Override
@@ -566,6 +579,22 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var value = getResolver(values, clazz);
 
         return new ConditionBranch<>(condition, value);
+    }
+
+    @Override
+    public List<StringResolver> visitRuleOfRhunok(SpellDescriptionParser.RuleOfRhunokContext ctx) {
+        // TODO IMPLEMENT
+        // Use spell duration.
+        // Make sure to add the period back as a static string.
+        return super.visitRuleOfRhunok(ctx);
+    }
+
+    @Override
+    public List<StringResolver> visitTortureRule(SpellDescriptionParser.TortureRuleContext ctx) {
+        // TODO IMPLEMENT
+        // Use spell proc chance.
+        // Make sure to add the percent sign back as a static string.
+        return super.visitTortureRule(ctx);
     }
 
     private BooleanResolver getBooleanResolver(List<StringResolver> resolvers) {
