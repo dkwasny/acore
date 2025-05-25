@@ -61,15 +61,37 @@ public class AntlrPlayground {
                     List.of(1, 2, 1),
                     List.of(1, 2, 0),
                     List.of(1f, 2f, 3f),
-                    List.of(0f, 0f, 0f),
-                    List.of(0L, 0L, 0L),
-                    20
+                    List.of(1f, 1f, 1f),
+                    List.of(1000L, 1000L, 1000L),
+                    List.of(2L, 2L, 2L),
+                    List.of(10f, 10f, 10f),
+                    List.of(5, 5, 5),
+                    List.of(1.2f, 1.2f, 1.2f),
+                    List.of(1.5f, 1.5f, 1.5f),
+                    List.of(0.5f, 0.5f, 0.5f),
+                    List.of(2.0f, 2.0f, 2.0f),
+                    List.of(50.0f, 50.0f, 50.0f),
+                    30000,
+                    30,
+                    4,
+                    6,
+                    80,
+                    7
                 )
             ),
             new CharacterInfo(
                 30,
                 "Male",
-                Set.of(50L)
+                20,
+                100,
+                110,
+                120,
+                10,
+                20,
+                1.0f,
+                false,
+                Set.of(50L),
+                "HearthstoneLocation"
             ),
             variables
         );

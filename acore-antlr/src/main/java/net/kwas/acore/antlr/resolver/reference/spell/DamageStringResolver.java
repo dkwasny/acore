@@ -8,17 +8,17 @@ public record DamageStringResolver(NumberResolver minResolver, NumberResolver ma
 
     @Override
     public String resolveString(SpellContext ctx) {
-        var lowerBound = minResolver.resolveNumber(ctx);
-        var upperBound = maxResolver.resolveNumber(ctx);
+        var minDamage = minResolver.resolveNumber(ctx);
+        var maxDamage = maxResolver.resolveNumber(ctx);
 
-        var hasVariance = Double.compare(lowerBound, upperBound) != 0;
+        var hasVariance = Double.compare(minDamage, maxDamage) != 0;
 
         String retVal;
         if (hasVariance) {
-            retVal = lowerBound + " to " + upperBound;
+            retVal = minDamage + " to " + maxDamage;
         }
         else {
-            retVal = Double.toString(lowerBound);
+            retVal = Double.toString(minDamage);
         }
         return retVal;
     }

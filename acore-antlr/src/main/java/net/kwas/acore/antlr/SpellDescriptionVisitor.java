@@ -395,41 +395,52 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     @Override
     public List<StringResolver> visitArithmeticDamageString(SpellDescriptionParser.ArithmeticDamageStringContext ctx) {
         var right = Double.parseDouble(ctx.right.getText());
-
-        // TODO: This needs updating to handle numericDefinition children
-        // These are number resolvers which are different than the damage string resolvers.
-        // There will be some nasty code here, but nothing crazy.
-        List<StringResolver> childResolver;
-        if (ctx.damageString() != null) {
-            childResolver = ctx.damageString().accept(this);
-        }
-        else if (ctx.auraDamageString() != null) {
-            childResolver = ctx.auraDamageString().accept(this);
-        }
-        else {
-            throw new RuntimeException("No damage resolver for arithmetic resolver");
-        }
-
-        // Leverage DamageStringResolver as a "pair" of number resolvers.
-        // Throw away the damage resolver itself after retrieving the two bound resolvers.
-        var damageResolver = getResolver(childResolver, DamageStringResolver.class);
         var rightResolver = new StaticNumberResolver(right);
 
-        NumberResolver lowerBoundResolver;
-        NumberResolver upperBoundResolver;
-        if (ctx.STAR() != null) {
-            lowerBoundResolver = new MultiplicationResolver(damageResolver.minResolver(), rightResolver);
-            upperBoundResolver = new MultiplicationResolver(damageResolver.maxResolver(), rightResolver);
-        }
-        else if (ctx.FORWARD_SLASH() != null) {
-            lowerBoundResolver = new DivisionResolver(damageResolver.minResolver(), rightResolver);
-            upperBoundResolver = new DivisionResolver(damageResolver.maxResolver(), rightResolver);
+        StringResolver retVal;
+        if (ctx.numericDefinition() != null) {
+            var childResolver = getNumberResolver(ctx.numericDefinition().accept(this));
+            if (ctx.STAR() != null) {
+                retVal = new MultiplicationResolver(childResolver, rightResolver);
+            }
+            else if (ctx.FORWARD_SLASH() != null) {
+                retVal = new DivisionResolver(childResolver, rightResolver);
+            }
+            else {
+                throw new RuntimeException("Unexpected operation for arithmetic string resolver");
+            }
+
         }
         else {
-            throw new RuntimeException("Unexpected operation for arithmetic string resolver");
+            List<StringResolver> childResolver;
+            if (ctx.damageString() != null) {
+                childResolver = ctx.damageString().accept(this);
+            } else if (ctx.auraDamageString() != null) {
+                childResolver = ctx.auraDamageString().accept(this);
+            } else {
+                throw new RuntimeException("No child resolver for arithmetic string resolver");
+            }
+
+            // Leverage DamageStringResolver as a "pair" of number resolvers.
+            // Throw away the damage resolver itself after retrieving the two inner number resolvers.
+            var damageResolver = getResolver(childResolver, DamageStringResolver.class);
+
+            NumberResolver lowerBoundResolver;
+            NumberResolver upperBoundResolver;
+            if (ctx.STAR() != null) {
+                lowerBoundResolver = new MultiplicationResolver(damageResolver.minResolver(), rightResolver);
+                upperBoundResolver = new MultiplicationResolver(damageResolver.maxResolver(), rightResolver);
+            } else if (ctx.FORWARD_SLASH() != null) {
+                lowerBoundResolver = new DivisionResolver(damageResolver.minResolver(), rightResolver);
+                upperBoundResolver = new DivisionResolver(damageResolver.maxResolver(), rightResolver);
+            } else {
+                throw new RuntimeException("Unexpected operation for arithmetic string resolver");
+            }
+
+            retVal = new DamageStringResolver(lowerBoundResolver, upperBoundResolver);
         }
 
-        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
+        return List.of(retVal);
     }
 
     @Override
@@ -475,9 +486,13 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitFormulaConditional(SpellDescriptionParser.FormulaConditionalContext ctx) {
-        // TODO IMPLEMENT
-        // Get condition as booleanresolver and the cases as number resolvers.  Return a number resolver.
-        return super.visitFormulaConditional(ctx);
+        var condition = getBooleanResolver(ctx.condition.accept(this));
+        var trueCase = getNumberResolver(ctx.trueCase.accept(this));
+        var branches = List.of(new ConditionBranch<>(condition, trueCase));
+
+        var falseCase = getNumberResolver(ctx.falseCase.accept(this));
+
+        return List.of(new NumericConditionalResolver(branches, falseCase));
     }
 
     @Override

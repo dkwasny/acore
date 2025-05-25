@@ -74,7 +74,7 @@ floorHeader: (UPPER_F_CHAR UPPER_L_CHAR UPPER_O_CHAR UPPER_O_CHAR UPPER_R_CHAR) 
 floor: floorHeader OPEN_PAREN formulaFragment CLOSE_PAREN ;
 
 formulaConditionalHeader: (UPPER_C_CHAR UPPER_O_CHAR UPPER_N_CHAR UPPER_D_CHAR) | (LOWER_C_CHAR LOWER_O_CHAR LOWER_N_CHAR LOWER_D_CHAR) ;
-formulaConditional: formulaConditionalHeader OPEN_PAREN condition=booleanFunction COMMA true=formulaFragment COMMA false=formulaFragment CLOSE_PAREN ;
+formulaConditional: formulaConditionalHeader OPEN_PAREN condition=booleanFunction COMMA trueCase=formulaFragment COMMA falseCase=formulaFragment CLOSE_PAREN ;
 
 /*
  * Boolean Function
