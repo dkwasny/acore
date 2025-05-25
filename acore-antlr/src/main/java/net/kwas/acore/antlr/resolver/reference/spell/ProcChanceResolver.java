@@ -9,7 +9,7 @@ public record ProcChanceResolver(Long spellId) implements NumberResolver {
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).procChance();
+        return ctx.getSpellInfo(mySpellId).procChance();
     }
 
 }

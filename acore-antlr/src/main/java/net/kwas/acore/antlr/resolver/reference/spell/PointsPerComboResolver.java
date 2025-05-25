@@ -9,7 +9,7 @@ public record PointsPerComboResolver(Long spellId, int index) implements NumberR
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).pointsPerCombo().get(index);
+        return ctx.getSpellInfo(mySpellId).pointsPerCombo().get(index);
     }
 
 }

@@ -9,7 +9,7 @@ public record RangeResolver(Long spellId, int index, boolean isMax) implements N
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        var spellInfo = ctx.getSpellInfos().get(mySpellId);
+        var spellInfo = ctx.getSpellInfo(mySpellId);
         return isMax
             ? spellInfo.maxRanges().get(index)
             : spellInfo.minRanges().get(index);

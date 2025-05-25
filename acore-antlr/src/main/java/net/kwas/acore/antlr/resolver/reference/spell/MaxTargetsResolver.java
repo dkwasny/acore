@@ -9,7 +9,7 @@ public record MaxTargetsResolver(Long spellId) implements NumberResolver {
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).maxTargets();
+        return ctx.getSpellInfo(mySpellId).maxTargets();
     }
 
 }

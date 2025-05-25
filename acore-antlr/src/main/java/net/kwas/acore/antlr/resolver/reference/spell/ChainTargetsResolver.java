@@ -9,7 +9,7 @@ public record ChainTargetsResolver(Long spellId, int index) implements NumberRes
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).chainTargets().get(index);
+        return ctx.getSpellInfo(mySpellId).chainTargets().get(index);
     }
 
 }

@@ -10,15 +10,14 @@ public record DamageResolver(int index, Long spellId, boolean isMax) implements 
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
 
-        var actualIndex = index - 1;
-        var spellInfo = ctx.getSpellInfos().get(mySpellId);
-        var baseValue = spellInfo.baseValues().get(actualIndex);
+        var spellInfo = ctx.getSpellInfo(mySpellId);
+        var baseValue = spellInfo.baseValues().get(index);
 
-        var effectPerLevel = spellInfo.baseValuePerLevels().get(actualIndex);
+        var effectPerLevel = spellInfo.baseValuePerLevels().get(index);
         var characterLevel = ctx.getCharacterInfo().characterLevel();
         var perLevelBonus = effectPerLevel * characterLevel;
 
-        var dieSides = spellInfo.dieSides().get(actualIndex);
+        var dieSides = spellInfo.dieSides().get(index);
 
         var roll = isMax ? dieSides : 1;
 

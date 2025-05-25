@@ -1,6 +1,7 @@
 package net.kwas.acore.antlr.resolver;
 
 import net.kwas.acore.antlr.resolver.context.SpellContext;
+import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public interface NumberResolver extends StringResolver {
 
@@ -9,10 +10,7 @@ public interface NumberResolver extends StringResolver {
     @Override
     default String resolveString(SpellContext ctx) {
         var value = resolveNumber(ctx);
-        var rounded = Math.round(value);
-        var absoluteValue = Math.abs(rounded);
-        ctx.setLastRenderedNumber(absoluteValue);
-        return Long.toString(absoluteValue);
+        return ResolverUtils.renderNumber(value, ctx);
     }
 
 }

@@ -9,6 +9,9 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.context.SpellInfo;
 import net.kwas.acore.dbc.model.record.DbcSpell;
 import net.kwas.acore.dbc.model.record.DbcSpellDescriptionVariables;
+import net.kwas.acore.dbc.model.record.DbcSpellDuration;
+import net.kwas.acore.dbc.model.record.DbcSpellRadius;
+import net.kwas.acore.dbc.model.record.DbcSpellRange;
 import net.kwas.acore.dbc.reader.DbcReader;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
@@ -21,20 +24,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SpellParserTester {
 
+    private static final long TEST_SPELL_ID = 10;
     private static final SpellDescriptionVisitor VISITOR = new SpellDescriptionVisitor();
 
     public static void main(String[] args) {
+        var spellInfoMap = getSpellInfoMap();
+
+        var variableMap = parseVariables();
+
         var dbcReader = new DbcReader(Path.of("/Users/dkwasny/Files/dbc"));
-        var spells = dbcReader.readDbc(DbcSpell.class);
+        var dbcSpells = dbcReader.readDbc(DbcSpell.class);
 
-        var allVariables = parseVariables();
-
-        var outputs = spells.stream()
-            .map(x -> parseDescription(x, allVariables.get((long)x.descriptionVariablesId)))
-            .toList();
+        for (var dbcSpell : dbcSpells) {
+            var variables = variableMap.get((long)dbcSpell.descriptionVariablesId);
+            var description = parseDescription(dbcSpell, variables, spellInfoMap);
+        }
 
         System.out.println("");
     }
@@ -72,7 +80,11 @@ public class SpellParserTester {
         return retVal;
     }
 
-    private static String parseDescription(DbcSpell dbcSpell, Map<String, NumberResolver> variables) {
+    private static String parseDescription(
+        DbcSpell dbcSpell,
+        Map<String, NumberResolver> variableMap,
+        Map<Long, SpellInfo> spellInfoMap
+    ) {
         var rawText = dbcSpell.description0;
 
         if (rawText == null || rawText.isEmpty()) {
@@ -93,36 +105,18 @@ public class SpellParserTester {
             }
         });
 
+        if (dbcSpell.id == TEST_SPELL_ID) {
+            System.out.println("START");
+        }
+
         var descTree = descParser.spellDescription();
         var description = VISITOR.parseSpellDescription(descTree);
 
         var ctx = new SpellContext(
-            10L,
-            Map.of(
-                10L, new SpellInfo(
-                    List.of(1, 2, 1),
-                    List.of(1, 2, 0),
-                    List.of(1f, 2f, 3f),
-                    List.of(1f, 1f, 1f),
-                    List.of(1000L, 1000L, 1000L),
-                    List.of(2L, 2L, 2L),
-                    List.of(10f, 10f, 10f),
-                    List.of(5, 5, 5),
-                    List.of(1.2f, 1.2f, 1.2f),
-                    List.of(1.5f, 1.5f, 1.5f),
-                    List.of(0.5f, 0.5f, 0.5f),
-                    List.of(2.0f, 2.0f, 2.0f),
-                    List.of(50.0f, 50.0f, 50.0f),
-                    30000,
-                    30,
-                    4,
-                    6,
-                    80,
-                    7
-                )
-            ),
+            dbcSpell.id,
+            spellInfoMap,
             new CharacterInfo(
-                30,
+                20,
                 "Male",
                 20,
                 100,
@@ -135,11 +129,112 @@ public class SpellParserTester {
                 Set.of(50L),
                 "HearthstoneLocation"
             ),
-            variables
+            variableMap
         );
 
         var output = description.resolveString(ctx);
+
+        if (dbcSpell.id == TEST_SPELL_ID) {
+            System.out.println(output);
+        }
+
         return output;
+    }
+
+    private static Map<Long, SpellInfo> getSpellInfoMap() {
+        var radiusMap = getRadiusMap();
+        var rangeMap = getRangeMap();
+        var durationMap = getDurationMap();
+
+        var dbcReader = new DbcReader(Path.of("/Users/dkwasny/Files/dbc"));
+        var spells = dbcReader.readDbc(DbcSpell.class);
+        return spells.stream()
+            .collect(Collectors.toMap(
+                x -> x.id,
+                x -> createSpellInfo(x, radiusMap, rangeMap, durationMap)
+            ));
+    }
+
+    private static List<Float> getRadii(DbcSpell dbcSpell, Map<Long, DbcSpellRadius> radiusMap) {
+        return List.of(
+            getRadius(dbcSpell.effectRadiusIndex0, radiusMap),
+            getRadius(dbcSpell.effectRadiusIndex1, radiusMap),
+            getRadius(dbcSpell.effectRadiusIndex2, radiusMap)
+        );
+    }
+
+    private static float getRadius(long index, Map<Long, DbcSpellRadius> radiusMap) {
+        var dbcSpellRadius = radiusMap.get(index);
+        var retVal = 0.0f;
+        if (dbcSpellRadius != null) {
+            retVal = dbcSpellRadius.radius;
+        }
+        return retVal;
+    }
+
+    private static SpellInfo createSpellInfo(
+        DbcSpell dbcSpell,
+        Map<Long, DbcSpellRadius> radiusMap,
+        Map<Long, DbcSpellRange> rangeMap,
+        Map<Long, DbcSpellDuration> durationMap
+    ) {
+        var radii = getRadii(dbcSpell, radiusMap);
+
+        var dbcRange = rangeMap.get(dbcSpell.rangeIndex);
+        var minRanges = List.of(
+            dbcRange != null ? dbcRange.rangeMin0 : 0,
+            dbcRange != null ? dbcRange.rangeMin1 : 0
+        );
+        var maxRanges = List.of(
+            dbcRange != null ? dbcRange.rangeMax0 : 0,
+            dbcRange != null ? dbcRange.rangeMax1 : 0
+        );
+
+        var dbcSpellDuration = durationMap.get(dbcSpell.durationIndex);
+
+        return new SpellInfo(
+            List.of(dbcSpell.effectBasePoints0, dbcSpell.effectBasePoints1, dbcSpell.effectBasePoints2),
+            List.of(dbcSpell.effectDieSides0, dbcSpell.effectDieSides1, dbcSpell.effectDieSides2),
+            List.of(dbcSpell.effectRealPointsPerLevel0, dbcSpell.effectRealPointsPerLevel1, dbcSpell.effectRealPointsPerLevel2),
+            List.of(dbcSpell.effectAuraPeriod0, dbcSpell.effectAuraPeriod1, dbcSpell.effectAuraPeriod2),
+            List.of(dbcSpell.effectChainTargets0, dbcSpell.effectChainTargets0, dbcSpell.effectChainTargets0),
+            radii,
+            List.of(dbcSpell.effectMiscValue0, dbcSpell.effectMiscValue1, dbcSpell.effectMiscValue2),
+            List.of(dbcSpell.effectPointsPerCombo0, dbcSpell.effectPointsPerCombo1, dbcSpell.effectPointsPerCombo2),
+            List.of(dbcSpell.effectAmplitude0, dbcSpell.effectAmplitude1, dbcSpell.effectAmplitude2),
+            List.of(dbcSpell.effectChainAmplitude0, dbcSpell.effectChainAmplitude1, dbcSpell.effectChainAmplitude2),
+            minRanges,
+            maxRanges,
+            dbcSpellDuration != null ? dbcSpellDuration.duration : 0,
+            dbcSpellDuration != null ? dbcSpellDuration.durationPerLevel : 0,
+            dbcSpellDuration != null ? dbcSpellDuration.maxDuration : 0,
+            dbcSpell.procChance,
+            dbcSpell.procCharges,
+            dbcSpell.maxTargets,
+            dbcSpell.maxTargetLevel,
+            dbcSpell.cumulativeAura
+        );
+    }
+
+    private static Map<Long, DbcSpellRadius> getRadiusMap() {
+        var dbcReader = new DbcReader(Path.of("/Users/dkwasny/Files/dbc"));
+        var values = dbcReader.readDbc(DbcSpellRadius.class);
+        return values.stream()
+            .collect(Collectors.toMap(x -> x.id, x -> x));
+    }
+
+    private static Map<Long, DbcSpellRange> getRangeMap() {
+        var dbcReader = new DbcReader(Path.of("/Users/dkwasny/Files/dbc"));
+        var values = dbcReader.readDbc(DbcSpellRange.class);
+        return values.stream()
+            .collect(Collectors.toMap(x -> x.id, x -> x));
+    }
+
+    private static Map<Long, DbcSpellDuration> getDurationMap() {
+        var dbcReader = new DbcReader(Path.of("/Users/dkwasny/Files/dbc"));
+        var values = dbcReader.readDbc(DbcSpellDuration.class);
+        return values.stream()
+            .collect(Collectors.toMap(x -> x.id, x -> x));
     }
 
 }

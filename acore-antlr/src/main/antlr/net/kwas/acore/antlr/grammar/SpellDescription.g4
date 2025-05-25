@@ -8,17 +8,25 @@ spellDescription: text ;
 /*
  * Grammar entry point for spell description variables
  */
-spellDescriptionVariables: spellDescriptionVariable (WS+ spellDescriptionVariable)* ;
+spellDescriptionVariables: (spellDescriptionVariable WS*)+ ;
 spellDescriptionVariable: DOLLAR_SIGN identifier EQUAL variableDefinition ;
 
-variableDefinition: numericConditional | formula | formulaFragment ;
+variableDefinition: stringConditional | formula | formulaFragment ;
 
 /*
- * Plain text
+ * All Text
  * Can contain pretty much anything.
  */
-text: string+ ;
-string: formula
+text: (conditionalText | squareBrackets)+ ;
+
+/*
+ * Conditional Text
+ * Text used within string conditionals.
+ * Contains almost everything except for square brackets due to said characters
+ * being used for syntax.
+ */
+conditionalText: conditionalString+ ;
+conditionalString: formula
     | stringConditional
     | numericReference
     | stringReference
@@ -74,30 +82,7 @@ floorHeader: (UPPER_F_CHAR UPPER_L_CHAR UPPER_O_CHAR UPPER_O_CHAR UPPER_R_CHAR) 
 floor: floorHeader OPEN_PAREN formulaFragment CLOSE_PAREN ;
 
 formulaConditionalHeader: (UPPER_C_CHAR UPPER_O_CHAR UPPER_N_CHAR UPPER_D_CHAR) | (LOWER_C_CHAR LOWER_O_CHAR LOWER_N_CHAR LOWER_D_CHAR) ;
-formulaConditional: formulaConditionalHeader OPEN_PAREN condition=booleanFunction COMMA trueCase=formulaFragment COMMA falseCase=formulaFragment CLOSE_PAREN ;
-
-/*
- * Boolean Function
- * Functions that return boolean values.
- * Only used within conditional functions.
- * Like formula functions, both lower and upper case are supported.
- */
-booleanFunction: DOLLAR_SIGN (
-    greaterThan
-    | greaterThanOrEqual
-    | equal
-    )
-    ;
-
-greaterThanHeader: (UPPER_G_CHAR UPPER_T_CHAR) | (LOWER_G_CHAR LOWER_T_CHAR) ;
-greaterThan: greaterThanHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
-
-greaterThanOrEqualHeader: (UPPER_G_CHAR UPPER_T_CHAR UPPER_E_CHAR) | (LOWER_G_CHAR LOWER_T_CHAR LOWER_E_CHAR) ;
-greaterThanOrEqual: greaterThanOrEqualHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
-
-equalHeader: (UPPER_E_CHAR UPPER_Q_CHAR) | (LOWER_E_CHAR LOWER_Q_CHAR) ;
-equal: equalHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
-
+formulaConditional: formulaConditionalHeader OPEN_PAREN condition=numericReference COMMA trueCase=formulaFragment COMMA falseCase=formulaFragment CLOSE_PAREN ;
 
 /*
  * Numeric Reference
@@ -143,6 +128,10 @@ numericDefinition: minDamage
     | spellPower
     | spirit
     | characterLevel
+    | attackRating
+    | greaterThan
+    | greaterThanOrEqual
+    | equal
     ;
 
 // References to data from the spell itself
@@ -153,10 +142,20 @@ auraPeriod: spellId=positiveInteger? (UPPER_T_CHAR | LOWER_T_CHAR) index=positiv
 procCharges: spellId=positiveInteger? LOWER_N_CHAR ;
 procChance: spellId=positiveInteger? (UPPER_H_CHAR | LOWER_H_CHAR) ;
 chainTargets: spellId=positiveInteger? LOWER_X_CHAR index=positiveInteger? ;
-// Radius has a concept of a min and max (via level), but all the radii I see
-// in the SpellRadius DBC file have the same min and max.
-// Just going to use the base radius for the time being.
-radius: spellId=positiveInteger? (UPPER_A_CHAR | LOWER_A_CHAR) index=positiveInteger? ;
+// Radius has a concept of a min and max (via level), but nearly every radius
+// I see in the SpellRadius DBC file has the same min and max.
+// The one entry that does not (46) has zero range per level.
+// I have no idea how said radius is intended to scale.
+// It also applies only to internal spells that look unusable by characters (56300).
+// Just going to always use the base radius for the time being.
+//
+// Bloodbolt Whirl (71899 through 71902) is the only spell to have a
+// reference with two identifying letters in it.
+// Ex: "allies within $s71447a1 yards."
+// I can only assume the leading "s" is some new syntax due to the large spell ID.
+// This could probably work for all reference types, but I'd rather just
+// keep the exception localized to radius for now.
+radius: LOWER_S_CHAR? spellId=positiveInteger? (UPPER_A_CHAR | LOWER_A_CHAR) index=positiveInteger? ;
 miscValue: spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger? ;
 pointsPerCombo: spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger? ;
 amplitude: spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
@@ -181,36 +180,56 @@ mainWeaponSpeed: (UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR) | (LOWER_M_CHAR LOWER_
 mainWeaponHandedness: UPPER_H_CHAR UPPER_N_CHAR UPPER_D_CHAR ;
 // TODO: Split into different spell power types if we can get said values.
 // I don't think the acore database has them.  Just the base value.
-spellPower: UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
+spellPower: (UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR)) | (LOWER_S_CHAR LOWER_P_CHAR) ;
 spirit: UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
 characterLevel: (UPPER_P_CHAR UPPER_L_CHAR) | (LOWER_P_CHAR LOWER_L_CHAR) ;
+// This reference only shows up in an unused spell description variable.
+// I'm guessing it refers to "attack rating".
+// WowWiki implies that attack rating was removed in 2.3.0 and the value
+// is now always {level * 5} (https://wowwiki-archive.fandom.com/wiki/Attack_Rating).
+// This would line up with the fact that the variable isn't actually used in any spells.
+// I'll just use the formula from the wiki until I find a real use for $AR.
+attackRating: (UPPER_A_CHAR UPPER_R_CHAR) ;
+
+/*
+ * Boolean Function
+ * Functions that return boolean values as numbers.
+ * Zero equals false, while non-zero equals true.
+ */
+greaterThanHeader: (UPPER_G_CHAR UPPER_T_CHAR) | (LOWER_G_CHAR LOWER_T_CHAR) ;
+greaterThan: greaterThanHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
+
+greaterThanOrEqualHeader: (UPPER_G_CHAR UPPER_T_CHAR UPPER_E_CHAR) | (LOWER_G_CHAR LOWER_T_CHAR LOWER_E_CHAR) ;
+greaterThanOrEqual: greaterThanOrEqualHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
+
+equalHeader: (UPPER_E_CHAR UPPER_Q_CHAR) | (LOWER_E_CHAR LOWER_Q_CHAR) ;
+equal: equalHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
 
 // KWAS TODO: Compare skill output for Judgement of Righteousness (20187)
+// Vindication as well (67)
 // to your actual character.
 
 /*
- * Conditionals
- * These had to be separated into numeric and string variants.
- * These are not used in formulas.  See formulaConditional for the formula version.
+ * String Conditionals
+ * These allow for conditional text rendering outside of a formula.
+ * As such, these are not used in formulas.
+ * See formulaConditional for the formula version.
  */
-// Numeric conditionals are only used in variable definitions
-numericConditional: numericConditionalIf numericConditionalElseIf* numericConditionalElse ;
-numericConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE;
-numericConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE formula CLOSE_SQUARE ;
-numericConditionalElse: OPEN_SQUARE formula CLOSE_SQUARE ;
-
-// String conditionals are only used as text in descriptions
 stringConditional: stringConditionalIf stringConditionalElseIf* stringConditionalElse ;
-stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE;
-stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE text? CLOSE_SQUARE ;
-stringConditionalElse: OPEN_SQUARE text? CLOSE_SQUARE ;
+stringConditionalIf: DOLLAR_SIGN QUESTION_MARK conditionalFragment OPEN_SQUARE conditionalText? CLOSE_SQUARE;
+stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE conditionalText? CLOSE_SQUARE ;
+// One conditional I came across (164) had a stray dollar sign before the else value.
+// Ex: $variable=$?s1234[${1}]$[${0}]
+// I don't know what the dollar sign means, and will assume it's pointless
+// until I find otherwise.
+stringConditionalElse: DOLLAR_SIGN? OPEN_SQUARE conditionalText? CLOSE_SQUARE ;
 
 conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
     | EXCLAMATION_POINT conditionalFragment
     | conditionalFragment AMPERSAND conditionalFragment
     | conditionalFragment PIPE conditionalFragment
     | conditionalSpellRef
-    | booleanFunction
+    | numericReference
     ;
 // TODO: Do a and s mean the same thing here?
 // Would `a` perhaps mean an aura is active on the character at the moment?
@@ -284,7 +303,7 @@ percentDamageStringRule: DOLLAR_SIGN positiveInteger PERCENT ;
 // I'm assuming it's supposed to reference the duration of the spell (i.e. $d)
 // but the text was never written correctly and fell through the cracks.
 // I wonder what the game itself does?  Maybe one day I'll look into it.
-ruleOfRhunok: WS DOLLAR_SIGN PERIOD ;
+ruleOfRhunok: DOLLAR_SIGN PERIOD EOF ;
 
 // Torture (47263) and its higher rank variants are the only spells to use
 // the at-sign.
@@ -360,12 +379,14 @@ miscChars: (WS
     | PLUS
     | LT_SIGN
     | GT_SIGN
-    | OPEN_SQUARE
-    | CLOSE_SQUARE
     | OPEN_PAREN
     | CLOSE_PAREN
     | QUESTION_MARK
     | PERCENT
+    )+ ;
+
+squareBrackets: (OPEN_SQUARE
+    | CLOSE_SQUARE
     )+ ;
 
 /*

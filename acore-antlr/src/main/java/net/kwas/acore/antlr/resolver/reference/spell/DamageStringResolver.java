@@ -3,6 +3,7 @@ package net.kwas.acore.antlr.resolver.reference.spell;
 import net.kwas.acore.antlr.resolver.NumberResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
+import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record DamageStringResolver(NumberResolver minResolver, NumberResolver maxResolver) implements StringResolver {
 
@@ -13,12 +14,15 @@ public record DamageStringResolver(NumberResolver minResolver, NumberResolver ma
 
         var hasVariance = Double.compare(minDamage, maxDamage) != 0;
 
+        var renderedMinDamage = ResolverUtils.renderNumber(minDamage, ctx);
+
         String retVal;
         if (hasVariance) {
-            retVal = minDamage + " to " + maxDamage;
+            var renderedMaxDamage = ResolverUtils.renderNumber(maxDamage, ctx);
+            retVal = renderedMinDamage + " to " + renderedMaxDamage;
         }
         else {
-            retVal = Double.toString(minDamage);
+            retVal = renderedMinDamage;
         }
         return retVal;
     }

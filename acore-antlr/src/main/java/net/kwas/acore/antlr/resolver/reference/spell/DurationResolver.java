@@ -6,18 +6,45 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record DurationResolver(Long spellId) implements NumberResolver {
 
+    private static final double SECOND = 1000;
+    private static final double MINUTE = SECOND * 60;
+    private static final double HOUR = MINUTE * 60;
+
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).duration();
+        var spellInfo = ctx.getSpellInfo(mySpellId);
+
+        var baseDuration = spellInfo.duration();
+        var durationPerLevel = spellInfo.durationPerLevel();
+        var maxDuration = spellInfo.maxDuration();
+        var characterLevel = ctx.getCharacterInfo().characterLevel();
+
+        var leveledDuration = baseDuration + (durationPerLevel * characterLevel);
+        return Math.min(leveledDuration, maxDuration);
     }
 
     @Override
     public String resolveString(SpellContext ctx) {
+        var number = resolveNumber(ctx);
 
-        // TODO: Dynamically choose text based on time.
-        // e.g. 10 sec vs 10 min
-        return NumberResolver.super.resolveString(ctx);
+        var newNumber = number;
+        var suffix = " ms";
+        if (number > HOUR) {
+            newNumber = (number / HOUR);
+            suffix = " hours";
+        }
+        else if (number > MINUTE) {
+            newNumber = (number / MINUTE);
+            suffix = " min";
+        }
+        else if (number > SECOND) {
+            newNumber = (number / SECOND);
+            suffix = " sec";
+        }
+
+        var renderedNumber = ResolverUtils.renderNumber(newNumber, ctx);
+        return renderedNumber + suffix;
     }
 
 

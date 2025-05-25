@@ -9,7 +9,7 @@ public record AmplitudeResolver(Long spellId, int index) implements NumberResolv
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).amplitudes().get(index);
+        return ctx.getSpellInfo(mySpellId).amplitudes().get(index);
     }
 
 }

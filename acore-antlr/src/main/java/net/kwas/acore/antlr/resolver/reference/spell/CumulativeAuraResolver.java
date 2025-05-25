@@ -9,7 +9,7 @@ public record CumulativeAuraResolver(Long spellId) implements NumberResolver {
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).cumulativeAura();
+        return ctx.getSpellInfo(mySpellId).cumulativeAura();
     }
 
 }

@@ -2,7 +2,6 @@ package net.kwas.acore.antlr;
 
 import net.kwas.acore.antlr.grammar.SpellDescriptionBaseVisitor;
 import net.kwas.acore.antlr.grammar.SpellDescriptionParser;
-import net.kwas.acore.antlr.resolver.BooleanResolver;
 import net.kwas.acore.antlr.resolver.conditional.AndResolver;
 import net.kwas.acore.antlr.resolver.conditional.ComparisonResolver;
 import net.kwas.acore.antlr.resolver.conditional.ComparisonType;
@@ -25,6 +24,7 @@ import net.kwas.acore.antlr.resolver.StringConcatenationResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
 import net.kwas.acore.antlr.resolver.reference.character.AttackPowerResolver;
+import net.kwas.acore.antlr.resolver.reference.character.AttackRatingResolver;
 import net.kwas.acore.antlr.resolver.reference.character.LevelResolver;
 import net.kwas.acore.antlr.resolver.reference.character.MainWeaponDamageResolver;
 import net.kwas.acore.antlr.resolver.reference.character.MainWeaponHandednessResolver;
@@ -53,6 +53,7 @@ import net.kwas.acore.antlr.resolver.reference.spell.ProcChargesResolver;
 import net.kwas.acore.antlr.resolver.reference.spell.RadiusResolver;
 import net.kwas.acore.antlr.resolver.reference.spell.RangeResolver;
 import net.kwas.acore.antlr.resolver.reference.spell.VariableResolver;
+import net.kwas.acore.antlr.resolver.util.ParseNumberResolver;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 
@@ -77,18 +78,31 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     private Map.Entry<String, NumberResolver> parseSpellDescriptionVariable(SpellDescriptionParser.SpellDescriptionVariableContext ctx) {
         var key = ctx.identifier().getText();
-        var value = getNumberResolver(ctx.variableDefinition().accept(this));
+        var stringResolver = getStringResolver(ctx.variableDefinition().accept(this));
+        var value = new ParseNumberResolver(stringResolver);
         return new AbstractMap.SimpleImmutableEntry<>(key, value);
     }
 
     @Override
     public List<StringResolver> visitText(SpellDescriptionParser.TextContext ctx) {
         var children = super.visitText(ctx);
-        return List.of(new StringConcatenationResolver(children));
+        return concatIfNecessary(children);
+    }
+
+    @Override
+    public List<StringResolver> visitConditionalText(SpellDescriptionParser.ConditionalTextContext ctx) {
+        var children = super.visitConditionalText(ctx);
+        return concatIfNecessary(children);
     }
 
     @Override
     public List<StringResolver> visitMiscChars(SpellDescriptionParser.MiscCharsContext ctx) {
+        var text = ctx.getText();
+        return List.of(new StaticStringResolver(text));
+    }
+
+    @Override
+    public List<StringResolver> visitSquareBrackets(SpellDescriptionParser.SquareBracketsContext ctx) {
         var text = ctx.getText();
         return List.of(new StaticStringResolver(text));
     }
@@ -329,6 +343,11 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitAttackRating(SpellDescriptionParser.AttackRatingContext ctx) {
+        return List.of(new AttackRatingResolver());
+    }
+
+    @Override
     public List<StringResolver> visitMainWeaponHandedness(SpellDescriptionParser.MainWeaponHandednessContext ctx) {
         return List.of(new MainWeaponHandednessResolver());
     }
@@ -342,10 +361,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     @Override
     public List<StringResolver> visitGenderString(SpellDescriptionParser.GenderStringContext ctx) {
         var values = ctx.text().stream().map(RuleContext::getText).toList();
-        // TODO: Remove after some testing with real life values
-        if (values.size() > 2) {
-            throw new RuntimeException("HERE: "+ values);
-        }
         return List.of(new GenderStringResolver(values));
     }
 
@@ -362,13 +377,13 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
         // This is special logic I made up based on a few spells that use this rule.
         // See the grammar file for more information.
-        int index = 1;
+        int index = 0;
         Long spellId = null;
         if (integer <= 3) {
-            index = integer;
+            index = integer - 1;
         }
         else {
-            spellId = Long.valueOf(index);
+            spellId = (long)integer;
         }
 
         return createDamageStringResolver(index, spellId);
@@ -486,7 +501,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitFormulaConditional(SpellDescriptionParser.FormulaConditionalContext ctx) {
-        var condition = getBooleanResolver(ctx.condition.accept(this));
+        var condition = getNumberResolver(ctx.condition.accept(this));
         var trueCase = getNumberResolver(ctx.trueCase.accept(this));
         var branches = List.of(new ConditionBranch<>(condition, trueCase));
 
@@ -512,12 +527,12 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         else if (ctx.conditionalSpellRef() != null) {
             return children;
         }
-        else if (ctx.booleanFunction() != null) {
+        else if (ctx.numericReference() != null) {
             return children;
         }
 
         if (ctx.EXCLAMATION_POINT() != null) {
-            var resolver = getBooleanResolver(children);
+            var resolver = getNumberResolver(children);
             return List.of(new NotResolver(resolver));
         }
 
@@ -526,8 +541,8 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
             throw new RuntimeException("Unexpected number of children for conditional fragment: " + children);
         }
 
-        var left = (BooleanResolver)children.getFirst();
-        var right = (BooleanResolver)children.getLast();
+        var left = (NumberResolver) children.getFirst();
+        var right = (NumberResolver)children.getLast();
 
         if (ctx.AMPERSAND() != null) {
             return List.of(new AndResolver(left, right));
@@ -539,70 +554,37 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         throw new RuntimeException("Unexpected usecase for conditional fragment: " + ctx);
     }
 
-    // TODO: Maybe find a way to merge visitStringConditional() and visitNumericConditional().
-    // It's a bit tricky due to the ANTLR context objects.  Not worth it right now.
     @Override
     public List<StringResolver> visitStringConditional(SpellDescriptionParser.StringConditionalContext ctx) {
         var branches = new ArrayList<ConditionBranch<StringResolver>>();
 
         var initialBranch = createBranch(
             ctx.stringConditionalIf().conditionalFragment(),
-            ctx.stringConditionalIf().text(),
-            StringResolver.class
+            ctx.stringConditionalIf().conditionalText()
         );
         branches.add(initialBranch);
 
         var remainingBranches = ctx.stringConditionalElseIf().stream()
             .map(x -> createBranch(
                 x.conditionalFragment(),
-                x.text(),
-                StringResolver.class
+                x.conditionalText()
             ))
             .toList();
         branches.addAll(remainingBranches);
 
-        var elseCases = ctx.stringConditionalElse().accept(this);
-        var elseCase = getStringResolver(elseCases);
+        var elseCase = visitOptionalContext(ctx.stringConditionalElse().conditionalText());
 
         return List.of(new StringConditionalResolver(branches, elseCase));
     }
 
-    @Override
-    public List<StringResolver> visitNumericConditional(SpellDescriptionParser.NumericConditionalContext ctx) {
-        var branches = new ArrayList<ConditionBranch<NumberResolver>>();
-
-        var initialBranch = createBranch(
-            ctx.numericConditionalIf().conditionalFragment(),
-            ctx.numericConditionalIf().formula(),
-            NumberResolver.class
-        );
-        branches.add(initialBranch);
-
-        var remainingBranches = ctx.numericConditionalElseIf().stream()
-            .map(x -> createBranch(
-                x.conditionalFragment(),
-                x.formula(),
-                NumberResolver.class
-            ))
-            .toList();
-        branches.addAll(remainingBranches);
-
-        var elseCases = ctx.numericConditionalElse().accept(this);
-        var elseCase = getNumberResolver(elseCases);
-
-        return List.of(new NumericConditionalResolver(branches, elseCase));
-    }
-
-    private <T extends StringResolver> ConditionBranch<T> createBranch(
+    private ConditionBranch<StringResolver> createBranch(
         SpellDescriptionParser.ConditionalFragmentContext conditionalFragmentContext,
-        ParserRuleContext valueContext,
-        Class<T> clazz
+        ParserRuleContext valueContext
     ) {
         var conditions = conditionalFragmentContext.accept(this);
-        var condition = getBooleanResolver(conditions);
+        var condition = getNumberResolver(conditions);
 
-        var values = valueContext.accept(this);
-        var value = getResolver(values, clazz);
+        var value = visitOptionalContext(valueContext);
 
         return new ConditionBranch<>(condition, value);
     }
@@ -625,12 +607,20 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         return List.of(new StringConcatenationResolver(resolvers));
     }
 
-    private BooleanResolver getBooleanResolver(List<StringResolver> resolvers) {
-        return getResolver(resolvers, BooleanResolver.class);
-    }
-
     private NumberResolver getNumberResolver(List<StringResolver> resolvers) {
         return getResolver(resolvers, NumberResolver.class);
+    }
+
+    private StringResolver visitOptionalContext(ParserRuleContext valueContext) {
+        StringResolver retVal;
+        if (valueContext == null) {
+            retVal = new StaticStringResolver("");
+        }
+        else {
+            var children = valueContext.accept(this);
+            retVal = getStringResolver(children);
+        }
+        return retVal;
     }
 
     private StringResolver getStringResolver(List<StringResolver> resolvers) {
@@ -652,12 +642,61 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     private Long getOptionalInteger(SpellDescriptionParser.PositiveIntegerContext ctx) {
-        return ctx != null ? Long.getLong(ctx.getText()) : null;
+        return ctx != null ? Long.parseLong(ctx.getText()) : null;
     }
 
     private int getIndex(SpellDescriptionParser.PositiveIntegerContext ctx) {
-        // A missing index implies index 1
-        return ctx != null ? Integer.parseInt(ctx.getText()) : 1;
+        // A missing index implies the first index.
+        var index = ctx != null ? Integer.parseInt(ctx.getText()) : 1;
+        // Convert the index to base zero.
+        return index - 1;
+    }
+
+    // Don't wrap with a concatenation resolver unless there are actually
+    // multiple resolvers after reducing.
+    private List<StringResolver> concatIfNecessary(List<StringResolver> resolvers) {
+        var reducedResolvers = resolvers;
+        if (resolvers.size() > 1) {
+            reducedResolvers = reduceStaticStringResolvers(resolvers);
+        }
+
+        StringResolver retVal;
+        if (reducedResolvers.size() > 1) {
+            retVal = new StringConcatenationResolver(reducedResolvers);
+        }
+        else {
+            retVal = reducedResolvers.getFirst();
+        }
+        return List.of(retVal);
+    }
+
+    // Combine sequential sibling static string resolves into one.
+    // We end up with a bunch of small static resolvers due to how fine-grained
+    // the grammar is.
+    private List<StringResolver> reduceStaticStringResolvers(List<StringResolver> resolvers) {
+        var retVal = new ArrayList<StringResolver>();
+
+        var builder = new StringBuilder();
+        for (var resolver : resolvers) {
+            if (resolver instanceof StaticStringResolver(String value)) {
+                builder.append(value);
+            }
+            else {
+                if (!builder.isEmpty()) {
+                    var staticResolver = new StaticStringResolver(builder.toString());
+                    retVal.add(staticResolver);
+                    builder = new StringBuilder();
+                }
+                retVal.add(resolver);
+            }
+        }
+
+        if (!builder.isEmpty()) {
+            var staticResolver = new StaticStringResolver(builder.toString());
+            retVal.add(staticResolver);
+        }
+
+        return retVal;
     }
 
     @Override

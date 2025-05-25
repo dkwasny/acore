@@ -9,7 +9,7 @@ public record ChainAmplitudeResolver(Long spellId, int index) implements NumberR
     @Override
     public double resolveNumber(SpellContext ctx) {
         var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfos().get(mySpellId).chainAmplitudes().get(index);
+        return ctx.getSpellInfo(mySpellId).chainAmplitudes().get(index);
     }
 
 }

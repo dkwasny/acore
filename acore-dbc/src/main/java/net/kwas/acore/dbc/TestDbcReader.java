@@ -66,13 +66,25 @@ public class TestDbcReader {
 
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-//            .filter(x -> x.id == 57861L)
-            .filter(x -> x.description0.contains("$HND"))
-//            .filter(x -> x.description0.matches(".*\\$[0-9]+[^a-zA-Z0-9]+.*"))
+            .filter(x -> x.id == 10L)
+//            .filter(x -> x.descriptionVariablesId == 181)
+//            .filter(x -> x.effectRadiusIndex0 == 46L || x.effectRadiusIndex1 == 46L || x.effectRadiusIndex2 == 46L)
+//            .filter(x -> x.description0.contains("$AR"))
+//            .filter(x -> x.description0.matches(".*\\$[a-zA-Z]+[0-9]+[a-zA-Z]+.*"))
 //            .filter(x -> x.procChance < 100)
             .toList();
 
+        var usedVariableIds = relevantSpells.stream()
+            .map(x -> x.descriptionVariablesId)
+            .collect(Collectors.toSet())
+            .stream()
+            .sorted()
+            .toList();
+
         var spellRadii = reader.readDbc(DbcSpellRadius.class);
+        var variableRadii = spellRadii.stream()
+            .filter(x -> Float.compare(x.radius, x.radiusMax) != 0)
+            .toList();
 
         var spellRanges = reader.readDbc(DbcSpellRange.class);
         var donutRanges = spellRanges.stream()
@@ -95,19 +107,19 @@ public class TestDbcReader {
 //        printAll(spellDurations);
 //        System.out.println();
 //
-//        var perLevelDurations = spellDurations.stream()
-//            .filter(x -> x.durationPerLevel != 0)
-//            .toList();
-//        printAll(perLevelDurations);
+        var perLevelDurations = spellDurations.stream()
+            .filter(x -> x.durationPerLevel != 0)
+            .toList();
+        printAll(perLevelDurations);
 //
-//        var perLevelDurationIds = perLevelDurations.stream()
-//            .map(x -> x.id)
-//            .collect(Collectors.toSet());
-//
-//        var durationSpells = spells.stream()
-//            .filter(x -> perLevelDurationIds.contains(x.durationIndex))
-//            .toList();
-//        printAll(durationSpells);
+        var perLevelDurationIds = perLevelDurations.stream()
+            .map(x -> x.id)
+            .collect(Collectors.toSet());
+
+        var perLeveldurationSpells = spells.stream()
+            .filter(x -> perLevelDurationIds.contains(x.durationIndex))
+            .toList();
+//        printAll(perLeveldurationSpells);
 //
 //
 //        var durationSpellStrings = durationSpells.stream()
@@ -134,6 +146,9 @@ public class TestDbcReader {
 //
 //        var spellDescriptionVariablesId = 181L;
         var spellDescriptionVariables = reader.readDbc(DbcSpellDescriptionVariables.class);
+        var arSpellVars = spellDescriptionVariables.stream()
+            .filter(x -> x.variable.contains("$AR"))
+            .toList();
 //        var spellDescriptionVariable = spellDescriptionVariables.stream().filter(x -> x.id == spellDescriptionVariablesId).toList();
 //        System.out.println(spellDescriptionVariable);
 //
@@ -172,7 +187,7 @@ public class TestDbcReader {
 //            .toList();
 //        printAll(tagsPerSpell);
 
-
+        System.out.println();
     }
 
     private static List<String> getTags(String string) {

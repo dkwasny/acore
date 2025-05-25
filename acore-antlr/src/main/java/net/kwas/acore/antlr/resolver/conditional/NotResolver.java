@@ -1,13 +1,15 @@
 package net.kwas.acore.antlr.resolver.conditional;
 
+import net.kwas.acore.antlr.resolver.NumberResolver;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
-import net.kwas.acore.antlr.resolver.BooleanResolver;
+import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
-public record NotResolver(BooleanResolver value) implements BooleanResolver {
+public record NotResolver(NumberResolver resolver) implements NumberResolver {
 
     @Override
-    public boolean resolveBoolean(SpellContext ctx) {
-        return !value.resolveBoolean(ctx);
+    public double resolveNumber(SpellContext ctx) {
+        var value = ResolverUtils.toBool(resolver.resolveNumber(ctx));
+        return ResolverUtils.toDouble(!value);
     }
 
 }
