@@ -4,16 +4,19 @@ import net.kwas.acore.antlr.grammar.SpellDescriptionBaseVisitor;
 import net.kwas.acore.antlr.grammar.SpellDescriptionParser;
 import net.kwas.acore.antlr.resolver.BooleanResolver;
 import net.kwas.acore.antlr.resolver.conditional.AndResolver;
+import net.kwas.acore.antlr.resolver.conditional.ComparisonResolver;
+import net.kwas.acore.antlr.resolver.conditional.ComparisonType;
 import net.kwas.acore.antlr.resolver.conditional.ConditionBranch;
 import net.kwas.acore.antlr.resolver.conditional.NumericConditionalResolver;
 import net.kwas.acore.antlr.resolver.conditional.StringConditionalResolver;
 import net.kwas.acore.antlr.resolver.conditional.ConditionalSpellRefResolver;
 import net.kwas.acore.antlr.resolver.conditional.NotResolver;
 import net.kwas.acore.antlr.resolver.conditional.OrResolver;
-import net.kwas.acore.antlr.resolver.function.GreaterThanResolver;
+import net.kwas.acore.antlr.resolver.math.MinResolver;
 import net.kwas.acore.antlr.resolver.math.AdditionResolver;
 import net.kwas.acore.antlr.resolver.math.DivisionResolver;
-import net.kwas.acore.antlr.resolver.function.MaxNumberResolver;
+import net.kwas.acore.antlr.resolver.math.MaxResolver;
+import net.kwas.acore.antlr.resolver.math.FloorResolver;
 import net.kwas.acore.antlr.resolver.math.MultiplicationResolver;
 import net.kwas.acore.antlr.resolver.NumberResolver;
 import net.kwas.acore.antlr.resolver.StaticNumberResolver;
@@ -21,14 +24,35 @@ import net.kwas.acore.antlr.resolver.StaticStringResolver;
 import net.kwas.acore.antlr.resolver.StringConcatenationResolver;
 import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
-import net.kwas.acore.antlr.resolver.reference.AuraDamageBoundResolver;
-import net.kwas.acore.antlr.resolver.reference.AuraPeriodResolver;
-import net.kwas.acore.antlr.resolver.reference.DamageStringResolver;
-import net.kwas.acore.antlr.resolver.reference.DurationResolver;
-import net.kwas.acore.antlr.resolver.reference.GenderStringResolver;
-import net.kwas.acore.antlr.resolver.reference.LocalizedStringResolver;
-import net.kwas.acore.antlr.resolver.reference.DamageBoundResolver;
-import net.kwas.acore.antlr.resolver.reference.VariableResolver;
+import net.kwas.acore.antlr.resolver.reference.character.AttackPowerResolver;
+import net.kwas.acore.antlr.resolver.reference.character.LevelResolver;
+import net.kwas.acore.antlr.resolver.reference.character.MainWeaponDamageResolver;
+import net.kwas.acore.antlr.resolver.reference.character.MainWeaponHandednessResolver;
+import net.kwas.acore.antlr.resolver.reference.character.MainWeaponSpeedResolver;
+import net.kwas.acore.antlr.resolver.reference.character.RangedAttackPowerResolver;
+import net.kwas.acore.antlr.resolver.reference.character.SpellPowerResolver;
+import net.kwas.acore.antlr.resolver.reference.character.SpiritResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.AmplitudeResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.AuraDamageResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.AuraPeriodResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.ChainAmplitudeResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.ChainTargetsResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.CumulativeAuraResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.DamageStringResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.DurationResolver;
+import net.kwas.acore.antlr.resolver.reference.character.GenderStringResolver;
+import net.kwas.acore.antlr.resolver.reference.character.HearthstoneLocationResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.LocalizedStringResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.DamageResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.MaxTargetLevelResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.MaxTargetsResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.MiscValueResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.PointsPerComboResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.ProcChanceResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.ProcChargesResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.RadiusResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.RangeResolver;
+import net.kwas.acore.antlr.resolver.reference.spell.VariableResolver;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 
@@ -130,21 +154,20 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     public List<StringResolver> visitMinDamage(SpellDescriptionParser.MinDamageContext ctx) {
         var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
-        return List.of(new DamageBoundResolver(index, spellId, false));
+        return List.of(new DamageResolver(index, spellId, false));
     }
 
     @Override
     public List<StringResolver> visitMaxDamage(SpellDescriptionParser.MaxDamageContext ctx) {
         var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
-        return List.of(new DamageBoundResolver(index, spellId, true));
+        return List.of(new DamageResolver(index, spellId, true));
     }
 
     @Override
     public List<StringResolver> visitFloor(SpellDescriptionParser.FloorContext ctx) {
-        // TODO IMPLEMENT
-        // Must return number resolver
-        return super.visitFloor(ctx);
+        var child = getNumberResolver(super.visitFloor(ctx));
+        return List.of(new FloorResolver(child));
     }
 
     @Override
@@ -156,170 +179,158 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     @Override
     public List<StringResolver> visitAuraPeriod(SpellDescriptionParser.AuraPeriodContext ctx) {
         var spellId = getOptionalInteger(ctx.spellId);
-        var index = Integer.parseInt(ctx.index.getText());
+        var index = getIndex(ctx.index);
         return List.of(new AuraPeriodResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitProcCharges(SpellDescriptionParser.ProcChargesContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitProcCharges(ctx);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new ProcChargesResolver(spellId));
     }
 
     @Override
     public List<StringResolver> visitProcChance(SpellDescriptionParser.ProcChanceContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitProcChance(ctx);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new ProcChanceResolver(spellId));
     }
 
     @Override
     public List<StringResolver> visitChainTargets(SpellDescriptionParser.ChainTargetsContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitChainTargets(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new ChainTargetsResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitRadius(SpellDescriptionParser.RadiusContext ctx) {
-        // TODO IMPLEMENT
-        // Need to reference SpellRadius DBC
-        return super.visitRadius(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new RadiusResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitHearthstoneLocation(SpellDescriptionParser.HearthstoneLocationContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitHearthstoneLocation(ctx);
+        return List.of(new HearthstoneLocationResolver());
     }
 
     @Override
     public List<StringResolver> visitMiscValue(SpellDescriptionParser.MiscValueContext ctx) {
-        // TODO IMPLEMENT
-        // A missing index implies index 1
-        return super.visitMiscValue(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new MiscValueResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitPointsPerCombo(SpellDescriptionParser.PointsPerComboContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitPointsPerCombo(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new PointsPerComboResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitAmplitude(SpellDescriptionParser.AmplitudeContext ctx) {
-        // TODO IMPLEMENT
-        // Index can be missing on this one.  Use `1` in this case.
-        return super.visitAmplitude(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new AmplitudeResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitChainAmplitude(SpellDescriptionParser.ChainAmplitudeContext ctx) {
-        // TODO Implement
-        return super.visitChainAmplitude(ctx);
-    }
-
-    @Override
-    public List<StringResolver> visitMaxTargets(SpellDescriptionParser.MaxTargetsContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMaxTargets(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new ChainAmplitudeResolver(spellId, index));
     }
 
     @Override
     public List<StringResolver> visitMinRange(SpellDescriptionParser.MinRangeContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMinRange(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new RangeResolver(spellId, index, false));
     }
 
     @Override
     public List<StringResolver> visitMaxRange(SpellDescriptionParser.MaxRangeContext ctx) {
-        // TODO IMPLEMENT
-        // Index can be missing.  Use `1`.
-        // Need to reference SpellRange DBC.
-        return super.visitMaxRange(ctx);
+        var index = getIndex(ctx.index);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new RangeResolver(spellId, index, true));
     }
 
     @Override
-    public List<StringResolver> visitMaxStacks(SpellDescriptionParser.MaxStacksContext ctx) {
-        // TODO IMPLEMENT
-        // Use the cumulativeAura property on the spell
-        return super.visitMaxStacks(ctx);
+    public List<StringResolver> visitCumulativeAura(SpellDescriptionParser.CumulativeAuraContext ctx) {
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new CumulativeAuraResolver(spellId));
+    }
+
+    @Override
+    public List<StringResolver> visitMaxTargets(SpellDescriptionParser.MaxTargetsContext ctx) {
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new MaxTargetsResolver(spellId));
     }
 
     @Override
     public List<StringResolver> visitMaxTargetLevel(SpellDescriptionParser.MaxTargetLevelContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMaxTargetLevel(ctx);
+        var spellId = getOptionalInteger(ctx.spellId);
+        return List.of(new MaxTargetLevelResolver(spellId));
     }
 
     @Override
     public List<StringResolver> visitAttackPower(SpellDescriptionParser.AttackPowerContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitAttackPower(ctx);
+        return List.of(new AttackPowerResolver());
     }
 
     @Override
     public List<StringResolver> visitRangedAttackPower(SpellDescriptionParser.RangedAttackPowerContext ctx) {
-        // TODO IMPLEMENT
-        // Not sure if we can get specifically ranged attack power...might need to settle for normal attack power.
-        return super.visitRangedAttackPower(ctx);
+        return List.of(new RangedAttackPowerResolver());
     }
 
     @Override
     public List<StringResolver> visitMainWeaponMinDamage(SpellDescriptionParser.MainWeaponMinDamageContext ctx) {
-        // TODO IMPLEMENT
-        // What separates a weapon's base damage from it's normal damage?
-        // Maybe attack power or something...
-        // Look at https://www.wowhead.com/tbc/spell=27155/seal-of-righteousness for a spell that uses this.
-        return super.visitMainWeaponMinDamage(ctx);
+        return List.of(new MainWeaponDamageResolver(false));
     }
 
     @Override
     public List<StringResolver> visitMainWeaponMaxDamage(SpellDescriptionParser.MainWeaponMaxDamageContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMainWeaponMaxDamage(ctx);
-    }
-
-    @Override
-    public List<StringResolver> visitMainWeaponMinBaseDamage(SpellDescriptionParser.MainWeaponMinBaseDamageContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMainWeaponMinBaseDamage(ctx);
-    }
-
-    @Override
-    public List<StringResolver> visitMainWeaponMaxBaseDamage(SpellDescriptionParser.MainWeaponMaxBaseDamageContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMainWeaponMaxBaseDamage(ctx);
+        return List.of(new MainWeaponDamageResolver(true));
     }
 
     @Override
     public List<StringResolver> visitMainWeaponSpeed(SpellDescriptionParser.MainWeaponSpeedContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitMainWeaponSpeed(ctx);
+        return List.of(new MainWeaponSpeedResolver());
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponMinBaseDamage(SpellDescriptionParser.MainWeaponMinBaseDamageContext ctx) {
+        // TODO: How is base damage different from normal damage?
+        // Create new resolver once I figure that out...
+        return List.of(new MainWeaponDamageResolver(false));
+    }
+
+    @Override
+    public List<StringResolver> visitMainWeaponMaxBaseDamage(SpellDescriptionParser.MainWeaponMaxBaseDamageContext ctx) {
+        // TODO: How is base damage different from normal damage?
+        // Create new resolver once I figure that out...
+        return List.of(new MainWeaponDamageResolver(true));
     }
 
     @Override
     public List<StringResolver> visitSpellPower(SpellDescriptionParser.SpellPowerContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitSpellPower(ctx);
+        return List.of(new SpellPowerResolver());
     }
 
     @Override
     public List<StringResolver> visitSpirit(SpellDescriptionParser.SpiritContext ctx) {
-        // TODO IMPLEMENT
-        return super.visitSpirit(ctx);
+        return List.of(new SpiritResolver());
     }
 
     @Override
-    public List<StringResolver> visitPlayerLevel(SpellDescriptionParser.PlayerLevelContext ctx) {
-        // TODO IMPLEMENT
-        // TODO Is there any difference between upper and lowercase???  Don't think too hard on it.
-        return super.visitPlayerLevel(ctx);
+    public List<StringResolver> visitCharacterLevel(SpellDescriptionParser.CharacterLevelContext ctx) {
+        return List.of(new LevelResolver());
     }
 
     @Override
-    public List<StringResolver> visitPlayerHandedness(SpellDescriptionParser.PlayerHandednessContext ctx) {
-        // TODO IMPLEMENT
-        // Somehow get 1h vs 2h from player's equipped weapon
-        return super.visitPlayerHandedness(ctx);
+    public List<StringResolver> visitMainWeaponHandedness(SpellDescriptionParser.MainWeaponHandednessContext ctx) {
+        return List.of(new MainWeaponHandednessResolver());
     }
 
     @Override
@@ -364,10 +375,10 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     private List<StringResolver> createDamageStringResolver(int index, Long spellId) {
-        var lowerBoundResolver = new DamageBoundResolver(index, spellId, false);
-        var upperBoundResolver = new DamageBoundResolver(index, spellId, true);
+        var minResolver = new DamageResolver(index, spellId, false);
+        var maxResolver = new DamageResolver(index, spellId, true);
 
-        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
+        return List.of(new DamageStringResolver(minResolver, maxResolver));
     }
 
     @Override
@@ -375,10 +386,10 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
 
-        var lowerBoundResolver = new AuraDamageBoundResolver(index, spellId, false);
-        var upperBoundResolver = new AuraDamageBoundResolver(index, spellId, true);
+        var minResolver = new AuraDamageResolver(index, spellId, false);
+        var maxResolver = new AuraDamageResolver(index, spellId, true);
 
-        return List.of(new DamageStringResolver(lowerBoundResolver, upperBoundResolver));
+        return List.of(new DamageStringResolver(minResolver, maxResolver));
     }
 
     @Override
@@ -407,12 +418,12 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         NumberResolver lowerBoundResolver;
         NumberResolver upperBoundResolver;
         if (ctx.STAR() != null) {
-            lowerBoundResolver = new MultiplicationResolver(damageResolver.lowerBoundResolver(), rightResolver);
-            upperBoundResolver = new MultiplicationResolver(damageResolver.upperBoundResolver(), rightResolver);
+            lowerBoundResolver = new MultiplicationResolver(damageResolver.minResolver(), rightResolver);
+            upperBoundResolver = new MultiplicationResolver(damageResolver.maxResolver(), rightResolver);
         }
         else if (ctx.FORWARD_SLASH() != null) {
-            lowerBoundResolver = new DivisionResolver(damageResolver.lowerBoundResolver(), rightResolver);
-            upperBoundResolver = new DivisionResolver(damageResolver.upperBoundResolver(), rightResolver);
+            lowerBoundResolver = new DivisionResolver(damageResolver.minResolver(), rightResolver);
+            upperBoundResolver = new DivisionResolver(damageResolver.maxResolver(), rightResolver);
         }
         else {
             throw new RuntimeException("Unexpected operation for arithmetic string resolver");
@@ -429,16 +440,37 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitMin(SpellDescriptionParser.MinContext ctx) {
-        // TODO IMPLEMENT
-        // Must return number resolver
-        return super.visitMin(ctx);
+        var left = getNumberResolver(ctx.left.accept(this));
+        var right = getNumberResolver(ctx.right.accept(this));
+        return List.of(new MinResolver(left, right));
     }
 
     @Override
     public List<StringResolver> visitMax(SpellDescriptionParser.MaxContext ctx) {
         var left = getNumberResolver(ctx.left.accept(this));
         var right = getNumberResolver(ctx.right.accept(this));
-        return List.of(new MaxNumberResolver(left, right));
+        return List.of(new MaxResolver(left, right));
+    }
+
+    @Override
+    public List<StringResolver> visitGreaterThan(SpellDescriptionParser.GreaterThanContext ctx) {
+        return createComparisonResolver(ctx.left, ctx.right, ComparisonType.GREATER_THAN);
+    }
+
+    @Override
+    public List<StringResolver> visitGreaterThanOrEqual(SpellDescriptionParser.GreaterThanOrEqualContext ctx) {
+        return createComparisonResolver(ctx.left, ctx.right, ComparisonType.GREATER_THAN_OR_EQUAL);
+    }
+
+    @Override
+    public List<StringResolver> visitEqual(SpellDescriptionParser.EqualContext ctx) {
+        return createComparisonResolver(ctx.left, ctx.right, ComparisonType.EQUAL);
+    }
+
+    private List<StringResolver> createComparisonResolver(SpellDescriptionParser.FormulaFragmentContext left, SpellDescriptionParser.FormulaFragmentContext right, ComparisonType comparisonType) {
+        var leftResolver = getNumberResolver(left.accept(this));
+        var rightResolver = getNumberResolver(right.accept(this));
+        return List.of(new ComparisonResolver(leftResolver, rightResolver, comparisonType));
     }
 
     @Override
@@ -446,27 +478,6 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
         // TODO IMPLEMENT
         // Get condition as booleanresolver and the cases as number resolvers.  Return a number resolver.
         return super.visitFormulaConditional(ctx);
-    }
-
-    @Override
-    public List<StringResolver> visitGreaterThan(SpellDescriptionParser.GreaterThanContext ctx) {
-        var left = getNumberResolver(ctx.left.accept(this));
-        var right = getNumberResolver(ctx.right.accept(this));
-        return List.of(new GreaterThanResolver(left, right));
-    }
-
-    @Override
-    public List<StringResolver> visitGreaterThanOrEqual(SpellDescriptionParser.GreaterThanOrEqualContext ctx) {
-        // TODO IMPLEMENT
-        // Must return boolean resolver
-        return super.visitGreaterThanOrEqual(ctx);
-    }
-
-    @Override
-    public List<StringResolver> visitEqual(SpellDescriptionParser.EqualContext ctx) {
-        // TODO IMPLEMENT
-        // Needs to return a boolean resolver
-        return super.visitEqual(ctx);
     }
 
     @Override
@@ -583,18 +594,20 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
 
     @Override
     public List<StringResolver> visitRuleOfRhunok(SpellDescriptionParser.RuleOfRhunokContext ctx) {
-        // TODO IMPLEMENT
-        // Use spell duration.
-        // Make sure to add the period back as a static string.
-        return super.visitRuleOfRhunok(ctx);
+        List<StringResolver> resolvers = List.of(
+            new DurationResolver(null),
+            new StaticStringResolver(".")
+        );
+        return List.of(new StringConcatenationResolver(resolvers));
     }
 
     @Override
     public List<StringResolver> visitTortureRule(SpellDescriptionParser.TortureRuleContext ctx) {
-        // TODO IMPLEMENT
-        // Use spell proc chance.
-        // Make sure to add the percent sign back as a static string.
-        return super.visitTortureRule(ctx);
+        List<StringResolver> resolvers = List.of(
+            new ProcChanceResolver(null),
+            new StaticStringResolver("%")
+        );
+        return List.of(new StringConcatenationResolver(resolvers));
     }
 
     private BooleanResolver getBooleanResolver(List<StringResolver> resolvers) {

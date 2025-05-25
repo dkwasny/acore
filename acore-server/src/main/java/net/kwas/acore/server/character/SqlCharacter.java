@@ -10,15 +10,15 @@ public record SqlCharacter(
     long guid,
     long account,
     String name,
-    long race,
+    int race,
     @Column("class")
-    long chrClass,
-    long gender,
-    long level,
+    int chrClass,
+    int gender,
+    int level,
     long xp,
     long money,
-    long online,
+    int online,
     long totaltime,
-    long zone
+    int zone
 ) {
 }

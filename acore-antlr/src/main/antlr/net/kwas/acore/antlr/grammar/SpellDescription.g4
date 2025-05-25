@@ -126,10 +126,10 @@ numericDefinition: minDamage
     | pointsPerCombo
     | amplitude
     | chainAmplitude
-    | maxTargets
     | minRange
     | maxRange
-    | maxStacks
+    | cumulativeAura
+    | maxTargets
     | maxTargetLevel
     | variableReference
     | attackPower
@@ -138,11 +138,11 @@ numericDefinition: minDamage
     | mainWeaponMaxDamage
     | mainWeaponMinBaseDamage
     | mainWeaponMaxBaseDamage
+    | mainWeaponHandedness
     | mainWeaponSpeed
     | spellPower
     | spirit
-    | playerLevel
-    | playerHandedness
+    | characterLevel
     ;
 
 // References to data from the spell itself
@@ -161,16 +161,16 @@ miscValue: spellId=positiveInteger? LOWER_Q_CHAR index=positiveInteger? ;
 pointsPerCombo: spellId=positiveInteger? LOWER_B_CHAR index=positiveInteger? ;
 amplitude: spellId=positiveInteger? LOWER_E_CHAR index=positiveInteger? ;
 chainAmplitude: spellId=positiveInteger? (UPPER_F_CHAR | LOWER_F_CHAR) index=positiveInteger? ;
-maxTargets: spellId=positiveInteger? LOWER_I_CHAR ;
 minRange: spellId=positiveInteger? LOWER_R_CHAR index=positiveInteger? ;
 maxRange: spellId=positiveInteger? UPPER_R_CHAR index=positiveInteger? ;
-maxStacks: spellId=positiveInteger? LOWER_U_CHAR ;
+cumulativeAura: spellId=positiveInteger? LOWER_U_CHAR ;  // AKA "Max Stacks"
+maxTargets: spellId=positiveInteger? LOWER_I_CHAR ;
 maxTargetLevel: spellId=positiveInteger? LOWER_V_CHAR ;
 
 // References to variables found in the SpellDescriptionVariables DBC file
 variableReference: LT_SIGN identifier GT_SIGN ;
 
-// References to data from the player
+// References to data from the character
 attackPower: UPPER_A_CHAR UPPER_P_CHAR ;
 rangedAttackPower: UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
 mainWeaponMinDamage: LOWER_M_CHAR LOWER_W_CHAR ;
@@ -178,12 +178,15 @@ mainWeaponMaxDamage: UPPER_M_CHAR UPPER_W_CHAR ;
 mainWeaponMinBaseDamage: LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR ;
 mainWeaponMaxBaseDamage: UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR ;
 mainWeaponSpeed: (UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR) | (LOWER_M_CHAR LOWER_W_CHAR LOWER_S_CHAR) ;
+mainWeaponHandedness: UPPER_H_CHAR UPPER_N_CHAR UPPER_D_CHAR ;
 // TODO: Split into different spell power types if we can get said values.
 // I don't think the acore database has them.  Just the base value.
 spellPower: UPPER_S_CHAR UPPER_P_CHAR (UPPER_H_CHAR | UPPER_S_CHAR) ;
 spirit: UPPER_S_CHAR UPPER_P_CHAR UPPER_I_CHAR ;
-playerLevel: (UPPER_P_CHAR UPPER_L_CHAR) | (LOWER_P_CHAR LOWER_L_CHAR) ;
-playerHandedness: UPPER_H_CHAR UPPER_N_CHAR UPPER_D_CHAR ;
+characterLevel: (UPPER_P_CHAR UPPER_L_CHAR) | (LOWER_P_CHAR LOWER_L_CHAR) ;
+
+// KWAS TODO: Compare skill output for Judgement of Righteousness (20187)
+// to your actual character.
 
 /*
  * Conditionals
@@ -210,7 +213,7 @@ conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
     | booleanFunction
     ;
 // TODO: Do a and s mean the same thing here?
-// Would `a` perhaps mean an aura is active on the player at the moment?
+// Would `a` perhaps mean an aura is active on the character at the moment?
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
 
 /*

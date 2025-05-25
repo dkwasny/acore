@@ -1,15 +1,14 @@
-package net.kwas.acore.antlr.resolver.reference;
+package net.kwas.acore.antlr.resolver.reference.spell;
 
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.NumberResolver;
+import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
-// TODO: Maybe rename to "isMax"?
-// Maybe the word "bound" could change??
-public record DamageBoundResolver(int index, Long spellId, boolean isUpperBound) implements NumberResolver {
+public record DamageResolver(int index, Long spellId, boolean isMax) implements NumberResolver {
 
     @Override
     public double resolveNumber(SpellContext ctx) {
-        var mySpellId = spellId != null ? spellId : ctx.getSpellId();
+        var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
 
         var actualIndex = index - 1;
         var spellInfo = ctx.getSpellInfos().get(mySpellId);
@@ -21,7 +20,7 @@ public record DamageBoundResolver(int index, Long spellId, boolean isUpperBound)
 
         var dieSides = spellInfo.dieSides().get(actualIndex);
 
-        var roll = isUpperBound ? dieSides : 1;
+        var roll = isMax ? dieSides : 1;
 
         // TODO: I feel like we need to incorporate spell power and coefficient or something.....
         return baseValue + perLevelBonus + roll;

@@ -1,4 +1,4 @@
-package net.kwas.acore.antlr.resolver.reference;
+package net.kwas.acore.antlr.resolver.reference.spell;
 
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.StringResolver;
