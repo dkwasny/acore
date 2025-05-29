@@ -65,7 +65,7 @@ public class TestDbcReader {
         var spells = reader.readDbc(DbcSpell.class);
 
         var relevantSpellIds = Set.of(
-            1510L
+            1908L
         );
 
         var relevantSpells = spells.stream()
@@ -73,9 +73,9 @@ public class TestDbcReader {
 //            .filter(x -> relevantSpellIds.contains(x.id))
 //            .filter(x -> x.descriptionVariablesId == 181)
 //            .filter(x -> x.effectRadiusIndex0 == 46L || x.effectRadiusIndex1 == 46L || x.effectRadiusIndex2 == 46L)
-//            .filter(x -> x.description0.contains("$d"))
+//            .filter(x -> x.description0.contains("$d1"))
 //            .filter(x -> x.description0.contains("]."))
-            .filter(x -> x.description0.matches(".*[^0-9]+\\.[0-9]+.*"))
+            .filter(x -> x.description0.matches(".*\\$d[2-90]+.*"))
 //            .filter(x -> Double.compare(x.effectAuraPeriod0, 0.0) == 0)
 //            .filter(x -> x.procChance < 100)
             .toList();

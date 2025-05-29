@@ -137,7 +137,12 @@ numericDefinition: minDamage
 // References to data from the spell itself
 minDamage: spellId=positiveInteger? LOWER_M_CHAR index=positiveInteger? ;
 maxDamage: spellId=positiveInteger? UPPER_M_CHAR index=positiveInteger? ;
-duration: spellId=positiveInteger? (UPPER_D_CHAR | LOWER_D_CHAR) ;
+// Even though a few spells have an index with duration, I don't think it
+// means anything.
+// Spells only have one duration value via an index.
+// All spells with $d2 that I could find display the same value as $d1 (or $d).
+// We need it in the grammar so we can throw away the index value.
+duration: spellId=positiveInteger? (UPPER_D_CHAR | LOWER_D_CHAR) index=positiveInteger? ;
 auraPeriod: spellId=positiveInteger? (UPPER_T_CHAR | LOWER_T_CHAR) index=positiveInteger? ;
 procCharges: spellId=positiveInteger? LOWER_N_CHAR ;
 procChance: spellId=positiveInteger? (UPPER_H_CHAR | LOWER_H_CHAR) ;
