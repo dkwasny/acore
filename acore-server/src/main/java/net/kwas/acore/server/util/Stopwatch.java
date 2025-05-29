@@ -3,6 +3,7 @@ package net.kwas.acore.server.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: Figure out how to use annotation to intercept methods for timing purposes!
 public class Stopwatch {
 
     private static final Logger LOG = LoggerFactory.getLogger(Stopwatch.class);
