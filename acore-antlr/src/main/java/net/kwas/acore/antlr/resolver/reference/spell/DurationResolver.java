@@ -6,8 +6,7 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record DurationResolver(Long spellId) implements NumberResolver {
 
-    private static final double SECOND = 1000;
-    private static final double MINUTE = SECOND * 60;
+    private static final double MINUTE = 60;
     private static final double HOUR = MINUTE * 60;
 
     @Override
@@ -21,7 +20,9 @@ public record DurationResolver(Long spellId) implements NumberResolver {
         var characterLevel = ctx.getCharacterInfo().characterLevel();
 
         var leveledDuration = baseDuration + (durationPerLevel * characterLevel);
-        return Math.min(leveledDuration, maxDuration);
+
+        var actualDuration = Math.min(leveledDuration, maxDuration);
+        return actualDuration / 1000.0;
     }
 
     @Override
@@ -29,7 +30,7 @@ public record DurationResolver(Long spellId) implements NumberResolver {
         var number = resolveNumber(ctx);
 
         var newNumber = number;
-        var suffix = " ms";
+        var suffix = " sec";
         if (number > HOUR) {
             newNumber = (number / HOUR);
             suffix = " hours";
@@ -37,10 +38,6 @@ public record DurationResolver(Long spellId) implements NumberResolver {
         else if (number > MINUTE) {
             newNumber = (number / MINUTE);
             suffix = " min";
-        }
-        else if (number > SECOND) {
-            newNumber = (number / SECOND);
-            suffix = " sec";
         }
 
         var renderedNumber = ResolverUtils.renderNumber(newNumber, ctx);

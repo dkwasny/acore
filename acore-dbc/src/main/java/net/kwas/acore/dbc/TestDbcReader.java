@@ -65,7 +65,7 @@ public class TestDbcReader {
         var spells = reader.readDbc(DbcSpell.class);
 
         var relevantSpellIds = Set.of(
-            52579L
+            1510L
         );
 
         var relevantSpells = spells.stream()

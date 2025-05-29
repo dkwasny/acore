@@ -114,6 +114,12 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
+    public List<StringResolver> visitStringNumber(SpellDescriptionParser.StringNumberContext ctx) {
+        var text = ctx.getText();
+        return List.of(new StaticStringResolver(text));
+    }
+
+    @Override
     public List<StringResolver> visitNumber(SpellDescriptionParser.NumberContext ctx) {
         var number = Double.parseDouble(ctx.getText());
         return List.of(new StaticNumberResolver(number));

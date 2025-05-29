@@ -44,15 +44,4 @@ public class SpellContext {
         this.lastRenderedNumber = lastRenderedNumber;
     }
 
-    @Override
-    public String toString() {
-        return "SpellContext{" +
-            "spellId=" + spellId +
-            ", spellInfoMap=" + spellInfoMap +
-            ", characterInfo=" + characterInfo +
-            ", variableMap=" + variableMap +
-            ", lastRenderedNumber=" + lastRenderedNumber +
-            '}';
-    }
-
 }

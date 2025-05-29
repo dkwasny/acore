@@ -30,7 +30,7 @@ conditionalString: formula
     | stringConditional
     | numericReference
     | stringReference
-    | number
+    | stringNumber
     | identifier
     | miscChars
     | oneOffRules
@@ -318,6 +318,13 @@ tortureRule: AT_SIGN PERCENT ;
  */
 number: (positiveInteger | decimal) ;
 positiveInteger: DIGITS ;
+
+// Numbers that show up outside of a formula need to be handled as pure strings.
+// Some spells leverage this to seemingly create decimal numbers via string
+// concatenation (e.g. "every {$123d/2}.2 seconds").
+// See spell 1510 for a real example.
+stringNumber: decimal ;
+
 decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
 
 // Intended to be any alphanumeric string.

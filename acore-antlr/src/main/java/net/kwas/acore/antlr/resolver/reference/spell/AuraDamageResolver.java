@@ -18,11 +18,8 @@ public record AuraDamageResolver(int index, Long spellId, boolean isMax) impleme
 
         var durationResolver = new DurationResolver(spellId);
         var duration = durationResolver.resolveNumber(ctx);
-        // Auras seem to always operate in seconds.
-        // I think we can just convert duration to seconds and be on our way.
-        var durationInSeconds = duration / 1000.0;
 
-        return baseDamage / auraPeriod * durationInSeconds;
+        return baseDamage / auraPeriod * duration;
     }
 
 }
