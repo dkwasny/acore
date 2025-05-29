@@ -64,13 +64,18 @@ public class TestDbcReader {
 
         var spells = reader.readDbc(DbcSpell.class);
 
+        var relevantSpellIds = Set.of(
+            52579L
+        );
+
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-            .filter(x -> x.id == 10L)
+            .filter(x -> relevantSpellIds.contains(x.id))
 //            .filter(x -> x.descriptionVariablesId == 181)
 //            .filter(x -> x.effectRadiusIndex0 == 46L || x.effectRadiusIndex1 == 46L || x.effectRadiusIndex2 == 46L)
-//            .filter(x -> x.description0.contains("$AR"))
-//            .filter(x -> x.description0.matches(".*\\$[a-zA-Z]+[0-9]+[a-zA-Z]+.*"))
+//            .filter(x -> x.description0.contains("$d"))
+//            .filter(x -> x.description0.matches(".*\\$o1.*"))
+//            .filter(x -> Double.compare(x.effectAuraPeriod0, 0.0) == 0)
 //            .filter(x -> x.procChance < 100)
             .toList();
 
@@ -106,7 +111,19 @@ public class TestDbcReader {
         var spellDurations = reader.readDbc(DbcSpellDuration.class);
 //        printAll(spellDurations);
 //        System.out.println();
-//
+
+        var longDurations = spellDurations.stream()
+            .filter(x -> x.duration > 60 * 1000)
+            .toList();
+        var longDurationIds = longDurations.stream()
+            .map(x -> x.id)
+            .collect(Collectors.toSet());
+        var spellsWithLongDurations = spells.stream()
+            .filter(x -> longDurationIds.contains(x.durationIndex))
+//            .filter(x -> x.description0.matches(".*\\$+[0-9]*[dD]+.*"))
+            .filter(x -> x.description0.matches(".*\\$+[0-9]*o+.*"))
+            .toList();
+
         var perLevelDurations = spellDurations.stream()
             .filter(x -> x.durationPerLevel != 0)
             .toList();
@@ -210,6 +227,14 @@ public class TestDbcReader {
 
     private static void printAll(Collection<?> list) {
         System.out.println(list.stream().map(Object::toString).collect(Collectors.joining("\n")));
+    }
+
+    private static boolean hasNonRegenAura(DbcSpell spell) {
+        return isNonRegenAura(spell.effectAura0) && isNonRegenAura(spell.effectAura1) && isNonRegenAura(spell.effectAura2);
+    }
+
+    private static boolean isNonRegenAura(long number) {
+        return number != 0 && number != 84 && number != 85;
     }
 
 }

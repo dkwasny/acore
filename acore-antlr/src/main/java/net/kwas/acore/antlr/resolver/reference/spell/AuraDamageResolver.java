@@ -2,6 +2,9 @@ package net.kwas.acore.antlr.resolver.reference.spell;
 
 import net.kwas.acore.antlr.resolver.NumberResolver;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
+import net.kwas.acore.antlr.resolver.util.ResolverUtils;
+
+import java.util.Set;
 
 public record AuraDamageResolver(int index, Long spellId, boolean isMax) implements NumberResolver {
 
@@ -15,8 +18,11 @@ public record AuraDamageResolver(int index, Long spellId, boolean isMax) impleme
 
         var durationResolver = new DurationResolver(spellId);
         var duration = durationResolver.resolveNumber(ctx);
+        // Auras seem to always operate in seconds.
+        // I think we can just convert duration to seconds and be on our way.
+        var durationInSeconds = duration / 1000.0;
 
-        return baseDamage / (auraPeriod / 1000.0) * duration;
+        return baseDamage / auraPeriod * durationInSeconds;
     }
 
 }

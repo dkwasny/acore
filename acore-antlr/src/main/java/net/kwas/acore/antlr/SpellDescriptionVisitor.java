@@ -368,7 +368,7 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     public List<StringResolver> visitDamageString(SpellDescriptionParser.DamageStringContext ctx) {
         var index = getIndex(ctx.index);
         var spellId = getOptionalInteger(ctx.spellId);
-        return createDamageStringResolver(index, spellId);
+        return List.of(createDamageStringResolver(index, spellId));
     }
 
     @Override
@@ -386,14 +386,21 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
             spellId = (long)integer;
         }
 
-        return createDamageStringResolver(index, spellId);
+        var damageStringResolver = createDamageStringResolver(index, spellId);
+        var percentResolver = new StaticStringResolver("%");
+        var resolvers = List.of(
+            damageStringResolver,
+            percentResolver
+        );
+
+        return List.of(new StringConcatenationResolver(resolvers));
     }
 
-    private List<StringResolver> createDamageStringResolver(int index, Long spellId) {
+    private StringResolver createDamageStringResolver(int index, Long spellId) {
         var minResolver = new DamageResolver(index, spellId, false);
         var maxResolver = new DamageResolver(index, spellId, true);
 
-        return List.of(new DamageStringResolver(minResolver, maxResolver));
+        return new DamageStringResolver(minResolver, maxResolver);
     }
 
     @Override
