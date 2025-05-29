@@ -11,7 +11,7 @@ public class SpellContext {
     private final CharacterInfo characterInfo;
     private final Map<String, NumberResolver> variableMap;
 
-    private long lastRenderedNumber = 0L;
+    private boolean isNextLocalizedStringPlural = false;
 
     public SpellContext(long spellId, Map<Long, SpellInfo> spellInfoMap, CharacterInfo characterInfo, Map<String, NumberResolver> variables) {
         this.spellId = spellId;
@@ -36,12 +36,11 @@ public class SpellContext {
         return variableMap;
     }
 
-    public long getLastRenderedNumber() {
-        return lastRenderedNumber;
+    public boolean isNextLocalizedStringPlural() {
+        return isNextLocalizedStringPlural;
     }
 
-    public void setLastRenderedNumber(long lastRenderedNumber) {
-        this.lastRenderedNumber = lastRenderedNumber;
+    public void setNextLocalizedStringPlural(boolean nextLocalizedStringPlural) {
+        isNextLocalizedStringPlural = nextLocalizedStringPlural;
     }
-
 }

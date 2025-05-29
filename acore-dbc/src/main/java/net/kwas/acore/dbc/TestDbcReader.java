@@ -70,13 +70,18 @@ public class TestDbcReader {
 
         var relevantSpells = spells.stream()
 //            .filter(x -> (x.description0.contains("$o1") && x.effectDieSides0 > 1) || (x.description0.contains("$o2") && x.effectDieSides1 > 1) || (x.description0.contains("$o3") && x.effectDieSides2 > 1))
-            .filter(x -> relevantSpellIds.contains(x.id))
+//            .filter(x -> relevantSpellIds.contains(x.id))
 //            .filter(x -> x.descriptionVariablesId == 181)
 //            .filter(x -> x.effectRadiusIndex0 == 46L || x.effectRadiusIndex1 == 46L || x.effectRadiusIndex2 == 46L)
 //            .filter(x -> x.description0.contains("$d"))
-//            .filter(x -> x.description0.matches(".*\\$o1.*"))
+//            .filter(x -> x.description0.contains("]."))
+            .filter(x -> x.description0.matches(".*[^0-9]+\\.[0-9]+.*"))
 //            .filter(x -> Double.compare(x.effectAuraPeriod0, 0.0) == 0)
 //            .filter(x -> x.procChance < 100)
+            .toList();
+
+        var relevantDescriptions = relevantSpells.stream()
+            .map(x -> x.description0)
             .toList();
 
         var usedVariableIds = relevantSpells.stream()

@@ -30,7 +30,7 @@ conditionalString: formula
     | stringConditional
     | numericReference
     | stringReference
-    | stringNumber
+    | number
     | identifier
     | miscChars
     | oneOffRules
@@ -40,7 +40,7 @@ conditionalString: formula
  * Formula
  * Contains recursive fragments to create a full formula.
  */
-formula: DOLLAR_SIGN OPEN_CURLY formulaFragment CLOSE_CURLY ;
+formula: DOLLAR_SIGN OPEN_CURLY formulaFragment CLOSE_CURLY (PERIOD decimalPlaces=positiveInteger)? ;
 
 formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
     | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
@@ -318,13 +318,6 @@ tortureRule: AT_SIGN PERCENT ;
  */
 number: (positiveInteger | decimal) ;
 positiveInteger: DIGITS ;
-
-// Numbers that show up outside of a formula need to be handled as pure strings.
-// Some spells leverage this to seemingly create decimal numbers via string
-// concatenation (e.g. "every {$123d/2}.2 seconds").
-// See spell 1510 for a real example.
-stringNumber: decimal ;
-
 decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
 
 // Intended to be any alphanumeric string.

@@ -17,10 +17,18 @@ public class ResolverUtils {
     }
 
     public static String renderNumber(double number, SpellContext ctx) {
-        var rounded = Math.round(number);
-        var absoluteValue = Math.abs(rounded);
-        ctx.setLastRenderedNumber(absoluteValue);
-        return Long.toString(absoluteValue);
+        return renderNumber(number, 0, ctx);
+    }
+
+    public static String renderNumber(double number, int decimalPlaces, SpellContext ctx) {
+        var absoluteValue = Math.abs(number);
+
+        // The only singular number is one without a decimal point.
+        boolean isPlural = !(Double.compare(absoluteValue, 1.0) == 0 && decimalPlaces == 0);
+        ctx.setNextLocalizedStringPlural(isPlural);
+
+        var formatString = "%." + decimalPlaces + "f";
+        return String.format(formatString, absoluteValue);
     }
 
 }

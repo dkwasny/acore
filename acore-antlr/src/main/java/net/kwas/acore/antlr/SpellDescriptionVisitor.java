@@ -2,6 +2,7 @@ package net.kwas.acore.antlr;
 
 import net.kwas.acore.antlr.grammar.SpellDescriptionBaseVisitor;
 import net.kwas.acore.antlr.grammar.SpellDescriptionParser;
+import net.kwas.acore.antlr.resolver.FormattedNumberResolver;
 import net.kwas.acore.antlr.resolver.conditional.AndResolver;
 import net.kwas.acore.antlr.resolver.conditional.ComparisonResolver;
 import net.kwas.acore.antlr.resolver.conditional.ComparisonType;
@@ -114,15 +115,22 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitStringNumber(SpellDescriptionParser.StringNumberContext ctx) {
-        var text = ctx.getText();
-        return List.of(new StaticStringResolver(text));
-    }
-
-    @Override
     public List<StringResolver> visitNumber(SpellDescriptionParser.NumberContext ctx) {
         var number = Double.parseDouble(ctx.getText());
         return List.of(new StaticNumberResolver(number));
+    }
+
+    @Override
+    public List<StringResolver> visitFormula(SpellDescriptionParser.FormulaContext ctx) {
+        var child = ctx.formulaFragment().accept(this);
+
+        var decimalPlaces = 0;
+        if (ctx.decimalPlaces != null) {
+            decimalPlaces = Integer.parseInt(ctx.decimalPlaces.getText());
+        }
+
+        var numberResolver = getNumberResolver(child);
+        return List.of(new FormattedNumberResolver(numberResolver, decimalPlaces));
     }
 
     @Override
