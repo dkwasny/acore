@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 public class SpellBeans {
 
     @Bean
-    @Qualifier("SpellSummaryMap")
-    public static Map<Long, SpellSummary> createSpellSummaryMap(DbcMgr dbcMgr) {
-        var stopwatch = Stopwatch.start("CreateSpellSummaryMap");
+    @Qualifier("RawSpellMap")
+    public static Map<Long, RawSpell> createRawSpellMap(DbcMgr dbcMgr) {
+        var stopwatch = Stopwatch.start("CreateRawSpellMap");
         var dbcReader = dbcMgr.getReader();
         var dbcSpells = dbcReader.readDbc(DbcSpell.class);
         var dbcSpellIcons = dbcReader.readDbc(DbcSpellIcon.class);
@@ -28,11 +28,11 @@ public class SpellBeans {
         var dbcSpellIconMap = dbcSpellIcons.stream()
             .collect(Collectors.toMap(x -> x.id, x -> x.filename));
 
-        var retVal = Collections.synchronizedMap(new LinkedHashMap<Long, SpellSummary>());
+        var retVal = Collections.synchronizedMap(new LinkedHashMap<Long, RawSpell>());
         for (var dbcSpell : dbcSpells) {
             var dbcIcon = dbcSpellIconMap.get(dbcSpell.spellIconId);
             var iconUrl = Icons.getIconUrl(dbcIcon);
-            var spell = new SpellSummary(
+            var spell = new RawSpell(
                 dbcSpell.id,
                 dbcSpell.name0,
                 dbcSpell.nameSubtext0,

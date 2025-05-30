@@ -11,17 +11,18 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class SpellDatabase {
 
     private final SpellQueries queries;
-    private final Map<Long, SpellSummary> spellSummaries;
-    private final Map<Long, StringResolver> spellDescriptionResolvers;
-    private final Map<Long, Map<String, NumberResolver>> spellDescriptionVariableResolvers;
-    private final Map<Long, SpellInfo> spellInfos;
+    private final Map<Long, RawSpell> rawSpellMap;
+    private final Map<Long, StringResolver> spellDescriptionMap;
+    private final Map<Long, Map<String, NumberResolver>> spellDescriptionVariableMap;
+    private final Map<Long, SpellInfo> spellInfoMap;
 
+    // TODO: Eventually allow the user to supply a character info
+    // The UI should think in actual spells and weapons instead of ids and damage values
     private final CharacterInfo dummyCharacterInfo = new CharacterInfo(
         20,
         "Male",
@@ -39,58 +40,58 @@ public class SpellDatabase {
 
     public SpellDatabase(
         SpellQueries queries,
-        @Qualifier("SpellSummaryMap") Map<Long, SpellSummary> spellSummaries,
-        @Qualifier("SpellDescriptionMap") Map<Long, StringResolver> spellDescriptionResolvers,
-        @Qualifier("SpellDescriptionVariableMap") Map<Long, Map<String, NumberResolver>> spellDescriptionVariableResolvers,
-        @Qualifier("SpellInfoMap") Map<Long, SpellInfo> spellInfos
+        @Qualifier("RawSpellMap") Map<Long, RawSpell> rawSpellMap,
+        @Qualifier("SpellDescriptionMap") Map<Long, StringResolver> spellDescriptionMap,
+        @Qualifier("SpellDescriptionVariableMap") Map<Long, Map<String, NumberResolver>> spellDescriptionVariableMap,
+        @Qualifier("SpellInfoMap") Map<Long, SpellInfo> spellInfoMap
     ) {
         this.queries = queries;
-        this.spellSummaries = spellSummaries;
-        this.spellDescriptionResolvers = spellDescriptionResolvers;
-        this.spellDescriptionVariableResolvers = spellDescriptionVariableResolvers;
-        this.spellInfos = spellInfos;
+        this.rawSpellMap = rawSpellMap;
+        this.spellDescriptionMap = spellDescriptionMap;
+        this.spellDescriptionVariableMap = spellDescriptionVariableMap;
+        this.spellInfoMap = spellInfoMap;
     }
 
     public Spell getSpell(long id) {
-        return resolveSpell(id);
+        return createSpell(id);
     }
 
     public Collection<Spell> getSpells() {
-        return spellSummaries.keySet().stream()
-            .map(this::resolveSpell)
+        return rawSpellMap.keySet().stream()
+            .map(this::createSpell)
             .toList();
     }
 
     public Collection<Spell> getSpellsForCharacter(long characterId) {
         // TODO: Create character context for character!
         return queries.getSpellIdsForCharacter(characterId).stream()
-            .map(this::resolveSpell)
+            .map(this::createSpell)
             .toList();
     }
 
     public Collection<Spell> searchName(String query) {
-        return spellSummaries.values().stream()
+        return rawSpellMap.values().stream()
             .filter(x -> x.name().contains(query))
-            .map(SpellSummary::id)
-            .map(this::resolveSpell)
+            .map(RawSpell::id)
+            .map(this::createSpell)
             .toList();
     }
 
     public Collection<Spell> searchDescription(String query) {
-        return spellSummaries.values().stream()
+        return rawSpellMap.values().stream()
             .filter(x -> x.rawDescription().contains(query))
-            .map(SpellSummary::id)
-            .map(this::resolveSpell)
+            .map(RawSpell::id)
+            .map(this::createSpell)
             .toList();
     }
 
-    private Spell resolveSpell(long id) {
-        var spellSummary = spellSummaries.get(id);
-        var descriptionResolver = spellDescriptionResolvers.get(id);
-        var variableResolvers = spellDescriptionVariableResolvers.get((long)spellSummary.spellDescriptionVariablesId());
+    private Spell createSpell(long id) {
+        var rawSpell = rawSpellMap.get(id);
+        var descriptionResolver = spellDescriptionMap.get(id);
+        var variableResolvers = spellDescriptionVariableMap.get((long)rawSpell.spellDescriptionVariablesId());
         var resolverContext = new SpellContext(
             id,
-            spellInfos,
+            spellInfoMap,
             dummyCharacterInfo,
             variableResolvers
         );
@@ -98,10 +99,10 @@ public class SpellDatabase {
 
         return new Spell(
             id,
-            spellSummary.name(),
-            spellSummary.subtext(),
+            rawSpell.name(),
+            rawSpell.subtext(),
             description,
-            spellSummary.iconUrl()
+            rawSpell.iconUrl()
         );
     }
 

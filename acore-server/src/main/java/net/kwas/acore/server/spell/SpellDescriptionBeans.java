@@ -37,21 +37,21 @@ public class SpellDescriptionBeans {
 
     @Bean
     @Qualifier("SpellDescriptionMap")
-    public static Map<Long, StringResolver> createDescriptionMap(
-        @Qualifier("SpellSummaryMap") Map<Long, SpellSummary> spellSummaries
+    public static Map<Long, StringResolver> createSpellDescriptionMap(
+        @Qualifier("RawSpellMap") Map<Long, RawSpell> rawSpellMap
     ) {
         var stopwatch = Stopwatch.start("CreateSpellDescriptionMap");
 
         // Use parallelStream().  The parsing code is CHUNKY.
-        var retVal = spellSummaries.values().parallelStream()
-            .collect(Collectors.toConcurrentMap(SpellSummary::id, SpellDescriptionBeans::parseSpellDescription));
+        var retVal = rawSpellMap.values().parallelStream()
+            .collect(Collectors.toConcurrentMap(RawSpell::id, SpellDescriptionBeans::parseSpellDescription));
 
         stopwatch.stop();
         return Collections.unmodifiableMap(retVal);
     }
 
-    private static StringResolver parseSpellDescription(SpellSummary spellSummary) {
-        var rawText = spellSummary.rawDescription();
+    private static StringResolver parseSpellDescription(RawSpell rawSpell) {
+        var rawText = rawSpell.rawDescription();
 
         var visitor = new SpellDescriptionVisitor();
         StringResolver resolver;
@@ -64,9 +64,9 @@ public class SpellDescriptionBeans {
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                    LOG.error("Spell Description Parser Error '{}' ({}): {}", spellSummary.name(), spellSummary.id(), msg);
-                    LOG.error("Spell Description Raw Text ({}): {}", spellSummary.id(), rawText);
-                    throw new RuntimeException("Error parsing spell description: " + spellSummary.id());
+                    LOG.error("Spell Description Parser Error '{}' ({}): {}", rawSpell.name(), rawSpell.id(), msg);
+                    LOG.error("Spell Description Raw Text ({}): {}", rawSpell.id(), rawText);
+                    throw new RuntimeException("Error parsing spell description: " + rawSpell.id());
                 }
             });
 
@@ -79,7 +79,7 @@ public class SpellDescriptionBeans {
 
     @Bean
     @Qualifier("SpellDescriptionVariableMap")
-    public static Map<Long, Map<String, NumberResolver>> createVariableMap(DbcMgr dbcMgr) {
+    public static Map<Long, Map<String, NumberResolver>> createSpellDescriptionVariableMap(DbcMgr dbcMgr) {
         var stopwatch = Stopwatch.start("CreateSpellDescriptionVariableMap");
         var dbcReader = dbcMgr.getReader();
         var dbcSpellDescriptionVariablesList = dbcReader.readDbc(DbcSpellDescriptionVariables.class);
