@@ -163,6 +163,8 @@ public class SpellDescriptionBeans {
             List.of(dbcSpell.effectChainAmplitude0, dbcSpell.effectChainAmplitude1, dbcSpell.effectChainAmplitude2),
             minRanges,
             maxRanges,
+            dbcSpell.baseLevel,
+            dbcSpell.maxLevel,
             dbcSpellDuration != null ? dbcSpellDuration.duration : 0,
             dbcSpellDuration != null ? dbcSpellDuration.durationPerLevel : 0,
             dbcSpellDuration != null ? dbcSpellDuration.maxDuration : 0,

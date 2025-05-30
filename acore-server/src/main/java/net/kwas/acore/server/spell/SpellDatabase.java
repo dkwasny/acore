@@ -66,6 +66,10 @@ public class SpellDatabase {
             .toList();
     }
 
+    public Spell getSpellForCharacter(long spellId, CharacterInfo characterInfo) {
+        return createSpell(spellId, characterInfo);
+    }
+
     public Collection<Spell> getSpellsForCharacter(long characterId, CharacterInfo characterInfo) {
         return queries.getSpellIdsForCharacter(characterId).stream()
             .map(x -> createSpell(x, characterInfo))

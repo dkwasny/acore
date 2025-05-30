@@ -44,4 +44,13 @@ public class CharacterController {
         return spellDb.getSpellsForCharacter(id, characterInfo);
     }
 
+    // TODO: Add a force parameter
+    // By default return 404 if character does not have the spell
+    // With force, it will always resolve the spell
+    @GetMapping("/api/character/{id}/spell/{spellId}")
+    public Spell getSpellForCharacter(@PathVariable long id, @PathVariable long spellId) {
+        var characterInfo = characterDb.getCharacterInfo(id);
+        return spellDb.getSpellForCharacter(spellId, characterInfo);
+    }
+
 }

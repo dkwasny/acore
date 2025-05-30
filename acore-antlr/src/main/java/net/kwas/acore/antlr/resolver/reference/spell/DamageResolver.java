@@ -13,9 +13,13 @@ public record DamageResolver(int index, Long spellId, boolean isMax) implements 
         var spellInfo = ctx.getSpellInfo(mySpellId);
         var baseValue = spellInfo.baseValues().get(index);
 
-        var effectPerLevel = spellInfo.baseValuePerLevels().get(index);
         var characterLevel = ctx.getCharacterInfo().characterLevel();
-        var perLevelBonus = effectPerLevel * characterLevel;
+        var baseLevel = spellInfo.baseLevel();
+        var maxLevel = spellInfo.maxLevel();
+        var levelMultiplier = Math.min(characterLevel, maxLevel) - baseLevel;
+
+        var effectPerLevel = spellInfo.baseValuePerLevels().get(index);
+        var perLevelBonus = effectPerLevel * levelMultiplier;
 
         var dieSides = spellInfo.dieSides().get(index);
 
