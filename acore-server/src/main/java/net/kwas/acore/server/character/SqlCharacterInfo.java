@@ -1,12 +1,8 @@
-package net.kwas.acore.antlr.resolver.context;
+package net.kwas.acore.server.character;
 
-import net.kwas.acore.common.Gender;
-
-import java.util.Set;
-
-public record CharacterInfo(
+public record SqlCharacterInfo(
     int characterLevel,
-    Gender gender,
+    int gender,
     long spirit,
     long attackPower,
     long rangedAttackPower,
@@ -17,7 +13,6 @@ public record CharacterInfo(
     float mainWeaponBaseMaxDamage,
     float mainWeaponSpeed,
     boolean isMainWeaponTwoHanded,
-    Set<Long> learnedSpellIds,
-    String hearthstoneLocation
+    int hearthstoneLocation
 ) {
 }

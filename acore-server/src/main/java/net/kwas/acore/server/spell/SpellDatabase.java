@@ -17,6 +17,7 @@ import java.util.Set;
 public class SpellDatabase {
 
     private final SpellQueries queries;
+
     private final Map<Long, RawSpell> rawSpellMap;
     private final Map<Long, StringResolver> spellDescriptionMap;
     private final Map<Long, Map<String, NumberResolver>> spellDescriptionVariableMap;
@@ -31,6 +32,8 @@ public class SpellDatabase {
         100,
         110,
         120,
+        10,
+        20,
         10,
         20,
         1.0f,
@@ -63,10 +66,9 @@ public class SpellDatabase {
             .toList();
     }
 
-    public Collection<Spell> getSpellsForCharacter(long characterId) {
-        // TODO: Create character context for character!
+    public Collection<Spell> getSpellsForCharacter(long characterId, CharacterInfo characterInfo) {
         return queries.getSpellIdsForCharacter(characterId).stream()
-            .map(this::createSpell)
+            .map(x -> createSpell(x, characterInfo))
             .toList();
     }
 
@@ -87,13 +89,17 @@ public class SpellDatabase {
     }
 
     private Spell createSpell(long id) {
+        return createSpell(id, dummyCharacterInfo);
+    }
+
+    private Spell createSpell(long id, CharacterInfo characterInfo) {
         var rawSpell = rawSpellMap.get(id);
         var descriptionResolver = spellDescriptionMap.get(id);
         var variableResolvers = spellDescriptionVariableMap.get((long)rawSpell.spellDescriptionVariablesId());
         var resolverContext = new SpellContext(
             id,
             spellInfoMap,
-            dummyCharacterInfo,
+            characterInfo,
             variableResolvers
         );
         var description = descriptionResolver.resolveString(resolverContext);

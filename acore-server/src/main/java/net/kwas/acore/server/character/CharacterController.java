@@ -40,7 +40,8 @@ public class CharacterController {
 
     @GetMapping("/api/character/{id}/spell")
     public Collection<Spell> getSpellsForCharacter(@PathVariable long id) {
-        return spellDb.getSpellsForCharacter(id);
+        var characterInfo = characterDb.getCharacterInfo(id);
+        return spellDb.getSpellsForCharacter(id, characterInfo);
     }
 
 }

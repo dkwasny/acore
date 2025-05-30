@@ -15,15 +15,19 @@ import java.util.stream.Collectors;
 @Configuration
 public class CharacterBeans {
 
+    // Most of these maps cast unsigned int (i.e. long) IDs to normal
+    // ints.  This is due to the acore database storing their references to
+    // said IDs as ints (or small ints) instead of unsigned ints.
+
     @Bean
     @Qualifier("RaceMap")
-    public static Map<Long, String> createRaceMap(DbcMgr dbcMgr) {
+    public static Map<Integer, String> createRaceMap(DbcMgr dbcMgr) {
         var stopwatch = Stopwatch.start("ReadRaces");
         var reader = dbcMgr.getReader();
         var chrRaces = reader.readDbc(DbcChrRaces.class);
 
         var retVal = chrRaces.stream()
-            .collect(Collectors.toMap(x -> x.id, x -> x.name0));
+            .collect(Collectors.toMap(x -> (int)x.id, x -> x.name0));
 
         stopwatch.stop();
         return retVal;
@@ -31,14 +35,14 @@ public class CharacterBeans {
 
     @Bean
     @Qualifier("ClassMap")
-    public static Map<Long, String> createClassMap(DbcMgr dbcMgr) {
+    public static Map<Integer, String> createClassMap(DbcMgr dbcMgr) {
         var stopwatch = Stopwatch.start("ReadClasses");
 
         var reader = dbcMgr.getReader();
         var chrClasses = reader.readDbc(DbcChrClasses.class);
 
         var retVal = chrClasses.stream()
-            .collect(Collectors.toMap(x -> x.id, x -> x.name0));
+            .collect(Collectors.toMap(x -> (int)x.id, x -> x.name0));
 
         stopwatch.stop();
         return retVal;
@@ -46,14 +50,14 @@ public class CharacterBeans {
 
     @Bean
     @Qualifier("ZoneMap")
-    public static Map<Long, String> createZoneMap(DbcMgr dbcMgr) {
+    public static Map<Integer, String> createZoneMap(DbcMgr dbcMgr) {
         var stopwatch = Stopwatch.start("ReadZones");
 
         var reader = dbcMgr.getReader();
         var areaTables = reader.readDbc(DbcAreaTable.class);
 
         var retVal = areaTables.stream()
-            .collect(Collectors.toMap(x -> x.id, x -> x.areaName0));
+            .collect(Collectors.toMap(x -> (int)x.id, x -> x.areaName0));
 
         stopwatch.stop();
         return retVal;

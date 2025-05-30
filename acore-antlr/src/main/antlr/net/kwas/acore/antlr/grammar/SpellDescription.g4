@@ -121,8 +121,8 @@ numericDefinition: minDamage
     | rangedAttackPower
     | mainWeaponMinDamage
     | mainWeaponMaxDamage
-    | mainWeaponMinBaseDamage
-    | mainWeaponMaxBaseDamage
+    | mainWeaponBaseMinDamage
+    | mainWeaponBaseMaxDamage
     | mainWeaponHandedness
     | mainWeaponSpeed
     | spellPower
@@ -179,8 +179,8 @@ attackPower: UPPER_A_CHAR UPPER_P_CHAR ;
 rangedAttackPower: UPPER_R_CHAR UPPER_A_CHAR UPPER_P_CHAR ;
 mainWeaponMinDamage: LOWER_M_CHAR LOWER_W_CHAR ;
 mainWeaponMaxDamage: UPPER_M_CHAR UPPER_W_CHAR ;
-mainWeaponMinBaseDamage: LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR ;
-mainWeaponMaxBaseDamage: UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR ;
+mainWeaponBaseMinDamage: LOWER_M_CHAR LOWER_W_CHAR LOWER_B_CHAR ;
+mainWeaponBaseMaxDamage: UPPER_M_CHAR UPPER_W_CHAR UPPER_B_CHAR ;
 mainWeaponSpeed: (UPPER_M_CHAR UPPER_W_CHAR UPPER_S_CHAR) | (LOWER_M_CHAR LOWER_W_CHAR LOWER_S_CHAR) ;
 mainWeaponHandedness: UPPER_H_CHAR UPPER_N_CHAR UPPER_D_CHAR ;
 // TODO: Split into different spell power types if we can get said values.

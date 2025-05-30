@@ -27,6 +27,7 @@ import net.kwas.acore.antlr.resolver.math.SubtractionResolver;
 import net.kwas.acore.antlr.resolver.reference.character.AttackPowerResolver;
 import net.kwas.acore.antlr.resolver.reference.character.AttackRatingResolver;
 import net.kwas.acore.antlr.resolver.reference.character.LevelResolver;
+import net.kwas.acore.antlr.resolver.reference.character.MainWeaponBaseDamageResolver;
 import net.kwas.acore.antlr.resolver.reference.character.MainWeaponDamageResolver;
 import net.kwas.acore.antlr.resolver.reference.character.MainWeaponHandednessResolver;
 import net.kwas.acore.antlr.resolver.reference.character.MainWeaponSpeedResolver;
@@ -328,17 +329,13 @@ public class SpellDescriptionVisitor extends SpellDescriptionBaseVisitor<List<St
     }
 
     @Override
-    public List<StringResolver> visitMainWeaponMinBaseDamage(SpellDescriptionParser.MainWeaponMinBaseDamageContext ctx) {
-        // TODO: How is base damage different from normal damage?
-        // Create new resolver once I figure that out...
-        return List.of(new MainWeaponDamageResolver(false));
+    public List<StringResolver> visitMainWeaponBaseMinDamage(SpellDescriptionParser.MainWeaponBaseMinDamageContext ctx) {
+        return List.of(new MainWeaponBaseDamageResolver(false));
     }
 
     @Override
-    public List<StringResolver> visitMainWeaponMaxBaseDamage(SpellDescriptionParser.MainWeaponMaxBaseDamageContext ctx) {
-        // TODO: How is base damage different from normal damage?
-        // Create new resolver once I figure that out...
-        return List.of(new MainWeaponDamageResolver(true));
+    public List<StringResolver> visitMainWeaponBaseMaxDamage(SpellDescriptionParser.MainWeaponBaseMaxDamageContext ctx) {
+        return List.of(new MainWeaponBaseDamageResolver(true));
     }
 
     @Override
