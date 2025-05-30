@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-	antlr
+    `java-library`
 }
 
 java {
@@ -16,19 +16,8 @@ repositories {
 }
 
 dependencies {
-    antlr("org.antlr:antlr4:4.13.2")
-
-    implementation(project(":acore-common"))
-
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.generateGrammarSource {
-    arguments = arguments + listOf(
-        "-package", "net.kwas.acore.antlr.grammar",
-        "-visitor"
-    )
 }
 
 tasks.test {

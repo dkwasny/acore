@@ -1,5 +1,6 @@
 package net.kwas.acore.server.character;
 
+import net.kwas.acore.common.Gender;
 import net.kwas.acore.server.util.AcoreUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -47,7 +48,7 @@ public class CharacterDatabase {
     private Character createCharacter(SqlCharacter sqlCharacter) {
         var race = raceMap.get(sqlCharacter.race());
         var chrClass = classMap.get(sqlCharacter.chrClass());
-        var gender = AcoreUtils.getGender(sqlCharacter.gender());
+        var gender = Gender.fromInt(sqlCharacter.gender());
         var online = AcoreUtils.isOnline(sqlCharacter.online());
         var zone = zoneMap.get(sqlCharacter.zone());
 

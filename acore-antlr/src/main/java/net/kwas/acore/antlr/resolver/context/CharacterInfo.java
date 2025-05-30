@@ -1,11 +1,12 @@
 package net.kwas.acore.antlr.resolver.context;
 
+import net.kwas.acore.common.Gender;
+
 import java.util.Set;
 
 public record CharacterInfo(
     int characterLevel,
-    // TODO
-    String gender,
+    Gender gender,
     long spirit,
     long attackPower,
     long rangedAttackPower,

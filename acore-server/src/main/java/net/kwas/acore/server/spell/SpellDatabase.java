@@ -5,6 +5,7 @@ import net.kwas.acore.antlr.resolver.StringResolver;
 import net.kwas.acore.antlr.resolver.context.CharacterInfo;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.context.SpellInfo;
+import net.kwas.acore.common.Gender;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class SpellDatabase {
     // The UI should think in actual spells and weapons instead of ids and damage values
     private final CharacterInfo dummyCharacterInfo = new CharacterInfo(
         20,
-        "Male",
+        Gender.MALE,
         20,
         100,
         110,

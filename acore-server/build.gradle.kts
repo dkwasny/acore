@@ -19,6 +19,7 @@ repositories {
 dependencies {
     implementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.3"))
 
+    implementation(project(":acore-common"))
     implementation(project(":acore-dbc"))
     implementation(project(":acore-antlr"))
 
