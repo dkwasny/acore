@@ -10,17 +10,20 @@ Intended to be a fun little dashboard for the MySQL database backing the [Azerot
 ### Setup
 1. Add a SQL user with read permissions to the three main AzerothCore databases.
     ```
-   -- Sample Queries
-   create user 'acore-server'@'localhost' identified by 'password';
-   grant select on acore_auth.* to 'acore-server'@'localhost';
-   grant select on acore_characters.* to 'acore-server'@'localhost';
-   grant select on acore_world.* to 'acore-server'@'localhost';
-   ```
+    -- Sample Queries
+    create user 'acore-server'@'localhost' identified by 'password';
+    grant select on acore_auth.* to 'acore-server'@'localhost';
+    grant select on acore_characters.* to 'acore-server'@'localhost';
+    grant select on acore_world.* to 'acore-server'@'localhost';
+    ```
+2. Obtain a copy of the client DBC files.
+    * Your server should have them under the `DataDir`.
+    * You can also find a copy at [wowgaming/client-data](https://github.com/wowgaming/client-data/releases).
 2. Create a new `acore-server/acore.dev.properties` file using the template.
 
 ### How to Run
-1. `gradlew bootRun` to start Spring Boot
-2. Optional: `gradlew viteRun` in a separate terminal to start the Vite dev UI server
+1. `./gradlew bootRun` to start Spring Boot
+2. Optional: `./gradlew viteRun` in a separate terminal to start the Vite dev UI server
 3. Open the app in your web browser based on what UI server you're using
     * Spring Boot: `http://localhost:8080`
     * Vite Dev: `http://localhost:5173`
