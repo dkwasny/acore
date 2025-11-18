@@ -1,5 +1,7 @@
 package net.kwas.acore.dbc;
 
+import net.kwas.acore.dbc.model.record.DbcChrClasses;
+import net.kwas.acore.dbc.model.record.DbcChrRaces;
 import net.kwas.acore.dbc.model.record.DbcSpell;
 import net.kwas.acore.dbc.model.record.DbcSpellDescriptionVariables;
 import net.kwas.acore.dbc.model.record.DbcSpellDuration;
@@ -211,6 +213,12 @@ public class TestDbcReader {
 //            .filter(x -> !x.getValue().isEmpty())
 //            .toList();
 //        printAll(tagsPerSpell);
+
+        var chrRaces = reader.readDbc(DbcChrRaces.class);
+        printAll(chrRaces);
+
+        var chrClasses = reader.readDbc(DbcChrClasses.class);
+        printAll(chrClasses);
 
         System.out.println();
     }

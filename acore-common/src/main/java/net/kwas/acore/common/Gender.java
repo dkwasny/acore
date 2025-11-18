@@ -2,35 +2,27 @@ package net.kwas.acore.common;
 
 public enum Gender {
 
-    MALE(0, "Male"),
-    FEMALE(1, "Female");
+    MALE(0),
+    FEMALE(1);
 
     private final int intValue;
-    private final String humanReadable;
 
-    Gender(int intValue, String humanReadable) {
+    Gender(int intValue) {
         this.intValue = intValue;
-        this.humanReadable = humanReadable;
     }
 
     public int getIntValue() {
         return intValue;
     }
 
-    public String getHumanReadable() {
-        return humanReadable;
-    }
-
     public static Gender fromInt(int value) {
-        if (value == MALE.getIntValue()) {
-            return MALE;
+        for (var gender : Gender.values()) {
+            if (value == gender.getIntValue()) {
+                return gender;
+            }
         }
-        else if (value == FEMALE.getIntValue()) {
-            return FEMALE;
-        }
-        else {
-            throw new RuntimeException("Unexpected gender value: " + value);
-        }
+
+        throw new RuntimeException("Unexpected Gender value: " + value);
     }
 
 }

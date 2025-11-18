@@ -23,7 +23,7 @@ public class ResolverUtils {
     public static String renderNumber(double number, int decimalPlaces, SpellContext ctx) {
         var absoluteValue = Math.abs(number);
 
-        // The only singular number is one without a decimal point.
+        // The only singular number is "1" without a decimal point.
         boolean isPlural = !(Double.compare(absoluteValue, 1.0) == 0 && decimalPlaces == 0);
         ctx.setNextLocalizedStringPlural(isPlural);
 

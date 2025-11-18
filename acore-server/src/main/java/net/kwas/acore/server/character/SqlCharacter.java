@@ -12,7 +12,7 @@ public record SqlCharacter(
     String name,
     int race,
     @Column("class")
-    int chrClass,
+    int charClass,
     int gender,
     int level,
     long xp,

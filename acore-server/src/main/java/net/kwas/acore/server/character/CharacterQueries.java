@@ -1,6 +1,5 @@
 package net.kwas.acore.server.character;
 
-import net.kwas.acore.server.item.SqlItem;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
