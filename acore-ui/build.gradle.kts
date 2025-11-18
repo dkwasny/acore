@@ -3,8 +3,7 @@
  * I want the UI to be built with native tooling but still executed via
  * stupid simple Gradle tasks.
  */
-
-tasks.register<Exec>("npmInstall") {
+val npmInstall by tasks.registering(Exec::class) {
     inputs.files("package.json")
     outputs.files("package-lock.json")
     outputs.dirs("node_modules")
@@ -12,8 +11,8 @@ tasks.register<Exec>("npmInstall") {
     commandLine("npm", "install")
 }
 
-tasks.register<Exec>("npmBuild") {
-    dependsOn("npmInstall")
+val npmBuild by tasks.registering(Exec::class) {
+    dependsOn(npmInstall)
 
     inputs.files(
         "eslint.config.js",
@@ -32,21 +31,50 @@ tasks.register<Exec>("npmBuild") {
     commandLine("npm", "run", "build")
 }
 
-tasks.register("build") {
-    dependsOn("npmBuild")
+val createJar by tasks.registering(Jar::class) {
+    dependsOn(npmBuild)
+
+    from("dist")
+    into("static")
+
+    archiveBaseName = project.name
+    archiveVersion = project.version.toString()
+    destinationDirectory = layout.buildDirectory
+}
+
+val build by tasks.registering {
+    dependsOn(createJar)
+}
+
+/*
+ * Custom configuration and artifact specification.
+ * This seems to be the bare minimum for exporting a jar to the java plugin
+ * within a different module.
+ */
+val javaArtifactConfigName = "javaArtifact"
+val javaArtifactConfig = configurations.create(javaArtifactConfigName)
+javaArtifactConfig.attributes {
+    attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+}
+
+artifacts {
+    add(javaArtifactConfigName, createJar)
 }
 
 /*
  * Task for running the Vite dev server.
- * The code should ideally work regardless of if it's hosted from
- * Vite's dev server or Spring Boot.
+ * Using the Vite server allows for much faster turnaround when editing the UI code.
  */
-tasks.register<Exec>("viteRun") {
-    dependsOn("npmInstall")
+val viteRun by tasks.registering(Exec::class) {
+    dependsOn(npmInstall)
 
     commandLine("npm", "run", "dev")
 }
 
-tasks.register<Delete>("clean") {
+/*
+ * Custom clean task for both output directories.
+ */
+val clean by tasks.registering(Delete::class) {
     delete("dist")
+    delete("build")
 }

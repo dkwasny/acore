@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":acore-common"))
     implementation(project(":acore-dbc"))
     implementation(project(":acore-antlr"))
+    implementation(project(":acore-ui"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -38,8 +39,4 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
         events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
     }
-}
-
-tasks.processResources {
-    dependsOn(":syncUiToServer")
 }
