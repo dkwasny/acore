@@ -24,18 +24,22 @@ public class CharacterDatabase {
     private final SpellQueries spellQueries;
 
     private final Map<Integer, String> zoneMap;
+    private final Map<Integer, Long> characterXpMap;
 
     public CharacterDatabase(
         CharacterRepository repo,
         CharacterQueries queries,
         SpellQueries spellQueries,
         @Qualifier("ZoneMap")
-        Map<Integer, String> zoneMap
+        Map<Integer, String> zoneMap,
+        @Qualifier("CharacterXpMap")
+        Map<Integer, Long> characterXpMap
     ) {
         this.repo = repo;
         this.queries = queries;
         this.spellQueries = spellQueries;
         this.zoneMap = zoneMap;
+        this.characterXpMap = characterXpMap;
     }
 
     public Collection<Character> getCharacters() {
@@ -60,6 +64,7 @@ public class CharacterDatabase {
         var race = Race.fromInt(sqlCharacter.race());
         var charClass = CharacterClass.fromInt(sqlCharacter.charClass());
         var gender = Gender.fromInt(sqlCharacter.gender());
+        var xpForNextLevel = characterXpMap.get(sqlCharacter.level());
         var online = AcoreUtils.isOnline(sqlCharacter.online());
         var zone = zoneMap.get(sqlCharacter.zone());
         var iconUrl = Icons.getCharacterIconUrl(race, gender);
@@ -74,6 +79,7 @@ public class CharacterDatabase {
             gender,
             sqlCharacter.level(),
             sqlCharacter.xp(),
+            xpForNextLevel,
             sqlCharacter.money(),
             online,
             sqlCharacter.totaltime(),

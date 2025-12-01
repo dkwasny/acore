@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.3"
+	id("org.springframework.boot") version "3.5.8"
 }
 
 java {
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.3"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.5.8"))
 
     implementation(project(":acore-common"))
     implementation(project(":acore-dbc"))
@@ -27,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.mysql:mysql-connector-j")
+
+    implementation("org.apache.commons:commons-csv:1.14.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
