@@ -78,3 +78,7 @@ val clean by tasks.registering(Delete::class) {
     delete("dist")
     delete("build")
 }
+
+val npmClean by tasks.registering(Delete::class) {
+    delete("node_modules")
+}

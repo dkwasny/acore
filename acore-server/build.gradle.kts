@@ -64,7 +64,7 @@ tasks.test {
     }
 }
 
-var openApiSpec = layout.projectDirectory.dir("src/main/resources/openapi.yaml")
+var openApiSpec = layout.projectDirectory.dir("src/main/resources/static/openapi.yaml")
 openApiGenerate {
     generatorName = "spring"
     inputSpec = openApiSpec.toString()
