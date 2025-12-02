@@ -1,0 +1,46 @@
+openapi: 3.0.4
+info:
+  title: Acore API
+  description: A readonly API for [Azerothcore](https://www.azerothcore.org/) servers.
+  version: 0.0.1
+
+components:
+  schemas:
+    Character:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        accountId:
+          type: integer
+          format: int64
+        race:
+          type: string
+          enum:
+            - HUMAN
+            - ORC
+            - DWARF
+            - NIGHT_ELF
+            - UNDEAD
+            - TAUREN
+            - GNOME
+            - TROLL
+            - BLOOD_ELF
+            - DRANEI
+        zone:
+          type: string
+
+paths:
+  /swagger-test/character:
+    get:
+      summary: Returns all characters.
+      responses:
+        "200":
+          description: A JSON array of characters.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Character'
