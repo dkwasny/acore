@@ -5,10 +5,10 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 
 public record FloorResolver(NumberResolver child) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var value = child.resolveNumber(ctx);
-        return Math.floor(value);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var value = child.resolveNumber(ctx);
+    return Math.floor(value);
+  }
 
 }

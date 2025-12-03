@@ -5,18 +5,18 @@ import net.kwas.acore.dbc.model.DbcType;
 
 public class DbcSpellIcon {
 
-    @DbcField(DbcType.UINT32)
-    public long id;
+  @DbcField(DbcType.UINT32)
+  public long id;
 
-    @DbcField(DbcType.STRING)
-    public String filename;
+  @DbcField(DbcType.STRING)
+  public String filename;
 
-    @Override
-    public String toString() {
-        return "SpellIconDbc{" +
-            "id=" + id +
-            ", filename='" + filename + '\'' +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return "SpellIconDbc{" +
+      "id=" + id +
+      ", filename='" + filename + '\'' +
+      '}';
+  }
 
 }

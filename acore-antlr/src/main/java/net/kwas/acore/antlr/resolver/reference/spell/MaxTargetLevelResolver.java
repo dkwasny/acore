@@ -6,10 +6,10 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record MaxTargetLevelResolver(Long spellId) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfo(mySpellId).maxTargetLevel();
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
+    return ctx.getSpellInfo(mySpellId).maxTargetLevel();
+  }
 
 }

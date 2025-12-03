@@ -17,34 +17,34 @@ import java.util.stream.Collectors;
 @Configuration
 public class SpellBeans {
 
-    @Bean
-    @Qualifier("RawSpellMap")
-    public static Map<Long, RawSpell> createRawSpellMap(DbcMgr dbcMgr) {
-        var stopwatch = Stopwatch.start("CreateRawSpellMap");
-        var dbcReader = dbcMgr.getReader();
-        var dbcSpells = dbcReader.readDbc(DbcSpell.class);
-        var dbcSpellIcons = dbcReader.readDbc(DbcSpellIcon.class);
+  @Bean
+  @Qualifier("RawSpellMap")
+  public static Map<Long, RawSpell> createRawSpellMap(DbcMgr dbcMgr) {
+    var stopwatch = Stopwatch.start("CreateRawSpellMap");
+    var dbcReader = dbcMgr.getReader();
+    var dbcSpells = dbcReader.readDbc(DbcSpell.class);
+    var dbcSpellIcons = dbcReader.readDbc(DbcSpellIcon.class);
 
-        var dbcSpellIconMap = dbcSpellIcons.stream()
-            .collect(Collectors.toMap(x -> x.id, x -> x.filename));
+    var dbcSpellIconMap = dbcSpellIcons.stream()
+      .collect(Collectors.toMap(x -> x.id, x -> x.filename));
 
-        var retVal = Collections.synchronizedMap(new LinkedHashMap<Long, RawSpell>());
-        for (var dbcSpell : dbcSpells) {
-            var dbcIcon = dbcSpellIconMap.get(dbcSpell.spellIconId);
-            var iconUrl = Icons.getIconUrl(dbcIcon);
-            var spell = new RawSpell(
-                dbcSpell.id,
-                dbcSpell.name0,
-                dbcSpell.nameSubtext0,
-                dbcSpell.description0,
-                iconUrl,
-                dbcSpell.descriptionVariablesId
-            );
-            retVal.put(spell.id(), spell);
-        }
-
-        stopwatch.stop();
-        return Collections.unmodifiableMap(retVal);
+    var retVal = Collections.synchronizedMap(new LinkedHashMap<Long, RawSpell>());
+    for (var dbcSpell : dbcSpells) {
+      var dbcIcon = dbcSpellIconMap.get(dbcSpell.spellIconId);
+      var iconUrl = Icons.getIconUrl(dbcIcon);
+      var spell = new RawSpell(
+        dbcSpell.id,
+        dbcSpell.name0,
+        dbcSpell.nameSubtext0,
+        dbcSpell.description0,
+        iconUrl,
+        dbcSpell.descriptionVariablesId
+      );
+      retVal.put(spell.id(), spell);
     }
+
+    stopwatch.stop();
+    return Collections.unmodifiableMap(retVal);
+  }
 
 }

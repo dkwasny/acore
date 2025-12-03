@@ -4,6 +4,6 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 
 public interface StringResolver {
 
-    String resolveString(SpellContext ctx);
+  String resolveString(SpellContext ctx);
 
 }

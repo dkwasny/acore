@@ -7,49 +7,49 @@ import java.util.Objects;
 
 public class DbcTestRecord {
 
-    @DbcField(DbcType.UINT32)
-    public long field1;
+  @DbcField(DbcType.UINT32)
+  public long field1;
 
-    @DbcField(DbcType.INT32)
-    public int field2;
+  @DbcField(DbcType.INT32)
+  public int field2;
 
-    @DbcField(DbcType.FLOAT)
-    public float field3;
+  @DbcField(DbcType.FLOAT)
+  public float field3;
 
-    @DbcField(DbcType.STRING)
-    public String field4;
+  @DbcField(DbcType.STRING)
+  public String field4;
 
-    public DbcTestRecord() {
+  public DbcTestRecord() {
 
-    }
+  }
 
-    public DbcTestRecord(long field1, int field2, float field3, String field4) {
-        this.field1 = field1;
-        this.field2 = field2;
-        this.field3 = field3;
-        this.field4 = field4;
-    }
+  public DbcTestRecord(long field1, int field2, float field3, String field4) {
+    this.field1 = field1;
+    this.field2 = field2;
+    this.field3 = field3;
+    this.field4 = field4;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        DbcTestRecord that = (DbcTestRecord) o;
-        return field1 == that.field1 && field2 == that.field2 && Float.compare(field3, that.field3) == 0 && Objects.equals(field4, that.field4);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    DbcTestRecord that = (DbcTestRecord) o;
+    return field1 == that.field1 && field2 == that.field2 && Float.compare(field3, that.field3) == 0 && Objects.equals(field4, that.field4);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(field1, field2, field3, field4);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(field1, field2, field3, field4);
+  }
 
-    @Override
-    public String toString() {
-        return "TestDbcRecord{" +
-            "field1=" + field1 +
-            ", field2=" + field2 +
-            ", field3=" + field3 +
-            ", field4='" + field4 + '\'' +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return "TestDbcRecord{" +
+      "field1=" + field1 +
+      ", field2=" + field2 +
+      ", field3=" + field3 +
+      ", field4='" + field4 + '\'' +
+      '}';
+  }
 
 }

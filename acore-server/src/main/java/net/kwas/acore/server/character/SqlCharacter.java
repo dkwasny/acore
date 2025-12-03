@@ -6,19 +6,19 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table(schema = "acore_characters", value = "characters")
 public record SqlCharacter(
-    @Id
-    long guid,
-    long account,
-    String name,
-    int race,
-    @Column("class")
-    int charClass,
-    int gender,
-    int level,
-    long xp,
-    long money,
-    int online,
-    long totaltime,
-    int zone
+  @Id
+  long guid,
+  long account,
+  String name,
+  int race,
+  @Column("class")
+  int charClass,
+  int gender,
+  int level,
+  long xp,
+  long money,
+  int online,
+  long totaltime,
+  int zone
 ) {
 }

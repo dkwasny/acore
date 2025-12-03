@@ -6,10 +6,10 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record ConditionalSpellRefResolver(long spellId) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var hasSpell = ctx.getCharacterInfo().learnedSpellIds().contains(spellId);
-        return ResolverUtils.toDouble(hasSpell);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var hasSpell = ctx.getCharacterInfo().learnedSpellIds().contains(spellId);
+    return ResolverUtils.toDouble(hasSpell);
+  }
 
 }

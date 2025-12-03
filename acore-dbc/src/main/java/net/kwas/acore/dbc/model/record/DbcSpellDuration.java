@@ -5,26 +5,26 @@ import net.kwas.acore.dbc.model.DbcType;
 
 public class DbcSpellDuration {
 
-    @DbcField(DbcType.UINT32)
-    public long id;
+  @DbcField(DbcType.UINT32)
+  public long id;
 
-    @DbcField(DbcType.INT32)
-    public int duration;
+  @DbcField(DbcType.INT32)
+  public int duration;
 
-    @DbcField(DbcType.INT32)
-    public int durationPerLevel;
+  @DbcField(DbcType.INT32)
+  public int durationPerLevel;
 
-    @DbcField(DbcType.INT32)
-    public int maxDuration;
+  @DbcField(DbcType.INT32)
+  public int maxDuration;
 
-    @Override
-    public String toString() {
-        return "DbcSpellDuration{" +
-            "id=" + id +
-            ", duration=" + duration +
-            ", durationPerLevel=" + durationPerLevel +
-            ", maxDuration=" + maxDuration +
-            '}';
-    }
+  @Override
+  public String toString() {
+    return "DbcSpellDuration{" +
+      "id=" + id +
+      ", duration=" + duration +
+      ", durationPerLevel=" + durationPerLevel +
+      ", maxDuration=" + maxDuration +
+      '}';
+  }
 
 }

@@ -6,10 +6,10 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record NotResolver(NumberResolver resolver) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var value = ResolverUtils.toBool(resolver.resolveNumber(ctx));
-        return ResolverUtils.toDouble(!value);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var value = ResolverUtils.toBool(resolver.resolveNumber(ctx));
+    return ResolverUtils.toDouble(!value);
+  }
 
 }

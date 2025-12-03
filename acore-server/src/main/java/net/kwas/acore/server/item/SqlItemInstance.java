@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table(schema = "acore_characters", value = "item_instance")
 public record SqlItemInstance(
-    @Id
-    long guid
+  @Id
+  long guid
 ) {
 }

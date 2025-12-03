@@ -6,10 +6,10 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record CumulativeAuraResolver(Long spellId) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfo(mySpellId).cumulativeAura();
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
+    return ctx.getSpellInfo(mySpellId).cumulativeAura();
+  }
 
 }

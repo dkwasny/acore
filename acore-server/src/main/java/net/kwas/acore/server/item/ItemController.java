@@ -9,20 +9,20 @@ import java.util.Collection;
 @RestController
 public class ItemController {
 
-    private final ItemDatabase db;
+  private final ItemDatabase db;
 
-    public ItemController(ItemDatabase db) {
-        this.db = db;
-    }
+  public ItemController(ItemDatabase db) {
+    this.db = db;
+  }
 
-    @GetMapping("/api/item")
-    public Collection<Item> getItems() {
-        return db.getItems();
-    }
+  @GetMapping("/api/item")
+  public Collection<Item> getItems() {
+    return db.getItems();
+  }
 
-    @GetMapping("/api/item/{id}")
-    public Item getItem(@PathVariable long id) {
-        return db.getItem(id);
-    }
+  @GetMapping("/api/item/{id}")
+  public Item getItem(@PathVariable long id) {
+    return db.getItem(id);
+  }
 
 }

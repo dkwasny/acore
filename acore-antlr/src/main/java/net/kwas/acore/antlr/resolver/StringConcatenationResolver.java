@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 
 public record StringConcatenationResolver(List<StringResolver> children) implements StringResolver {
 
-    @Override
-    public String resolveString(SpellContext ctx) {
-        return children.stream()
-            .map(x -> x.resolveString(ctx))
-            .collect(Collectors.joining(""));
-    }
+  @Override
+  public String resolveString(SpellContext ctx) {
+    return children.stream()
+      .map(x -> x.resolveString(ctx))
+      .collect(Collectors.joining(""));
+  }
 
 }

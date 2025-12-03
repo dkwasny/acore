@@ -5,9 +5,9 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 
 public record SpellPowerResolver() implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        return ctx.getCharacterInfo().spellPower();
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    return ctx.getCharacterInfo().spellPower();
+  }
 
 }

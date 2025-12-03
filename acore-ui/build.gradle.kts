@@ -4,46 +4,46 @@
  * stupid simple Gradle tasks.
  */
 val npmInstall by tasks.registering(Exec::class) {
-    inputs.files("package.json")
-    outputs.files("package-lock.json")
-    outputs.dirs("node_modules")
+  inputs.files("package.json")
+  outputs.files("package-lock.json")
+  outputs.dirs("node_modules")
 
-    commandLine("npm", "install")
+  commandLine("npm", "install")
 }
 
 val npmBuild by tasks.registering(Exec::class) {
-    dependsOn(npmInstall)
+  dependsOn(npmInstall)
 
-    inputs.files(
-        "eslint.config.js",
-        "index.html",
-        "package-lock.json",
-        "tsconfig.app.json",
-        "tsconfig.json",
-        "tsconfig.node.json",
-        "vite.config.ts"
-    )
-    inputs.dir("node_modules")
-    inputs.dir("src")
-    inputs.dir("public")
-    outputs.dirs("dist")
+  inputs.files(
+    "eslint.config.js",
+    "index.html",
+    "package-lock.json",
+    "tsconfig.app.json",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "vite.config.ts"
+  )
+  inputs.dir("node_modules")
+  inputs.dir("src")
+  inputs.dir("public")
+  outputs.dirs("dist")
 
-    commandLine("npm", "run", "build")
+  commandLine("npm", "run", "build")
 }
 
 val createJar by tasks.registering(Jar::class) {
-    dependsOn(npmBuild)
+  dependsOn(npmBuild)
 
-    from("dist")
-    into("static")
+  from("dist")
+  into("static")
 
-    archiveBaseName = project.name
-    archiveVersion = project.version.toString()
-    destinationDirectory = layout.buildDirectory
+  archiveBaseName = project.name
+  archiveVersion = project.version.toString()
+  destinationDirectory = layout.buildDirectory
 }
 
 val build by tasks.registering {
-    dependsOn(createJar)
+  dependsOn(createJar)
 }
 
 /*
@@ -54,11 +54,11 @@ val build by tasks.registering {
 val javaArtifactConfigName = "javaArtifact"
 val javaArtifactConfig = configurations.create(javaArtifactConfigName)
 javaArtifactConfig.attributes {
-    attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+  attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
 }
 
 artifacts {
-    add(javaArtifactConfigName, createJar)
+  add(javaArtifactConfigName, createJar)
 }
 
 /*
@@ -66,19 +66,19 @@ artifacts {
  * Using the Vite server allows for much faster turnaround when editing the UI code.
  */
 val viteRun by tasks.registering(Exec::class) {
-    dependsOn(npmInstall)
+  dependsOn(npmInstall)
 
-    commandLine("npm", "run", "dev")
+  commandLine("npm", "run", "dev")
 }
 
 /*
  * Custom clean task for both output directories.
  */
 val clean by tasks.registering(Delete::class) {
-    delete("dist")
-    delete("build")
+  delete("dist")
+  delete("build")
 }
 
 val npmClean by tasks.registering(Delete::class) {
-    delete("node_modules")
+  delete("node_modules")
 }

@@ -6,41 +6,41 @@ import java.util.Map;
 
 public class SpellContext {
 
-    private final long spellId;
-    private final Map<Long, SpellInfo> spellInfoMap;
-    private final CharacterInfo characterInfo;
-    private final Map<String, NumberResolver> variableMap;
+  private final long spellId;
+  private final Map<Long, SpellInfo> spellInfoMap;
+  private final CharacterInfo characterInfo;
+  private final Map<String, NumberResolver> variableMap;
 
-    private boolean isNextLocalizedStringPlural = false;
+  private boolean isNextLocalizedStringPlural = false;
 
-    public SpellContext(long spellId, Map<Long, SpellInfo> spellInfoMap, CharacterInfo characterInfo, Map<String, NumberResolver> variables) {
-        this.spellId = spellId;
-        this.spellInfoMap = spellInfoMap;
-        this.characterInfo = characterInfo;
-        this.variableMap = variables;
-    }
+  public SpellContext(long spellId, Map<Long, SpellInfo> spellInfoMap, CharacterInfo characterInfo, Map<String, NumberResolver> variables) {
+    this.spellId = spellId;
+    this.spellInfoMap = spellInfoMap;
+    this.characterInfo = characterInfo;
+    this.variableMap = variables;
+  }
 
-    public long getSpellId() {
-        return spellId;
-    }
+  public long getSpellId() {
+    return spellId;
+  }
 
-    public SpellInfo getSpellInfo(long id) {
-        return spellInfoMap.getOrDefault(id, SpellInfo.EMPTY);
-    }
+  public SpellInfo getSpellInfo(long id) {
+    return spellInfoMap.getOrDefault(id, SpellInfo.EMPTY);
+  }
 
-    public CharacterInfo getCharacterInfo() {
-        return characterInfo;
-    }
+  public CharacterInfo getCharacterInfo() {
+    return characterInfo;
+  }
 
-    public Map<String, NumberResolver> getVariableMap() {
-        return variableMap;
-    }
+  public Map<String, NumberResolver> getVariableMap() {
+    return variableMap;
+  }
 
-    public boolean isNextLocalizedStringPlural() {
-        return isNextLocalizedStringPlural;
-    }
+  public boolean isNextLocalizedStringPlural() {
+    return isNextLocalizedStringPlural;
+  }
 
-    public void setNextLocalizedStringPlural(boolean nextLocalizedStringPlural) {
-        isNextLocalizedStringPlural = nextLocalizedStringPlural;
-    }
+  public void setNextLocalizedStringPlural(boolean nextLocalizedStringPlural) {
+    isNextLocalizedStringPlural = nextLocalizedStringPlural;
+  }
 }

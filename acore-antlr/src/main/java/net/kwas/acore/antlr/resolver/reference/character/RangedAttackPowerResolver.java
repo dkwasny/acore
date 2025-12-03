@@ -5,9 +5,9 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 
 public record RangedAttackPowerResolver() implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        return ctx.getCharacterInfo().rangedAttackPower();
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    return ctx.getCharacterInfo().rangedAttackPower();
+  }
 
 }

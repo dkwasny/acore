@@ -1,13 +1,13 @@
 package net.kwas.acore.antlr.resolver.math;
 
-import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.NumberResolver;
+import net.kwas.acore.antlr.resolver.context.SpellContext;
 
 public record AdditionResolver(NumberResolver left, NumberResolver right) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        return left.resolveNumber(ctx) + right.resolveNumber(ctx);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    return left.resolveNumber(ctx) + right.resolveNumber(ctx);
+  }
 
 }

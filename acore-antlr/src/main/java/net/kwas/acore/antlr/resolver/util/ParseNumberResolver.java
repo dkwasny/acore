@@ -15,10 +15,10 @@ import net.kwas.acore.antlr.resolver.context.SpellContext;
 // Maybe consider revisiting if number parsing is low performance (unlikely).
 public record ParseNumberResolver(StringResolver child) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var string = child.resolveString(ctx);
-        return Double.parseDouble(string);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var string = child.resolveString(ctx);
+    return Double.parseDouble(string);
+  }
 
 }

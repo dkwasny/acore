@@ -6,10 +6,10 @@ import net.kwas.acore.antlr.resolver.util.ResolverUtils;
 
 public record RadiusResolver(Long spellId, int index) implements NumberResolver {
 
-    @Override
-    public double resolveNumber(SpellContext ctx) {
-        var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
-        return ctx.getSpellInfo(mySpellId).radii().get(index);
-    }
+  @Override
+  public double resolveNumber(SpellContext ctx) {
+    var mySpellId = ResolverUtils.getSpellId(spellId, ctx);
+    return ctx.getSpellInfo(mySpellId).radii().get(index);
+  }
 
 }

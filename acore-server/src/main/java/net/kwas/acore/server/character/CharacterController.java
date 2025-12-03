@@ -13,44 +13,44 @@ import java.util.Collection;
 @RestController
 public class CharacterController {
 
-    private final CharacterDatabase characterDb;
-    private final ItemDatabase itemDb;
-    private final SpellDatabase spellDb;
+  private final CharacterDatabase characterDb;
+  private final ItemDatabase itemDb;
+  private final SpellDatabase spellDb;
 
-    public CharacterController(CharacterDatabase characterDb, ItemDatabase itemDb, SpellDatabase spellDb) {
-        this.characterDb = characterDb;
-        this.itemDb = itemDb;
-        this.spellDb = spellDb;
-    }
+  public CharacterController(CharacterDatabase characterDb, ItemDatabase itemDb, SpellDatabase spellDb) {
+    this.characterDb = characterDb;
+    this.itemDb = itemDb;
+    this.spellDb = spellDb;
+  }
 
-    @GetMapping("/api/character")
-    public Collection<Character> getCharacters() {
-        return characterDb.getCharacters();
-    }
+  @GetMapping("/api/character")
+  public Collection<Character> getCharacters() {
+    return characterDb.getCharacters();
+  }
 
-    @GetMapping("/api/character/{id}")
-    public Character getCharacter(@PathVariable long id) {
-        return characterDb.getCharacter(id);
-    }
+  @GetMapping("/api/character/{id}")
+  public Character getCharacter(@PathVariable long id) {
+    return characterDb.getCharacter(id);
+  }
 
-    @GetMapping("/api/character/{id}/item")
-    public Collection<Item> getItemsForCharacter(@PathVariable long id) {
-        return itemDb.getItemsForCharacter(id);
-    }
+  @GetMapping("/api/character/{id}/item")
+  public Collection<Item> getItemsForCharacter(@PathVariable long id) {
+    return itemDb.getItemsForCharacter(id);
+  }
 
-    @GetMapping("/api/character/{id}/spell")
-    public Collection<Spell> getSpellsForCharacter(@PathVariable long id) {
-        var characterInfo = characterDb.getCharacterInfo(id);
-        return spellDb.getSpellsForCharacter(id, characterInfo);
-    }
+  @GetMapping("/api/character/{id}/spell")
+  public Collection<Spell> getSpellsForCharacter(@PathVariable long id) {
+    var characterInfo = characterDb.getCharacterInfo(id);
+    return spellDb.getSpellsForCharacter(id, characterInfo);
+  }
 
-    // TODO: Add a force parameter
-    // By default return 404 if character does not have the spell
-    // With force, it will always resolve the spell
-    @GetMapping("/api/character/{id}/spell/{spellId}")
-    public Spell getSpellForCharacter(@PathVariable long id, @PathVariable long spellId) {
-        var characterInfo = characterDb.getCharacterInfo(id);
-        return spellDb.getSpellForCharacter(spellId, characterInfo);
-    }
+  // TODO: Add a force parameter
+  // By default return 404 if character does not have the spell
+  // With force, it will always resolve the spell
+  @GetMapping("/api/character/{id}/spell/{spellId}")
+  public Spell getSpellForCharacter(@PathVariable long id, @PathVariable long spellId) {
+    var characterInfo = characterDb.getCharacterInfo(id);
+    return spellDb.getSpellForCharacter(spellId, characterInfo);
+  }
 
 }
