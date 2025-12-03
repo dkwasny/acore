@@ -20,44 +20,44 @@ import sys
 
 numArgs = len(sys.argv)
 if (numArgs) != 2:
-    raise Exception(f'Invalid amount of arguments {numArgs}')
+  raise Exception(f'Invalid amount of arguments {numArgs}')
 
 filename = sys.argv[1]
 
 with open(filename) as file:
-    lines = [x.strip() for x in file]
+  lines = [x.strip() for x in file]
 
 for line in lines:
-    parts = line.split(maxsplit=1)
-    if len(parts) != 2:
-        raise Exception(f'Invalid number of parts: {parts}')
-    inName = parts[0].strip()
-    inType = parts[1].strip()
+  parts = line.split(maxsplit=1)
+  if len(parts) != 2:
+    raise Exception(f'Invalid number of parts: {parts}')
+  inName = parts[0].strip()
+  inType = parts[1].strip()
 
-    # Javaify the field names
-    fieldName = inName[:1].lower() + inName[1:]
-    fieldName = fieldName.replace('ID', 'Id')
-    fieldName = fieldName.replace('_', '')
-    fieldName = fieldName.replace('iD', 'id')
+  # Javaify the field names
+  fieldName = inName[:1].lower() + inName[1:]
+  fieldName = fieldName.replace('ID', 'Id')
+  fieldName = fieldName.replace('_', '')
+  fieldName = fieldName.replace('iD', 'id')
 
-    match inType:
-        case 'uint32':
-            dbcType = 'UINT32'
-            javaType = 'long'
-        case 'int32':
-            dbcType = 'INT32'
-            javaType = 'int'
-        case 'float':
-            dbcType = 'FLOAT'
-            javaType = 'float'
-        case 'string':
-            dbcType = 'STRING'
-            javaType = 'String'
-        case _:
-            dbcType = inType
-            javaType = inType
+  match inType:
+    case 'uint32':
+      dbcType = 'UINT32'
+      javaType = 'long'
+    case 'int32':
+      dbcType = 'INT32'
+      javaType = 'int'
+    case 'float':
+      dbcType = 'FLOAT'
+      javaType = 'float'
+    case 'string':
+      dbcType = 'STRING'
+      javaType = 'String'
+    case _:
+      dbcType = inType
+      javaType = inType
 
-    annotation = f'@DbcField(DbcType.{dbcType})'
-    field = f'public {javaType} {fieldName};'
+  annotation = f'@DbcField(DbcType.{dbcType})'
+  field = f'public {javaType} {fieldName};'
 
-    print(f'{annotation}\n{field}\n')
+  print(f'{annotation}\n{field}\n')
