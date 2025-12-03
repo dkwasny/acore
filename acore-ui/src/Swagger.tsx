@@ -5,9 +5,9 @@ const serverName = window.location.origin;
 const openapiUrl = `${serverName}/openapi.yaml`;
 
 function Swagger() {
-    return (
-        <SwaggerUI url={openapiUrl} />
-    )
+  return (
+    <SwaggerUI url={openapiUrl} />
+  )
 }
 
 export default Swagger

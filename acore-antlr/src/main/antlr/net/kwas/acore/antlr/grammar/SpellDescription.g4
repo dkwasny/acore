@@ -27,14 +27,14 @@ text: (conditionalText | squareBrackets)+ ;
  */
 conditionalText: conditionalString+ ;
 conditionalString: formula
-    | stringConditional
-    | numericReference
-    | stringReference
-    | number
-    | identifier
-    | miscChars
-    | oneOffRules
-    ;
+  | stringConditional
+  | numericReference
+  | stringReference
+  | number
+  | identifier
+  | miscChars
+  | oneOffRules
+  ;
 
 /*
  * Formula
@@ -43,20 +43,20 @@ conditionalString: formula
 formula: DOLLAR_SIGN OPEN_CURLY formulaFragment CLOSE_CURLY (PERIOD decimalPlaces=positiveInteger)? ;
 
 formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
-    | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
-    | formulaFragment (PLUS | HYPHEN) formulaFragment
-    | formulaFunction
-    | numericReference
-    // Having both numericReference and numericDefinition as formula fragments
-    // effectively makes dollar signs optional for all numeric references.
-    // Only one spell actually leverages this ability (58644).
-    // I'm not sure if this is a mistake, or some new syntax introduced in a
-    // later version of WotLK.
-    // I don't think this will cause any problems.
-    // NOTE: Remove this rule and handle said spell directly if issues do arise.
-    | numericDefinition
-    | number
-    ;
+  | formulaFragment (STAR | FORWARD_SLASH) formulaFragment
+  | formulaFragment (PLUS | HYPHEN) formulaFragment
+  | formulaFunction
+  | numericReference
+  // Having both numericReference and numericDefinition as formula fragments
+  // effectively makes dollar signs optional for all numeric references.
+  // Only one spell actually leverages this ability (58644).
+  // I'm not sure if this is a mistake, or some new syntax introduced in a
+  // later version of WotLK.
+  // I don't think this will cause any problems.
+  // NOTE: Remove this rule and handle said spell directly if issues do arise.
+  | numericDefinition
+  | number
+  ;
 
 /*
  * Formula Function
@@ -65,12 +65,11 @@ formulaFragment: OPEN_PAREN formulaFragment CLOSE_PAREN
  * "header" rules in an attempt to make the rules more readable.
  */
 formulaFunction: DOLLAR_SIGN (
-    min
-    | max
-    | floor
-    | formulaConditional
-    )
-    ;
+  min
+  | max
+  | floor
+  | formulaConditional
+  );
 
 minHeader: (UPPER_M_CHAR UPPER_I_CHAR UPPER_N_CHAR) | (LOWER_M_CHAR LOWER_I_CHAR LOWER_N_CHAR) ;
 min: minHeader OPEN_PAREN left=formulaFragment COMMA right=formulaFragment CLOSE_PAREN ;
@@ -100,39 +99,39 @@ formulaConditional: formulaConditionalHeader OPEN_PAREN condition=numericReferen
  */
 numericReference: DOLLAR_SIGN numericDefinition ;
 numericDefinition: minDamage
-    | maxDamage
-    | duration
-    | auraPeriod
-    | procCharges
-    | procChance
-    | chainTargets
-    | radius
-    | miscValue
-    | pointsPerCombo
-    | amplitude
-    | chainAmplitude
-    | minRange
-    | maxRange
-    | cumulativeAura
-    | maxTargets
-    | maxTargetLevel
-    | variableReference
-    | attackPower
-    | rangedAttackPower
-    | mainWeaponMinDamage
-    | mainWeaponMaxDamage
-    | mainWeaponBaseMinDamage
-    | mainWeaponBaseMaxDamage
-    | mainWeaponHandedness
-    | mainWeaponSpeed
-    | spellPower
-    | spirit
-    | characterLevel
-    | attackRating
-    | greaterThan
-    | greaterThanOrEqual
-    | equal
-    ;
+  | maxDamage
+  | duration
+  | auraPeriod
+  | procCharges
+  | procChance
+  | chainTargets
+  | radius
+  | miscValue
+  | pointsPerCombo
+  | amplitude
+  | chainAmplitude
+  | minRange
+  | maxRange
+  | cumulativeAura
+  | maxTargets
+  | maxTargetLevel
+  | variableReference
+  | attackPower
+  | rangedAttackPower
+  | mainWeaponMinDamage
+  | mainWeaponMaxDamage
+  | mainWeaponBaseMinDamage
+  | mainWeaponBaseMaxDamage
+  | mainWeaponHandedness
+  | mainWeaponSpeed
+  | spellPower
+  | spirit
+  | characterLevel
+  | attackRating
+  | greaterThan
+  | greaterThanOrEqual
+  | equal
+  ;
 
 // References to data from the spell itself
 minDamage: spellId=positiveInteger? LOWER_M_CHAR index=positiveInteger? ;
@@ -230,12 +229,12 @@ stringConditionalElseIf: QUESTION_MARK conditionalFragment OPEN_SQUARE condition
 stringConditionalElse: DOLLAR_SIGN? OPEN_SQUARE conditionalText? CLOSE_SQUARE ;
 
 conditionalFragment: OPEN_PAREN conditionalFragment CLOSE_PAREN
-    | EXCLAMATION_POINT conditionalFragment
-    | conditionalFragment AMPERSAND conditionalFragment
-    | conditionalFragment PIPE conditionalFragment
-    | conditionalSpellRef
-    | numericReference
-    ;
+  | EXCLAMATION_POINT conditionalFragment
+  | conditionalFragment AMPERSAND conditionalFragment
+  | conditionalFragment PIPE conditionalFragment
+  | conditionalSpellRef
+  | numericReference
+  ;
 // TODO: Do a and s mean the same thing here?
 // Would `a` perhaps mean an aura is active on the character at the moment?
 conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
@@ -246,14 +245,13 @@ conditionalSpellRef: (LOWER_A_CHAR | LOWER_S_CHAR) positiveInteger ;
  * variable definitions.
  */
 stringReference: DOLLAR_SIGN (
-    localizedString
-    | genderString
-    | damageString
-    | auraDamageString
-    | arithmeticDamageString
-    | hearthstoneLocation
-    )
-    ;
+  localizedString
+  | genderString
+  | damageString
+  | auraDamageString
+  | arithmeticDamageString
+  | hearthstoneLocation
+  );
 
 // NOTE: It's important that colon not be a part of the text rule.
 // This rule would need significant refactoring to allow it.
@@ -285,9 +283,9 @@ hearthstoneLocation: LOWER_Z_CHAR ;
  * These rules should have the lowest priority in the gammar.
  */
 oneOffRules: percentDamageStringRule
-    | ruleOfRhunok
-    | tortureRule
-    ;
+  | ruleOfRhunok
+  | tortureRule
+  ;
 
 // A few spells seem to have references without any letters
 // indicating what attribute to use and are always followed by
@@ -330,69 +328,68 @@ decimal: HYPHEN? DIGITS? PERIOD? DIGITS ;
 // plain text (both of which are part of the grammar).
 // TODO: Is there a better way to handle this?
 identifier: (LOWER_A_CHAR
-    | LOWER_B_CHAR
-    | LOWER_C_CHAR
-    | LOWER_D_CHAR
-    | LOWER_E_CHAR
-    | LOWER_F_CHAR
-    | LOWER_G_CHAR
-    | LOWER_H_CHAR
-    | LOWER_I_CHAR
-    | LOWER_L_CHAR
-    | LOWER_M_CHAR
-    | LOWER_N_CHAR
-    | LOWER_O_CHAR
-    | LOWER_P_CHAR
-    | LOWER_Q_CHAR
-    | LOWER_R_CHAR
-    | LOWER_S_CHAR
-    | LOWER_T_CHAR
-    | LOWER_U_CHAR
-    | LOWER_V_CHAR
-    | LOWER_W_CHAR
-    | LOWER_X_CHAR
-    | LOWER_Z_CHAR
-    | UPPER_A_CHAR
-    | UPPER_B_CHAR
-    | UPPER_C_CHAR
-    | UPPER_D_CHAR
-    | UPPER_E_CHAR
-    | UPPER_F_CHAR
-    | UPPER_G_CHAR
-    | UPPER_H_CHAR
-    | UPPER_I_CHAR
-    | UPPER_L_CHAR
-    | UPPER_M_CHAR
-    | UPPER_N_CHAR
-    | UPPER_O_CHAR
-    | UPPER_P_CHAR
-    | UPPER_Q_CHAR
-    | UPPER_R_CHAR
-    | UPPER_S_CHAR
-    | UPPER_T_CHAR
-    | UPPER_W_CHAR
-    | UPPER_X_CHAR
-    | OTHER_CHARS
-    | DIGITS)+ ;
+  | LOWER_B_CHAR
+  | LOWER_C_CHAR
+  | LOWER_D_CHAR
+  | LOWER_E_CHAR
+  | LOWER_F_CHAR
+  | LOWER_G_CHAR
+  | LOWER_H_CHAR
+  | LOWER_I_CHAR
+  | LOWER_L_CHAR
+  | LOWER_M_CHAR
+  | LOWER_N_CHAR
+  | LOWER_O_CHAR
+  | LOWER_P_CHAR
+  | LOWER_Q_CHAR
+  | LOWER_R_CHAR
+  | LOWER_S_CHAR
+  | LOWER_T_CHAR
+  | LOWER_U_CHAR
+  | LOWER_V_CHAR
+  | LOWER_W_CHAR
+  | LOWER_X_CHAR
+  | LOWER_Z_CHAR
+  | UPPER_A_CHAR
+  | UPPER_B_CHAR
+  | UPPER_C_CHAR
+  | UPPER_D_CHAR
+  | UPPER_E_CHAR
+  | UPPER_F_CHAR
+  | UPPER_G_CHAR
+  | UPPER_H_CHAR
+  | UPPER_I_CHAR
+  | UPPER_L_CHAR
+  | UPPER_M_CHAR
+  | UPPER_N_CHAR
+  | UPPER_O_CHAR
+  | UPPER_P_CHAR
+  | UPPER_Q_CHAR
+  | UPPER_R_CHAR
+  | UPPER_S_CHAR
+  | UPPER_T_CHAR
+  | UPPER_W_CHAR
+  | UPPER_X_CHAR
+  | OTHER_CHARS
+  | DIGITS
+  )+ ;
 
 miscChars: (WS
-    | PERIOD
-    | NON_WORD
-    | COMMA
-    | EQUAL
-    | HYPHEN
-    | PLUS
-    | LT_SIGN
-    | GT_SIGN
-    | OPEN_PAREN
-    | CLOSE_PAREN
-    | QUESTION_MARK
-    | PERCENT
-    )+ ;
+  | PERIOD
+  | NON_WORD
+  | COMMA
+  | EQUAL
+  | HYPHEN
+  | PLUS
+  | LT_SIGN
+  | GT_SIGN
+  | OPEN_PAREN
+  | CLOSE_PAREN
+  | QUESTION_MARK
+  | PERCENT
+  )+ ;
 
-squareBrackets: (OPEN_SQUARE
-    | CLOSE_SQUARE
-    )+ ;
+squareBrackets: (OPEN_SQUARE | CLOSE_SQUARE)+ ;
 
 /*
  * Lexer Rules
