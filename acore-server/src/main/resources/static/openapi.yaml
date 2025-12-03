@@ -3,44 +3,291 @@ info:
   title: Acore API
   description: A readonly API for [Azerothcore](https://www.azerothcore.org/) servers.
   version: 0.0.1
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+
+servers:
+  - url: http://{server}:{port}/api
+    description: The base server template
+    variables:
+      server:
+        enum: [ localhost ]
+        default: localhost
+        description: The name of the server
+      port:
+        enum: [ "8080" ]
+        default: "8080"
+        description: The port of the server
+
+paths:
+  /character:
+    get:
+      summary: Returns all characters
+      operationId: getCharacters
+      responses:
+        "200":
+          description: A JSON array of characters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Characters"
+  /character/{characterId}:
+    get:
+      summary: Returns a character
+      operationId: getCharacter
+      parameters:
+        - $ref: "#/components/parameters/characterId"
+      responses:
+        "200":
+          description: A JSON object of the character
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Character"
+  /character/{characterId}/item:
+    get:
+      summary: Returns all items owned by a character
+      operationId: getItemsForCharacter
+      parameters:
+        - $ref: "#/components/parameters/characterId"
+      responses:
+        "200":
+          description: A JSON array of items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Items"
+  /character/{characterId}/spell:
+    get:
+      summary: Returns all spells owned by a character
+      operationId: getSpellsForCharacter
+      parameters:
+        - $ref: "#/components/parameters/characterId"
+      responses:
+        "200":
+          description: A JSON array of spells
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Spells"
+  /character/{characterId}/spell/{spellId}:
+    get:
+      summary: Returns a spell from the context of the specified character
+      operationId: getSpellForCharacter
+      parameters:
+        - $ref: "#/components/parameters/characterId"
+        - $ref: "#/components/parameters/spellId"
+      responses:
+        "200":
+          description: A JSON object of the spell
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Spell"
 
 components:
   schemas:
     Character:
       type: object
+      required:
+        - id
+        - accountId
+        - name
+        - race
+        - characterClass
+        - gender
+        - level
+        - xp
+        - xpForNextLevel
+        - money
+        - online
+        - totalTime
+        - zone
+        - iconUrl
+        - charClassIconUrl
       properties:
         id:
           type: integer
           format: int64
+          nullable: false
         accountId:
           type: integer
           format: int64
-        race:
+          nullable: false
+        name:
           type: string
-          enum:
-            - HUMAN
-            - ORC
-            - DWARF
-            - NIGHT_ELF
-            - UNDEAD
-            - TAUREN
-            - GNOME
-            - TROLL
-            - BLOOD_ELF
-            - DRANEI
+          nullable: false
+        race:
+          $ref: "#/components/schemas/Race"
+        characterClass:
+          $ref: "#/components/schemas/CharacterClass"
+        gender:
+          $ref: "#/components/schemas/Gender"
+        level:
+          type: integer
+          format: int32
+          nullable: false
+        xp:
+          type: integer
+          format: int64
+          nullable: false
+        xpForNextLevel:
+          type: integer
+          format: int64
+          nullable: false
+        money:
+          type: integer
+          format: int64
+          nullable: false
+        online:
+          type: boolean
+          nullable: false
+        totalTime:
+          type: integer
+          format: int64
+          nullable: false
         zone:
           type: string
+          nullable: false
+        iconUrl:
+          type: string
+          format: uri
+          nullable: false
+        charClassIconUrl:
+          type: string
+          format: uri
+          nullable: false
+    Characters:
+      type: array
+      items:
+        $ref: "#/components/schemas/Character"
+    Race:
+      type: string
+      nullable: false
+      enum:
+        - HUMAN
+        - ORC
+        - DWARF
+        - NIGHT_ELF
+        - UNDEAD
+        - TAUREN
+        - GNOME
+        - TROLL
+        - BLOOD_ELF
+        - DRANEI
+    CharacterClass:
+      type: string
+      nullable: false
+      enum:
+        - WARRIOR
+        - PALADIN
+        - HUNTER
+        - ROGUE
+        - PRIEST
+        - DEATH_KNIGHT
+        - SHAMAN
+        - MAGE
+        - WARLOCK
+        - DRUID
+    Gender:
+      type: string
+      nullable: false
+      enum:
+        - MALE
+        - FEMALE
+    Item:
+      type: object
+      required:
+        - id
+        - itemTemplateId
+        - name
+        - description
+        - iconUrl
+        - ownerId
+        - ownerName
+        - count
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: false
+        itemTemplateId:
+          type: integer
+          format: int64
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        description:
+          type: string
+          nullable: false
+        iconUrl:
+          type: string
+          format: uri
+          nullable: false
+        ownerId:
+          type: integer
+          format: int64
+          nullable: false
+        ownerName:
+          type: string
+          nullable: false
+        count:
+          type: integer
+          format: int64
+          nullable: false
+    Items:
+      type: array
+      items:
+        $ref: "#/components/schemas/Item"
+    Spell:
+      type: object
+      required:
+        - id
+        - name
+        - subtext
+        - description
+        - iconUrl
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        subtext:
+          type: string
+          nullable: false
+        description:
+          type: string
+          nullable: false
+        iconUrl:
+          type: string
+          format: uri
+          nullable: false
+    Spells:
+      type: array
+      items:
+        $ref: "#/components/schemas/Spell"
+  parameters:
+    characterId:
+      name: characterId
+      in: path
+      description: The id of the character
+      required: true
+      schema:
+        type: integer
+        format: int64
+        nullable: false
+    spellId:
+      name: spellId
+      in: path
+      description: The id of the spell
+      required: true
+      schema:
+        type: integer
+        format: int64
+        nullable: false
 
-paths:
-  /swagger-test/character:
-    get:
-      summary: Returns all characters.
-      responses:
-        "200":
-          description: A JSON array of characters.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Character'

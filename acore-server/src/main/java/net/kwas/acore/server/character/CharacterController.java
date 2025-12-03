@@ -1,17 +1,20 @@
 package net.kwas.acore.server.character;
 
-import net.kwas.acore.server.item.Item;
+import net.kwas.acore.server.api.CharacterApi;
 import net.kwas.acore.server.item.ItemDatabase;
-import net.kwas.acore.server.spell.Spell;
+import net.kwas.acore.server.model.Character;
+import net.kwas.acore.server.model.Item;
+import net.kwas.acore.server.model.Spell;
 import net.kwas.acore.server.spell.SpellDatabase;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
-public class CharacterController {
+public class CharacterController implements CharacterApi {
 
   private final CharacterDatabase characterDb;
   private final ItemDatabase itemDb;
@@ -23,34 +26,33 @@ public class CharacterController {
     this.spellDb = spellDb;
   }
 
-  @GetMapping("/api/character")
-  public Collection<Character> getCharacters() {
+  @Override
+  public Character getCharacter(Long characterId) {
+    return characterDb.getCharacter(characterId);
+  }
+
+  @Override
+  public List<Character> getCharacters() {
     return characterDb.getCharacters();
   }
 
-  @GetMapping("/api/character/{id}")
-  public Character getCharacter(@PathVariable long id) {
-    return characterDb.getCharacter(id);
+  // TODO: Add 404 support
+  @Override
+  public List<Item> getItemsForCharacter(Long characterId) {
+    return itemDb.getItemsForCharacter(characterId);
   }
 
-  @GetMapping("/api/character/{id}/item")
-  public Collection<Item> getItemsForCharacter(@PathVariable long id) {
-    return itemDb.getItemsForCharacter(id);
-  }
-
-  @GetMapping("/api/character/{id}/spell")
-  public Collection<Spell> getSpellsForCharacter(@PathVariable long id) {
-    var characterInfo = characterDb.getCharacterInfo(id);
-    return spellDb.getSpellsForCharacter(id, characterInfo);
-  }
-
-  // TODO: Add a force parameter
-  // By default return 404 if character does not have the spell
-  // With force, it will always resolve the spell
-  @GetMapping("/api/character/{id}/spell/{spellId}")
-  public Spell getSpellForCharacter(@PathVariable long id, @PathVariable long spellId) {
-    var characterInfo = characterDb.getCharacterInfo(id);
+  @Override
+  public Spell getSpellForCharacter(Long characterId, Long spellId) {
+    var characterInfo = characterDb.getCharacterInfo(characterId);
     return spellDb.getSpellForCharacter(spellId, characterInfo);
+  }
+
+  // TODO: Add 404 support
+  @Override
+  public List<Spell> getSpellsForCharacter(Long characterId) {
+    var characterInfo = characterDb.getCharacterInfo(characterId);
+    return spellDb.getSpellsForCharacter(characterId, characterInfo);
   }
 
 }

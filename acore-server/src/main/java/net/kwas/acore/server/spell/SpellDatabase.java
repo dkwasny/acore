@@ -6,10 +6,12 @@ import net.kwas.acore.antlr.resolver.context.CharacterInfo;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
 import net.kwas.acore.antlr.resolver.context.SpellInfo;
 import net.kwas.acore.common.Gender;
+import net.kwas.acore.server.model.Spell;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +62,7 @@ public class SpellDatabase {
     return createSpell(id);
   }
 
-  public Collection<Spell> getSpells() {
+  public List<Spell> getSpells() {
     return rawSpellMap.keySet().stream()
       .map(this::createSpell)
       .toList();
@@ -70,13 +72,13 @@ public class SpellDatabase {
     return createSpell(spellId, characterInfo);
   }
 
-  public Collection<Spell> getSpellsForCharacter(long characterId, CharacterInfo characterInfo) {
+  public List<Spell> getSpellsForCharacter(long characterId, CharacterInfo characterInfo) {
     return queries.getSpellIdsForCharacter(characterId).stream()
       .map(x -> createSpell(x, characterInfo))
       .toList();
   }
 
-  public Collection<Spell> searchName(String query) {
+  public List<Spell> searchName(String query) {
     return rawSpellMap.values().stream()
       .filter(x -> x.name().contains(query))
       .map(RawSpell::id)
@@ -84,7 +86,7 @@ public class SpellDatabase {
       .toList();
   }
 
-  public Collection<Spell> searchDescription(String query) {
+  public List<Spell> searchDescription(String query) {
     return rawSpellMap.values().stream()
       .filter(x -> x.rawDescription().contains(query))
       .map(RawSpell::id)

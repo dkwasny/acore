@@ -1,5 +1,6 @@
 package net.kwas.acore.server.character;
 
+import net.kwas.acore.server.model.Character;
 import net.kwas.acore.antlr.resolver.context.CharacterInfo;
 import net.kwas.acore.common.CharacterClass;
 import net.kwas.acore.common.Gender;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,7 +44,7 @@ public class CharacterDatabase {
     this.characterXpMap = characterXpMap;
   }
 
-  public Collection<Character> getCharacters() {
+  public List<Character> getCharacters() {
     return AcoreUtils.iterableToStream(repo.findAll())
       .map(this::createCharacter)
       .toList();

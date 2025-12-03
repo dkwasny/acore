@@ -1,10 +1,12 @@
 package net.kwas.acore.server.item;
 
+import net.kwas.acore.server.model.Item;
 import net.kwas.acore.server.util.Icons;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -18,7 +20,7 @@ public class ItemDatabase {
     this.iconMap = iconMap;
   }
 
-  public Collection<Item> getItems() {
+  public List<Item> getItems() {
     return queries.getItems().stream()
       .map(this::createItem)
       .toList();
@@ -29,7 +31,7 @@ public class ItemDatabase {
     return createItem(sqlItemSummary);
   }
 
-  public Collection<Item> getItemsForCharacter(long characterId) {
+  public List<Item> getItemsForCharacter(long characterId) {
     return queries.getItemsForCharacter(characterId).stream()
       .map(this::createItem)
       .toList();

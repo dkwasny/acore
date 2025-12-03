@@ -1,5 +1,6 @@
 package net.kwas.acore.server.spell;
 
+import net.kwas.acore.server.model.Spell;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,7 @@ public class SpellController {
   }
 
   @GetMapping("/api/spell")
-  public Collection<Spell> getSpells() {
+  public List<Spell> getSpells() {
     return spellDb.getSpells();
   }
 
@@ -31,12 +32,12 @@ public class SpellController {
 
   @GetMapping("/api/spell/{id}/name")
   public String getSpellName(@PathVariable long id) {
-    return spellDb.getSpell(id).name();
+    return spellDb.getSpell(id).getName();
   }
 
   @GetMapping("/api/spell/{id}/description")
   public String getSpellDescription(@PathVariable long id) {
-    return spellDb.getSpell(id).description();
+    return spellDb.getSpell(id).getDescription();
   }
 
   @GetMapping("/api/spell/search")
@@ -53,9 +54,9 @@ public class SpellController {
   private Function<Spell, String> getStringRetriever(String searchField) {
     switch (searchField) {
       case "name":
-        return Spell::name;
+        return Spell::getName;
       case "description":
-        return Spell::description;
+        return Spell::getDescription;
       default:
         throw new RuntimeException("Unexpected search field: " + searchField);
     }

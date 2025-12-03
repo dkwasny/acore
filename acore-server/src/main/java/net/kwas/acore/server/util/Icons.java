@@ -4,14 +4,17 @@ import net.kwas.acore.common.CharacterClass;
 import net.kwas.acore.common.Gender;
 import net.kwas.acore.common.Race;
 
+import java.net.URI;
+
 public class Icons {
 
   private static final String BASE_URL = "https://wow.zamimg.com/images/wow/icons/small/";
   private static final String FILE_EXTENSION = ".jpg";
 
-  public static String getIconUrl(String rawReference) {
+  public static URI getIconUrl(String rawReference) {
     if (rawReference == null) {
-      return "";
+      // TODO: is this valid and necessary?
+      return URI.create("");
     }
 
     var split = rawReference.split("\\\\");
@@ -21,7 +24,7 @@ public class Icons {
     return getUrl(lowerCase);
   }
 
-  public static String getCharacterIconUrl(Race race, Gender gender) {
+  public static URI getCharacterIconUrl(Race race, Gender gender) {
     var normalizedRace = normalizeEnumName(race.name());
     var normalizedGender = normalizeEnumName(gender.name());
     var iconName = "race_" + normalizedRace + "_" + normalizedGender;
@@ -29,7 +32,7 @@ public class Icons {
     return getUrl(iconName);
   }
 
-  public static String getCharacterClassIconUrl(CharacterClass charClass) {
+  public static URI getCharacterClassIconUrl(CharacterClass charClass) {
     var normalizedCharClass = normalizeEnumName(charClass.name());
     var iconName = "class_" + normalizedCharClass;
 
@@ -40,8 +43,11 @@ public class Icons {
     return value.replace("_", "").toLowerCase();
   }
 
-  private static String getUrl(String iconName) {
-    return BASE_URL + iconName + FILE_EXTENSION;
+  private static URI getUrl(String iconName) {
+    var unsanitized = BASE_URL + iconName + FILE_EXTENSION;
+    // There are a few icon names that have unnecessary spaces both around and within the string.
+    var sanitized = unsanitized.replace(" ", "");
+    return URI.create(sanitized);
   }
 
 }

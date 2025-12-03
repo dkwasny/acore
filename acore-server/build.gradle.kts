@@ -72,11 +72,18 @@ openApiGenerate {
   apiPackage = "net.kwas.acore.server.api"
   invokerPackage = "net.kwas.acore.server.invoker"
   modelPackage = "net.kwas.acore.server.model"
+  importMappings = mapOf(
+    "Race" to "net.kwas.acore.common.Race",
+    "CharacterClass" to "net.kwas.acore.common.CharacterClass",
+    "Gender" to "net.kwas.acore.common.Gender"
+  )
   configOptions = mapOf(
     "dateLibrary" to "java8",
     "library" to "spring-boot",
     "useSpringBoot3" to "true",
+    // Only generate interfaces.  I will handle the implementations.
     "interfaceOnly" to "true",
+    "requestMappingMode" to "api_interface",
     // Using OpenAPI's nullable requires another dependency.
     // Turn it back on if I need it.
     "openApiNullable" to "false",
