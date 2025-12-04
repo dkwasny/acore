@@ -20,9 +20,20 @@ servers:
         default: "8080"
         description: The port of the server
 
+tags:
+  - name: Character
+    description: Access character information
+  - name: Item
+    description: Access item information
+  - name: Item Template
+    description: Access item template information
+  - name: Spell
+    description: Access spell information
+
 paths:
   /character:
     get:
+      tags: [ Character ]
       summary: Returns all characters
       operationId: getCharacters
       responses:
@@ -34,6 +45,7 @@ paths:
                 $ref: "#/components/schemas/Characters"
   /character/{characterId}:
     get:
+      tags: [ Character ]
       summary: Returns a character
       operationId: getCharacter
       parameters:
@@ -47,6 +59,7 @@ paths:
                 $ref: "#/components/schemas/Character"
   /character/{characterId}/item:
     get:
+      tags: [ Character, Item ]
       summary: Returns all items owned by a character
       operationId: getItemsForCharacter
       parameters:
@@ -60,6 +73,7 @@ paths:
                 $ref: "#/components/schemas/Items"
   /character/{characterId}/spell:
     get:
+      tags: [ Character, Spell ]
       summary: Returns all spells owned by a character
       operationId: getSpellsForCharacter
       parameters:
@@ -73,10 +87,103 @@ paths:
                 $ref: "#/components/schemas/Spells"
   /character/{characterId}/spell/{spellId}:
     get:
+      tags: [ Character, Spell ]
       summary: Returns a spell from the context of the specified character
       operationId: getSpellForCharacter
       parameters:
         - $ref: "#/components/parameters/characterId"
+        - $ref: "#/components/parameters/spellId"
+      responses:
+        "200":
+          description: A JSON object of the spell
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Spell"
+  /item:
+    get:
+      tags: [ Item ]
+      summary: Returns all items
+      operationId: getItems
+      responses:
+        "200":
+          description: A JSON array of items
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Items"
+  /item/{itemId}:
+    get:
+      tags: [ Item ]
+      summary: Returns an item
+      operationId: getItem
+      parameters:
+        - $ref: "#/components/parameters/itemId"
+      responses:
+        "200":
+          description: A JSON object of the item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+  /item-template:
+    get:
+      tags: [ Item Template ]
+      summary: Returns all item templates
+      operationId: getItemTemplates
+      responses:
+        "200":
+          description: A JSON array of item templates
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemTemplates"
+  /item-template/{itemTemplateId}:
+    get:
+      tags: [ Item Template ]
+      summary: Returns an item template
+      operationId: getItemTemplate
+      parameters:
+        - $ref: "#/components/parameters/itemTemplateId"
+      responses:
+        "200":
+          description: A JSON object of the item template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemTemplate"
+  /spell:
+    get:
+      tags: [ Spell ]
+      summary: Returns all spells or a subset based on the provided criteria
+      operationId: getSpells
+      parameters:
+        - name: searchField
+          in: query
+          description: The field to search on
+          schema:
+            type: string
+            enum:
+              - name
+              - description
+        - name: searchQuery
+          in: query
+          description: The value to search for
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A JSON array of spells
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Spells"
+  /spell/{spellId}:
+    get:
+      tags: [ Spell ]
+      summary: Returns a spell
+      operationId: getSpell
+      parameters:
         - $ref: "#/components/parameters/spellId"
       responses:
         "200":
@@ -241,6 +348,32 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Item"
+    ItemTemplate:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - iconUrl
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        description:
+          type: string
+          nullable: false
+        iconUrl:
+          type: string
+          format: uri
+          nullable: false
+    ItemTemplates:
+      type: array
+      items:
+        $ref: "#/components/schemas/ItemTemplate"
     Spell:
       type: object
       required:
@@ -271,6 +404,7 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Spell"
+
   parameters:
     characterId:
       name: characterId
@@ -290,4 +424,21 @@ components:
         type: integer
         format: int64
         nullable: false
-
+    itemId:
+      name: itemId
+      in: path
+      description: The id of the item instance
+      required: true
+      schema:
+        type: integer
+        format: int64
+        nullable: false
+    itemTemplateId:
+      name: itemTemplateId
+      in: path
+      description: The id of the item template
+      required: true
+      schema:
+        type: integer
+        format: int64
+        nullable: false

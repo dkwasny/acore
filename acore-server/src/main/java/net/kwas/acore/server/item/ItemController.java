@@ -1,5 +1,6 @@
 package net.kwas.acore.server.item;
 
+import net.kwas.acore.server.api.ItemApi;
 import net.kwas.acore.server.model.Item;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RestController
-public class ItemController {
+public class ItemController implements ItemApi {
 
   private final ItemDatabase db;
 
@@ -17,14 +18,14 @@ public class ItemController {
     this.db = db;
   }
 
-  @GetMapping("/api/item")
-  public List<Item> getItems() {
-    return db.getItems();
+  @Override
+  public Item getItem(Long itemId) {
+    return db.getItem(itemId);
   }
 
-  @GetMapping("/api/item/{id}")
-  public Item getItem(@PathVariable long id) {
-    return db.getItem(id);
+  @Override
+  public List<Item> getItems() {
+    return db.getItems();
   }
 
 }

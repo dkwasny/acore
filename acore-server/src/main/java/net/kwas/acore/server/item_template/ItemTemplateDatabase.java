@@ -1,11 +1,13 @@
 package net.kwas.acore.server.item_template;
 
+import net.kwas.acore.server.model.ItemTemplate;
 import net.kwas.acore.server.util.AcoreUtils;
 import net.kwas.acore.server.util.Icons;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,7 +21,7 @@ public class ItemTemplateDatabase {
     this.repo = repo;
   }
 
-  public Collection<ItemTemplate> getAll() {
+  public List<ItemTemplate> getAll() {
     var sqlData = repo.findAll();
     return AcoreUtils.iterableToStream(sqlData)
       .map(this::toItemTemplate)

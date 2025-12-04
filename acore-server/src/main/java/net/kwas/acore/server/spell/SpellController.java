@@ -1,5 +1,6 @@
 package net.kwas.acore.server.spell;
 
+import net.kwas.acore.server.api.SpellApi;
 import net.kwas.acore.server.model.Spell;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +13,7 @@ import java.util.function.Function;
 
 // TODO: 404 if not found for all methods
 @RestController
-public class SpellController {
+public class SpellController implements SpellApi {
 
   private final SpellDatabase spellDb;
 
@@ -20,46 +21,32 @@ public class SpellController {
     this.spellDb = spellDb;
   }
 
-  @GetMapping("/api/spell")
-  public List<Spell> getSpells() {
-    return spellDb.getSpells();
+  @Override
+  public Spell getSpell(Long spellId) {
+    return spellDb.getSpell(spellId);
   }
 
-  @GetMapping("/api/spell/{id}")
-  public Spell getSpell(@PathVariable long id) {
-    return spellDb.getSpell(id);
-  }
+  @Override
+  public List<Spell> getSpells(String searchField, String searchQuery) {
+    var retVal = spellDb.getSpells();
 
-  @GetMapping("/api/spell/{id}/name")
-  public String getSpellName(@PathVariable long id) {
-    return spellDb.getSpell(id).getName();
-  }
+    if (searchField != null && searchQuery != null) {
+      var stringRetriever = getStringRetriever(searchField);
 
-  @GetMapping("/api/spell/{id}/description")
-  public String getSpellDescription(@PathVariable long id) {
-    return spellDb.getSpell(id).getDescription();
-  }
+      retVal = retVal.stream()
+        .filter(x -> stringRetriever.apply(x).contains(searchQuery))
+        .toList();
+    }
 
-  @GetMapping("/api/spell/search")
-  public List<Spell> searchSpells(@RequestParam String searchField, @RequestParam String query) {
-    var spells = spellDb.getSpells();
-
-    var stringRetriever = getStringRetriever(searchField);
-
-    return spells.stream()
-      .filter(x -> stringRetriever.apply(x).contains(query))
-      .toList();
+    return retVal;
   }
 
   private Function<Spell, String> getStringRetriever(String searchField) {
-    switch (searchField) {
-      case "name":
-        return Spell::getName;
-      case "description":
-        return Spell::getDescription;
-      default:
-        throw new RuntimeException("Unexpected search field: " + searchField);
-    }
+    return switch (searchField) {
+      case "name" -> Spell::getName;
+      case "description" -> Spell::getDescription;
+      default -> throw new RuntimeException("Unexpected search field: " + searchField);
+    };
   }
 
 }

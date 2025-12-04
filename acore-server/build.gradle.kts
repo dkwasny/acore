@@ -72,7 +72,7 @@ openApiGenerate {
   apiPackage = "net.kwas.acore.server.api"
   invokerPackage = "net.kwas.acore.server.invoker"
   modelPackage = "net.kwas.acore.server.model"
-  importMappings = mapOf(
+  schemaMappings = mapOf(
     "Race" to "net.kwas.acore.common.Race",
     "CharacterClass" to "net.kwas.acore.common.CharacterClass",
     "Gender" to "net.kwas.acore.common.Gender"
@@ -80,6 +80,7 @@ openApiGenerate {
   configOptions = mapOf(
     "dateLibrary" to "java8",
     "library" to "spring-boot",
+    "configPackage" to "net.kwas.acore.server.config",
     "useSpringBoot3" to "true",
     // Only generate interfaces.  I will handle the implementations.
     "interfaceOnly" to "true",
