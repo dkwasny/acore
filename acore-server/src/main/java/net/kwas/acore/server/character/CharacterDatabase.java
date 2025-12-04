@@ -1,17 +1,16 @@
 package net.kwas.acore.server.character;
 
-import net.kwas.acore.server.model.Character;
 import net.kwas.acore.antlr.resolver.context.CharacterInfo;
 import net.kwas.acore.common.CharacterClass;
 import net.kwas.acore.common.Gender;
 import net.kwas.acore.common.Race;
+import net.kwas.acore.server.model.Character;
 import net.kwas.acore.server.spell.SpellQueries;
 import net.kwas.acore.server.util.AcoreUtils;
 import net.kwas.acore.server.util.Icons;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
