@@ -37,4 +37,5 @@ server emulator.
    * Vite Dev: http://localhost:5173
 
 ### Swagger UI
-The [Swagger UI](https://swagger.io/) for the API can be accessed via http://localhost:8080/swagger.
+The [Swagger UI](https://swagger.io/) for the API can be accessed via the `/swagger` endpoint
+on the [Spring](http://localhost:8080/swagger) or [Vite](http://localhost:5173/swagger) server.
