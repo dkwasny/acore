@@ -13,7 +13,22 @@ public class MainWeaponSpeedResolverTest {
 
   @Test
   public void returnsMainWeaponSpeed() {
-    var charInfo = new CharacterInfo(1, Gender.MALE,0L,0L,0L,0L,1f,2f,3f,4f,2.75f,false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      1,
+      Gender.MALE,
+      0L,
+      0L,
+      0L,
+      0L,
+      1f,
+      2f,
+      3f,
+      4f,
+      2.75f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new MainWeaponSpeedResolver();

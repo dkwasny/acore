@@ -13,7 +13,22 @@ public class HearthstoneLocationResolverTest {
 
   @Test
   public void returnsHearthstoneLocation() {
-    var charInfo = new CharacterInfo(1, Gender.MALE, 0L,0L,0L,0L,0f,0f,0f,0f,0f,false, Set.of(), "Stormwind");
+    var charInfo = new CharacterInfo(
+      1,
+      Gender.MALE,
+      0L,
+      0L,
+      0L,
+      0L,
+      0f,
+      0f,
+      0f,
+      0f,
+      0f,
+      false,
+      Set.of(),
+      "Stormwind"
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new HearthstoneLocationResolver();

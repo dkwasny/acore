@@ -11,20 +11,36 @@ import java.util.Set;
 
 public class MainWeaponDamageResolverTest {
 
+  private final SpellContext ctx = new SpellContext(
+    0L,
+    Map.of(),
+    new CharacterInfo(
+      1,
+      Gender.MALE,
+      0L,
+      0L,
+      0L,
+      0L,
+      1f,
+      2f,
+      3f,
+      4f,
+      5f,
+      false,
+      Set.of(),
+      ""
+    ),
+    Map.of()
+  );
+
   @Test
   public void minReturnsMinDamage() {
-    var charInfo = new CharacterInfo(1, Gender.MALE,0L,0L,0L,0L,1f,2f,3f,4f,5f,false, Set.of(), "");
-    var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
-
     var resolver = new MainWeaponDamageResolver(false);
     Assertions.assertEquals(1.0, resolver.resolveNumber(ctx), 1e-9);
   }
 
   @Test
   public void maxReturnsMaxDamage() {
-    var charInfo = new CharacterInfo(1, Gender.MALE,0L,0L,0L,0L,1f,2f,3f,4f,5f,false, Set.of(), "");
-    var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
-
     var resolver = new MainWeaponDamageResolver(true);
     Assertions.assertEquals(2.0, resolver.resolveNumber(ctx), 1e-9);
   }

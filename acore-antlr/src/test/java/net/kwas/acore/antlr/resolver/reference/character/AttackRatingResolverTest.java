@@ -13,7 +13,22 @@ public class AttackRatingResolverTest {
 
   @Test
   public void attackRatingIsLevelTimesFive() {
-    var charInfo = new CharacterInfo(7, Gender.FEMALE, 0L, 0L, 0L, 0L, 0f, 0f, 0f, 0f, 0f, false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      7,
+      Gender.FEMALE,
+      0L,
+      0L,
+      0L,
+      0L,
+      0f,
+      0f,
+      0f,
+      0f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new AttackRatingResolver();

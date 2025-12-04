@@ -13,7 +13,22 @@ public class LevelResolverTest {
 
   @Test
   public void returnsCharacterLevelAsNumber() {
-    var charInfo = new CharacterInfo(42, Gender.MALE, 0L,0L,0L,0L,0f,0f,0f,0f,0f,false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      42,
+      Gender.MALE,
+      0L,
+      0L,
+      0L,
+      0L,
+      0f,
+      0f,
+      0f,
+      0f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new LevelResolver();

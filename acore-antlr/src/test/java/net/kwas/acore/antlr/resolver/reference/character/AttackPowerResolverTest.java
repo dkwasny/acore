@@ -13,7 +13,22 @@ public class AttackPowerResolverTest {
 
   @Test
   public void returnsAttackPowerFromCharacterInfo() {
-    var charInfo = new CharacterInfo(10, Gender.MALE, 0L, 123L, 0L, 0L, 0f, 0f, 0f, 0f, 0f, false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      10,
+      Gender.MALE,
+      0L,
+      123L,
+      0L,
+      0L,
+      0f,
+      0f,
+      0f,
+      0f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new AttackPowerResolver();

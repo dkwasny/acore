@@ -14,18 +14,36 @@ public class GenderStringResolverTest {
 
   @Test
   public void maleSelectsFirstValue() {
-    var charInfo = new CharacterInfo(1, Gender.MALE, 0L, 0L, 0L, 0L, 0f,0f,0f,0f,0f,false, Set.of(), "");
-    var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
-    var resolver = new GenderStringResolver(List.of("he","she"));
+    var ctx = getSpellCtx(Gender.MALE);
+    var resolver = new GenderStringResolver(List.of("he", "she"));
     Assertions.assertEquals("he", resolver.resolveString(ctx));
   }
 
   @Test
   public void femaleSelectsSecondValue() {
-    var charInfo = new CharacterInfo(1, Gender.FEMALE, 0L, 0L, 0L, 0L, 0f,0f,0f,0f,0f,false, Set.of(), "");
-    var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
-    var resolver = new GenderStringResolver(List.of("he","she"));
+    var ctx = getSpellCtx(Gender.FEMALE);
+    var resolver = new GenderStringResolver(List.of("he", "she"));
     Assertions.assertEquals("she", resolver.resolveString(ctx));
+  }
+
+  private SpellContext getSpellCtx(Gender gender) {
+    var charInfo = new CharacterInfo(
+      1,
+      gender,
+      0L,
+      0L,
+      0L,
+      0L,
+      0f,
+      0f,
+      0f,
+      0f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
+    return new SpellContext(0L, Map.of(), charInfo, Map.of());
   }
 
 }

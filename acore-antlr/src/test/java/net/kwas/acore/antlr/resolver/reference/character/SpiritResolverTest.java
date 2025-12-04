@@ -13,7 +13,22 @@ public class SpiritResolverTest {
 
   @Test
   public void returnsSpiritValue() {
-    var charInfo = new CharacterInfo(1, Gender.MALE,13L,0L,0L,0L,1f,2f,3f,4f,0f,false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      1,
+      Gender.MALE,
+      13L,
+      0L,
+      0L,
+      0L,
+      1f,
+      2f,
+      3f,
+      4f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new SpiritResolver();

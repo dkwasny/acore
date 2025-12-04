@@ -13,7 +13,22 @@ public class RangedAttackPowerResolverTest {
 
   @Test
   public void returnsRangedAttackPower() {
-    var charInfo = new CharacterInfo(1, Gender.MALE,0L,0L,321L,0L,1f,2f,3f,4f,0f,false, Set.of(), "");
+    var charInfo = new CharacterInfo(
+      1,
+      Gender.MALE,
+      0L,
+      0L,
+      321L,
+      0L,
+      1f,
+      2f,
+      3f,
+      4f,
+      0f,
+      false,
+      Set.of(),
+      ""
+    );
     var ctx = new SpellContext(0L, Map.of(), charInfo, Map.of());
 
     var resolver = new RangedAttackPowerResolver();
