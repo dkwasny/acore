@@ -27,6 +27,12 @@ public record SpellInfo(
   long cumulativeAura
 ) {
 
+  // Some spells reference other spells that do not exist in the DBC data.
+  // One example is Great Stamina (4195) that references a version of
+  // Great Stamina (4187) which is not present in the WotLK DBC files.
+  // These are likely old spells that have been superseded by newer
+  // versions (e.g. 61686 for Great Stamina).
+  // This empty spell info is used in such cases.
   public static final SpellInfo EMPTY = new SpellInfo(
     List.of(0, 0, 0),
     List.of(0, 0, 0),
@@ -51,4 +57,5 @@ public record SpellInfo(
     0L,
     0L
   );
+
 }

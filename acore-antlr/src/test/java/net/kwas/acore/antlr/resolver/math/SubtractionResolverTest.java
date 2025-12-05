@@ -2,14 +2,13 @@ package net.kwas.acore.antlr.resolver.math;
 
 import net.kwas.acore.antlr.resolver.NumberResolver;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
+import net.kwas.acore.antlr.resolver.context.SpellContextBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 public class SubtractionResolverTest {
 
-  private final SpellContext ctx = new SpellContext(0L, Map.of(), null, Map.of());
+  private final SpellContext ctx = new SpellContextBuilder().createSpellContext();
 
   @Test
   public void subtractsCorrectly() {

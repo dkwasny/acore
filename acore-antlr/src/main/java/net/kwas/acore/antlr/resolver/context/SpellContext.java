@@ -32,8 +32,8 @@ public class SpellContext {
     return characterInfo;
   }
 
-  public Map<String, NumberResolver> getVariableMap() {
-    return variableMap;
+  public NumberResolver getVariable(String key) {
+    return variableMap.get(key);
   }
 
   public boolean isNextLocalizedStringPlural() {

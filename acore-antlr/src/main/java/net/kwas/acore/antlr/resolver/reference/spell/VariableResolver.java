@@ -7,7 +7,7 @@ public record VariableResolver(String variable) implements NumberResolver {
 
   @Override
   public double resolveNumber(SpellContext ctx) {
-    var resolver = ctx.getVariableMap().get(variable);
+    var resolver = ctx.getVariable(variable);
     if (resolver == null) {
       throw new RuntimeException("Variable not found: " + variable);
     }

@@ -1,37 +1,21 @@
 package net.kwas.acore.antlr.resolver.reference.character;
 
-import net.kwas.acore.antlr.resolver.context.CharacterInfo;
+import net.kwas.acore.antlr.resolver.context.CharacterInfoBuilder;
 import net.kwas.acore.antlr.resolver.context.SpellContext;
-import net.kwas.acore.common.Gender;
+import net.kwas.acore.antlr.resolver.context.SpellContextBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-import java.util.Set;
-
 public class MainWeaponBaseDamageResolverTest {
 
-  private final SpellContext ctx = new SpellContext(
-    0L,
-    Map.of(),
-    new CharacterInfo(
-      1,
-      Gender.MALE,
-      0L,
-      0L,
-      0L,
-      0L,
-      1f,
-      2f,
-      3f,
-      4f,
-      0f,
-      false,
-      Set.of(),
-      ""
-    ),
-    Map.of()
-  );
+  private final SpellContext ctx = new SpellContextBuilder()
+    .characterInfo(
+      new CharacterInfoBuilder()
+        .mainWeaponBaseMinDamage(3f)
+        .mainWeaponBaseMaxDamage(4f)
+        .createCharacterInfo()
+    )
+    .createSpellContext();
 
   @Test
   public void minReturnsBaseMinDamage() {
